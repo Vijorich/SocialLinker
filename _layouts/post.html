@@ -2,6 +2,7 @@
 layout: default
 ---
 <article class="post-single">
+  <p class="post-back"><a href="{{ '/' | relative_url }}" data-i18n="back_home">{{ site.data.locale.ru.back_home }}</a></p>
   <header class="post-header">
     <h1 class="post-title">{{ page.title | escape }}</h1>
     <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
@@ -9,5 +10,4 @@ layout: default
   <div class="post-content">
     {{ content }}
   </div>
-  <p class="post-back"><a href="{{ '/' | relative_url }}" data-i18n="back_home">{{ site.data.locale.ru.back_home }}</a></p>
 </article>

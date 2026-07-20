@@ -8,7 +8,7 @@
   --accent: #fa7979;
   --accent-bg: rgba(250, 137, 137, 0.1);
   --max-width: 640px;
-  --radius: 12px;
+  --radius: 16px;
 }
 
 * { box-sizing: border-box; }
@@ -33,7 +33,7 @@ a { color: var(--accent); }
 }
 
 /* Single post reuses .container */
-.post-single { max-width: var(--max-width); margin: 0 auto; }
+.post-single { max-width: var(--max-width); margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
 
 /* Hero */
 .hero {
@@ -129,10 +129,10 @@ a { color: var(--accent); }
   padding: 0.9rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  --r-tl: var(--radius);
-  --r-tr: var(--radius);
-  --r-bl: var(--radius);
-  --r-br: var(--radius);
+  --r-tl: 8px;
+  --r-tr: 8px;
+  --r-bl: 8px;
+  --r-br: 8px;
   border-radius: var(--r-tl) var(--r-tr) var(--r-br) var(--r-bl);
   color: var(--fg);
   text-decoration: none;
@@ -198,7 +198,7 @@ a { color: var(--accent); }
 .post-content { line-height: 1.75; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
 .post-content h1, .post-content h2, .post-content h3 { letter-spacing: -0.02em; }
-.post-back { margin-top: 3rem; }
+.post-back { margin: 0 0 2rem; }
 .post-back a { color: var(--accent); text-decoration: none; }
 .post-back a:hover { text-decoration: underline; }
 
