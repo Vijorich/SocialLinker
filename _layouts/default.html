@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ site.description | escape }}">
+  <meta name="author" content="{{ site.author | escape }}">
+  <meta property="og:title" content="{{ site.title }}">
+  <meta property="og:description" content="{{ site.description | escape }}">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{{ site.data.profile.avatar | absolute_url }}">
+  <link rel="icon" href="{{ site.data.profile.avatar | relative_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+  <script>window.__LOCALE__ = {{ site.data.locale | jsonify }};</script>
+</head>
+<body>
+{{ content }}
+<script src="{{ '/assets/i18n.js' | relative_url }}" defer></script>
+</body>
+</html>

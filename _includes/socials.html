@@ -1,0 +1,13 @@
+<section class="section socials" id="links">
+  <h2 class="section-title" data-i18n="nav_links">{{ site.data.locale.ru.nav_links }}</h2>
+  <ul class="link-list">
+    {% for item in site.data.social.items %}
+    <li>
+      <a href="{{ item.url }}" target="_blank" rel="noopener me" class="link-card">
+        {% include icon.html name=item.icon %}
+        <span>{{ item.name | escape }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>

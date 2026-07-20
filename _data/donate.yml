@@ -1,0 +1,10 @@
+items:
+  - name: Boosty
+    url: https://boosty.to/your-username
+    icon: heart
+  - name: Buy Me a Coffee
+    url: https://www.buymeacoffee.com/your-username
+    icon: coffee
+  - name: PayPal
+    url: https://paypal.me/your-username
+    icon: paypal

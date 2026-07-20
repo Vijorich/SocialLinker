@@ -1,0 +1,7 @@
+<header class="hero">
+  <img class="avatar" src="{{ site.data.profile.avatar | relative_url }}" alt="{{ site.data.profile.nick | escape }}" width="120" height="120">
+  <h1 class="nick">{{ site.data.profile.nick | escape }}</h1>
+  <button class="lang-toggle" type="button" data-lang-toggle aria-label="Switch language">
+    <span data-i18n="toggle_lang">{{ site.data.locale.ru.toggle_lang }}</span>
+  </button>
+</header>

@@ -1,0 +1,13 @@
+<section class="section donate" id="support">
+  <h2 class="section-title" data-i18n="nav_support">{{ site.data.locale.ru.nav_support }}</h2>
+  <ul class="link-list donate-list">
+    {% for item in site.data.donate.items %}
+    <li>
+      <a href="{{ item.url }}" target="_blank" rel="noopener" class="link-card donate-card">
+        {% include icon.html name=item.icon %}
+        <span>{{ item.name | escape }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>

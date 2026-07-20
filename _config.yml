@@ -1,0 +1,39 @@
+# Site
+title: SocialLinker
+description: "Personal business card."
+author: your_nick
+lang: ru
+
+# ponytail: project-page URL. For user page (user.github.io), set url + leave baseurl empty.
+url: ""
+baseurl: "/SocialLinker"
+
+# Build
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Plugins (GH Pages whitelist)
+plugins:
+  - jekyll-feed
+
+feed:
+  path: /feed.xml
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+
+# Exclude
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
