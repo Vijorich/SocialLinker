@@ -20,7 +20,7 @@ body {
   background: var(--bg);
   color: var(--fg);
   line-height: 1.6;
-  font-size: 16px;
+  font-size: 1rem;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -30,10 +30,12 @@ a { color: var(--accent); }
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 2.5rem 1.25rem 4rem;
+  /* ponytail: rem scale here matches body's 1rem=16px */
+  font-size: 1rem;
 }
 
 /* Single post reuses .container */
-.post-single { max-width: var(--max-width); margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+.post-single { max-width: var(--max-width); margin: 0 auto; padding: 2.5rem 1.25rem 4rem; font-size: 1rem; }
 
 /* Hero */
 .hero {
@@ -43,12 +45,12 @@ a { color: var(--accent); }
   padding-top: 1.5rem;
 }
 .avatar {
-  width: 120px;
-  height: 120px;
+  width: 7.5rem;
+  height: 7.5rem;
   border-radius: 50%;
   display: block;
   margin: 0 auto 1rem;
-  border: 2px solid var(--border);
+  border: 0.125rem solid var(--border);
 }
 .nick {
   font-size: 1.75rem;
@@ -62,8 +64,8 @@ a { color: var(--accent); }
   right: 0;
   background: var(--bg-card);
   color: var(--fg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 0.0625rem solid var(--border);
+  border-radius: 0.5rem;
   padding: 0.35rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 700;
@@ -78,12 +80,12 @@ a { color: var(--accent); }
 /* Sections */
 .section { margin-bottom: 3rem; }
 .section-title {
-  font-size: 0.78rem;
+  font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--fg-muted);
-  margin: 0 0 1rem;
-  font-weight: 600;
+  margin: 0 0 1.25rem;
+  font-weight: 700;
 }
 
 /* Bio + post prose share styling */
@@ -94,21 +96,21 @@ a { color: var(--accent); }
 .bio-content code, .post-content code {
   background: var(--bg-card);
   padding: 0.15em 0.4em;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   font-size: 0.9em;
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 /* Inline code only above; fenced blocks styled below */
 .bio-content pre, .post-content pre {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   padding: 1rem;
   border-radius: var(--radius);
   overflow-x: auto;
 }
 .bio-content pre code, .post-content pre code { background: none; border: none; padding: 0; }
 .bio-content blockquote, .post-content blockquote {
-  border-left: 3px solid var(--accent);
+  border-left: 0.1875rem solid var(--accent);
   margin: 1rem 0;
   padding: 0.25rem 1rem;
   color: var(--fg-muted);
@@ -122,7 +124,7 @@ a { color: var(--accent); }
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 .link-list li { margin: 0; }
 .link-card {
@@ -131,21 +133,21 @@ a { color: var(--accent); }
   gap: 0.75rem;
   padding: 0.9rem 1rem;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 0.0625rem solid var(--border);
+  border-radius: 0.5rem;
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
 /* Cards form one block: outer corners rounded to 16, inner stay 8 */
-.link-list li:first-child .link-card { border-top-left-radius: 16px; border-top-right-radius: 16px; }
-.link-list li:last-child .link-card { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+.link-list li:first-child .link-card { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
+.link-list li:last-child .link-card { border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 @media (hover: hover) {
 .link-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent);
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
 }
 }
 .link-card svg { flex-shrink: 0; }
@@ -153,7 +155,7 @@ a { color: var(--accent); }
 /* Donate block */
 .donate-list .link-card {
   background: var(--accent-bg);
-  border-color: rgba(250, 137, 137, 0.4);
+  border-color: rgba(250, 137, 137, 0.4); /* ponytail: color, not size */
 }
 @media (hover: hover) {
 .donate-list .link-card:hover {
@@ -172,8 +174,7 @@ a { color: var(--accent); }
   align-items: baseline;
   gap: 1rem;
 }
-.post-card:hover .post-title { color: var(--accent); }
-.post-title { font-weight: 600; transition: color 0.15s; }
+.post-title { font-weight: 600; }
 .post-date { color: var(--fg-muted); font-size: 0.85rem; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .post-excerpt {
   display: block;
