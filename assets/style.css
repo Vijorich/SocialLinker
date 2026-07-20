@@ -33,7 +33,7 @@ a { color: var(--accent); }
 }
 
 /* Single post reuses .container */
-.post-single { max-width: var(--max-width); }
+.post-single { max-width: var(--max-width); margin: 0 auto; }
 
 /* Hero */
 .hero {

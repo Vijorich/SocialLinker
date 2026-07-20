@@ -2,8 +2,8 @@
   <h2 class="section-title" data-i18n="nav_bio">{{ site.data.locale.ru.nav_bio }}</h2>
   <div class="bio-content"
        data-i18n-bio
-       data-bio-ru="{{ site.data.profile.bio.ru | markdownify | strip_newlines | escape }}"
-       data-bio-en="{{ site.data.profile.bio.en | markdownify | strip_newlines | escape }}">
+       data-bio-ru="{{ site.data.profile.bio.ru | markdownify | strip_newlines }}"
+       data-bio-en="{{ site.data.profile.bio.en | markdownify | strip_newlines }}">
     {{ site.data.profile.bio.ru | markdownify }}
   </div>
 </section>
