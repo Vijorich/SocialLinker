@@ -1,9 +1,11 @@
 /* Rouge syntax highlighting — warm theme */
+/* Single layer: no double border/card-in-card. */
 .highlight {
+  position: relative;
   background: #1f1616;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1rem 1.25rem;
+  padding: 2.25rem 1.25rem 1rem;
   overflow-x: auto;
   margin: 1.5rem 0;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -12,6 +14,44 @@
 }
 .highlight pre { margin: 0; }
 .highlight code { background: none; padding: 0; }
+
+/* Language label, top-left */
+.highlight::before {
+  position: absolute;
+  top: 0.6rem;
+  left: 1.25rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+/* ponytail: kramdown puts language class on outer div, not .highlight.
+   Map common languages; add more as needed. */
+.language-csharp.highlighter-rouge .highlight::before { content: "C#"; }
+.language-cs.highlighter-rouge .highlight::before { content: "C#"; }
+.language-bash.highlighter-rouge .highlight::before { content: "Bash"; }
+.language-sh.highlighter-rouge .highlight::before { content: "Shell"; }
+.language-js.highlighter-rouge .highlight::before { content: "JavaScript"; }
+.language-javascript.highlighter-rouge .highlight::before { content: "JavaScript"; }
+.language-ts.highlighter-rouge .highlight::before { content: "TypeScript"; }
+.language-typescript.highlighter-rouge .highlight::before { content: "TypeScript"; }
+.language-json.highlighter-rouge .highlight::before { content: "JSON"; }
+.language-yaml.highlighter-rouge .highlight::before { content: "YAML"; }
+.language-yml.highlighter-rouge .highlight::before { content: "YAML"; }
+.language-html.highlighter-rouge .highlight::before { content: "HTML"; }
+.language-css.highlighter-rouge .highlight::before { content: "CSS"; }
+.language-xml.highlighter-rouge .highlight::before { content: "XML"; }
+.language-py.highlighter-rouge .highlight::before { content: "Python"; }
+.language-python.highlighter-rouge .highlight::before { content: "Python"; }
+.language-rb.highlighter-rouge .highlight::before { content: "Ruby"; }
+.language-ruby.highlighter-rouge .highlight::before { content: "Ruby"; }
+.language-go.highlighter-rouge .highlight::before { content: "Go"; }
+.language-sql.highlighter-rouge .highlight::before { content: "SQL"; }
+.language-dockerfile.highlighter-rouge .highlight::before { content: "Dockerfile"; }
+
+/* Token colors */
 .highlight .c, .highlight .c1, .highlight .cm, .highlight .cs { color: #8a7a7a; font-style: italic; }
 .highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt { color: #fa7979; }
 .highlight .o, .highlight .ow { color: #e7e4e4; }

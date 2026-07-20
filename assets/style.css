@@ -98,14 +98,7 @@ a { color: var(--accent); }
   font-size: 0.9em;
   border: 1px solid var(--border);
 }
-.bio-content pre, .post-content pre {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 1rem;
-  border-radius: var(--radius);
-  overflow-x: auto;
-}
-.bio-content pre code, .post-content pre code { background: none; border: none; padding: 0; }
+/* Inline code only above; fenced blocks styled via .highlight in syntax.css */
 .bio-content blockquote, .post-content blockquote {
   border-left: 3px solid var(--accent);
   margin: 1rem 0;
