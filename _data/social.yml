@@ -9,12 +9,9 @@ items:
   - name: YouTube Second
     url: https://www.youtube.com/@vijorsup
     icon: youtube
-  - name: YouTube Second
-    url: https://www.youtube.com/@vijorsup
-    icon: youtube
   - name: Telegram channel
     url: https://t.me/zerotaste
     icon: telegram
-  - name: VK сообщество
+  - name: VK community
     url: https://vk.ru/vijorich
     icon: vk
