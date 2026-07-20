@@ -2,16 +2,20 @@
   <h2 class="section-title" data-i18n="nav_posts">{{ site.data.locale.ru.nav_posts }}</h2>
   {% assign posts = site.posts | sort: "date" | reverse %}
   {% if posts.size > 0 %}
-  <ul class="post-list">
+  <ul class="link-list post-list">
     {% for post in posts limit: 10 %}
-    <li class="post-item">
-      <a href="{{ post.url | relative_url }}" class="post-link">
-        <span class="post-title">{{ post.title | escape }}</span>
-        <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+    <li>
+      <a href="{{ post.url | relative_url }}" class="link-card post-card">
+        <span class="post-card-body">
+          <span class="post-card-head">
+            <span class="post-title">{{ post.title | escape }}</span>
+            <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+          </span>
+          {% if post.excerpt %}
+          <span class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</span>
+          {% endif %}
+        </span>
       </a>
-      {% if post.excerpt %}
-      <p class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
-      {% endif %}
     </li>
     {% endfor %}
   </ul>
