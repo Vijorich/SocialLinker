@@ -1,64 +1,61 @@
-/* Rouge syntax highlighting — warm theme */
-/* Single layer: no double border/card-in-card. */
+/* Rouge syntax highlighting — warm, minimal theme */
 .highlight {
   position: relative;
-  background: #1f1616;
+  background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2.25rem 1.25rem 1rem;
+  border-radius: 10px;
+  padding: 2.4rem 1.1rem 1.1rem;
   overflow-x: auto;
   margin: 1.5rem 0;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.875rem;
+  line-height: 1.65;
 }
 .highlight pre { margin: 0; }
 .highlight code { background: none; padding: 0; }
 
-/* Language label, top-left */
-.highlight::before {
-  position: absolute;
-  top: 0.6rem;
-  left: 1.25rem;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-}
-/* ponytail: kramdown puts language class on outer div, not .highlight.
-   Map common languages; add more as needed. */
-.language-csharp.highlighter-rouge .highlight::before { content: "C#"; }
+/* Language label, top-left — single source, keyed off kramdown's language-* class */
+.language-csharp.highlighter-rouge .highlight::before,
 .language-cs.highlighter-rouge .highlight::before { content: "C#"; }
-.language-bash.highlighter-rouge .highlight::before { content: "Bash"; }
-.language-sh.highlighter-rouge .highlight::before { content: "Shell"; }
-.language-js.highlighter-rouge .highlight::before { content: "JavaScript"; }
+.language-bash.highlighter-rouge .highlight::before,
+.language-sh.highlighter-rouge .highlight::before { content: "Bash"; }
+.language-js.highlighter-rouge .highlight::before,
 .language-javascript.highlighter-rouge .highlight::before { content: "JavaScript"; }
-.language-ts.highlighter-rouge .highlight::before { content: "TypeScript"; }
+.language-ts.highlighter-rouge .highlight::before,
 .language-typescript.highlighter-rouge .highlight::before { content: "TypeScript"; }
 .language-json.highlighter-rouge .highlight::before { content: "JSON"; }
-.language-yaml.highlighter-rouge .highlight::before { content: "YAML"; }
+.language-yaml.highlighter-rouge .highlight::before,
 .language-yml.highlighter-rouge .highlight::before { content: "YAML"; }
 .language-html.highlighter-rouge .highlight::before { content: "HTML"; }
 .language-css.highlighter-rouge .highlight::before { content: "CSS"; }
 .language-xml.highlighter-rouge .highlight::before { content: "XML"; }
-.language-py.highlighter-rouge .highlight::before { content: "Python"; }
+.language-py.highlighter-rouge .highlight::before,
 .language-python.highlighter-rouge .highlight::before { content: "Python"; }
-.language-rb.highlighter-rouge .highlight::before { content: "Ruby"; }
+.language-rb.highlighter-rouge .highlight::before,
 .language-ruby.highlighter-rouge .highlight::before { content: "Ruby"; }
 .language-go.highlighter-rouge .highlight::before { content: "Go"; }
 .language-sql.highlighter-rouge .highlight::before { content: "SQL"; }
 .language-dockerfile.highlighter-rouge .highlight::before { content: "Dockerfile"; }
 
-/* Token colors */
+.highlight::before {
+  position: absolute;
+  top: 0.7rem;
+  left: 1.1rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* Token colors — soft, not neon */
 .highlight .c, .highlight .c1, .highlight .cm, .highlight .cs { color: #8a7a7a; font-style: italic; }
-.highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt { color: #fa7979; }
-.highlight .o, .highlight .ow { color: #e7e4e4; }
-.highlight .n, .highlight .nc, .highlight .nn, .highlight .nf, .highlight .nx { color: #f5c08a; }
-.highlight .s, .highlight .s1, .highlight .s2, .highlight .sc, .highlight .sb, .highlight .si { color: #a8d8a0; }
-.highlight .m, .highlight .mi, .highlight .mf, .highlight .mh { color: #e0a0c0; }
-.highlight .nf, .highlight .fm { color: #f5c08a; }
+.highlight .k, .highlight .kd, .kn, .kp, .kr, .kt { color: #f0a0a0; }
+.highlight .o, .highlight .ow { color: #c9b8b8; }
+.highlight .n, .highlight .nc, .highlight .nn, .highlight .nf, .nx { color: #e8c79a; }
+.highlight .s, .highlight .s1, .s2, .sc, .sb, .si { color: #a8d8a0; }
+.highlight .m, .highlight .mi, .mf, .mh { color: #d6a3c4; }
 .highlight .nb, .highlight .bp { color: #9ecbff; }
-.highlight .err { color: #ff6b6b; }
-.highlight .w { color: #e7e4e4; }
+.highlight .err { color: #ff8a8a; }
+.highlight .w { color: #c9b8b8; }
