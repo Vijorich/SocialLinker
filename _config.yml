@@ -10,10 +10,8 @@ baseurl: "/SocialLinker"
 
 # Build
 markdown: kramdown
-highlighter: rouge
 kramdown:
   input: GFM
-  syntax_highlighter: rouge
 
 # Plugins (GH Pages whitelist)
 plugins: []
