@@ -1,0 +1,24 @@
+/* Rouge syntax highlighting — warm theme */
+.highlight {
+  background: #1f1616;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.highlight pre { margin: 0; }
+.highlight code { background: none; padding: 0; }
+.highlight .c, .highlight .c1, .highlight .cm, .highlight .cs { color: #8a7a7a; font-style: italic; }
+.highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt { color: #fa7979; }
+.highlight .o, .highlight .ow { color: #e7e4e4; }
+.highlight .n, .highlight .nc, .highlight .nn, .highlight .nf, .highlight .nx { color: #f5c08a; }
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .sc, .highlight .sb, .highlight .si { color: #a8d8a0; }
+.highlight .m, .highlight .mi, .highlight .mf, .highlight .mh { color: #e0a0c0; }
+.highlight .nf, .highlight .fm { color: #f5c08a; }
+.highlight .nb, .highlight .bp { color: #9ecbff; }
+.highlight .err { color: #ff6b6b; }
+.highlight .w { color: #e7e4e4; }

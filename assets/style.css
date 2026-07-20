@@ -71,7 +71,9 @@ a { color: var(--accent); }
   transition: background 0.15s, border-color 0.15s;
   font-family: inherit;
 }
+@media (hover: hover) {
 .lang-toggle:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+}
 
 /* Sections */
 .section { margin-bottom: 3rem; }
@@ -145,10 +147,12 @@ a { color: var(--accent); }
 .link-list li:first-child .link-card { --r-tl: 16px; --r-tr: 16px; --r-bl: 8px; --r-br: 8px; }
 /* Last card: square top, round bottom */
 .link-list li:last-child .link-card { --r-tl: 8px; --r-tr: 8px; --r-bl: 16px; --r-br: 16px; }
+@media (hover: hover) {
 .link-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent);
   transform: translateY(-1px);
+}
 }
 .link-card svg { flex-shrink: 0; }
 
@@ -157,10 +161,12 @@ a { color: var(--accent); }
   background: var(--accent-bg);
   border-color: rgba(250, 137, 137, 0.4);
 }
+@media (hover: hover) {
 .donate-list .link-card:hover {
   background: var(--accent);
   color: #0d0d14;
   border-color: var(--accent);
+}
 }
 
 /* Posts list */
