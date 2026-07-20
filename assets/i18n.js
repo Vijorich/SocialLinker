@@ -24,12 +24,11 @@
     return DEFAULT_LANG;
   }
 
-  function currentLang() {
-    return document.documentElement.lang || DEFAULT_LANG;
-  }
+  var activeLang = DEFAULT_LANG;
 
   function applyLang(lang) {
     if (LANGS.indexOf(lang) === -1) lang = DEFAULT_LANG;
+    activeLang = lang;
     document.documentElement.lang = lang;
 
     var strings = getLocale()[lang] || {};
@@ -47,10 +46,7 @@
     }
 
     var toggle = document.querySelector("[data-lang-toggle] span");
-    if (toggle) {
-      var other = currentLang() === "ru" ? "EN" : "RU";
-      toggle.textContent = other;
-    }
+    if (toggle) toggle.textContent = lang === "ru" ? "EN" : "RU";
   }
 
   function init() {
@@ -58,7 +54,7 @@
     var btn = document.querySelector("[data-lang-toggle]");
     if (btn) {
       btn.addEventListener("click", function () {
-        var next = currentLang() === "ru" ? "en" : "ru";
+        var next = activeLang === "ru" ? "en" : "ru";
         setStoredLang(next);
         applyLang(next);
       });

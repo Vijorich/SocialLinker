@@ -16,11 +16,7 @@ kramdown:
   syntax_highlighter: rouge
 
 # Plugins (GH Pages whitelist)
-plugins:
-  - jekyll-feed
-
-feed:
-  path: /feed.xml
+plugins: []
 
 # Defaults
 defaults:
