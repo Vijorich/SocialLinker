@@ -1,12 +1,12 @@
 :root {
-  --bg: #0d0d14;
-  --bg-card: #16161f;
+  --bg: #140d0d;
+  --bg-card: #1f1616;
   --bg-card-hover: #1c1c28;
-  --fg: #e4e4e7;
-  --fg-muted: #9ca3af;
-  --border: #27272a;
-  --accent: #89b4fa;
-  --accent-bg: rgba(137, 180, 250, 0.1);
+  --fg: #e7e4e4;
+  --fg-muted: #af9c9c;
+  --border: #2a2727;
+  --accent: #fa7979;
+  --accent-bg: rgba(250, 137, 137, 0.1);
   --max-width: 640px;
   --radius: 12px;
 }
@@ -112,15 +112,16 @@ a { color: var(--accent); }
 }
 .bio-content ul, .bio-content ol, .post-content ul, .post-content ol { padding-left: 1.5rem; }
 
-/* Link list */
+/* Link list — cards share borders to read as one block */
 .link-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 4px;
 }
+.link-list li { margin: 0; }
 .link-card {
   display: flex;
   align-items: center;
@@ -128,12 +129,22 @@ a { color: var(--accent); }
   padding: 0.9rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  --r-tl: var(--radius);
+  --r-tr: var(--radius);
+  --r-bl: var(--radius);
+  --r-br: var(--radius);
+  border-radius: var(--r-tl) var(--r-tr) var(--r-br) var(--r-bl);
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
+/* One card: fully rounded */
+.link-list li:only-child .link-card { --r-tl: 16px; --r-tr: 16px; --r-bl: 16px; --r-br: 16px; }
+/* First card: round top, square bottom */
+.link-list li:first-child .link-card { --r-tl: 16px; --r-tr: 16px; --r-bl: 8px; --r-br: 8px; }
+/* Last card: square top, round bottom */
+.link-list li:last-child .link-card { --r-tl: 8px; --r-tr: 8px; --r-bl: 16px; --r-br: 16px; }
 .link-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent);
@@ -144,7 +155,7 @@ a { color: var(--accent); }
 /* Donate block */
 .donate-list .link-card {
   background: var(--accent-bg);
-  border-color: rgba(137, 180, 250, 0.4);
+  border-color: rgba(250, 137, 137, 0.4);
 }
 .donate-list .link-card:hover {
   background: var(--accent);
