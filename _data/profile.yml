@@ -1,20 +1,8 @@
-nick: your_nick
-avatar: /assets/avatar.svg
+nick: Vijor
+avatar: /assets/avatar.png
 
 bio:
   ru: |
-    Привет! Это **твоё** био с *markdown*.
-
-    - Списки работают
-    - Ссылки: [example](https://example.com)
-    - Код: `inline`
-
-    Поменяй текст в `_data/profile.yml`.
+    Кто-то что делает что-то
   en: |
-    Hi! This is **your** bio with *markdown*.
-
-    - Lists work
-    - Links: [example](https://example.com)
-    - Code: `inline`
-
-    Edit text in `_data/profile.yml`.
+    Someone who is doing something

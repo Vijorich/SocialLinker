@@ -1,10 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Avatar">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1e1e2e"/>
-      <stop offset="1" stop-color="#0d0d14"/>
-    </linearGradient>
-  </defs>
-  <rect width="120" height="120" rx="60" fill="url(#g)" stroke="#27272a" stroke-width="2"/>
-  <text x="60" y="72" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="42" font-weight="700" fill="#89b4fa">YN</text>
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="1024.000000pt" height="1024.000000pt" viewBox="0 0 1024.000000 1024.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)"
+fill="#000000" stroke="none">
+<path d="M0 5120 l0 -5120 5120 0 5120 0 0 5120 0 5120 -5120 0 -5120 0 0
+-5120z m5535 3563 c11 -21 96 -168 188 -327 93 -160 179 -309 192 -331 12 -22
+38 -67 57 -100 19 -33 87 -150 150 -260 63 -110 145 -251 182 -314 36 -62 66
+-115 66 -116 0 -2 37 -65 81 -141 69 -118 397 -687 449 -779 9 -16 61 -106
+115 -200 227 -393 470 -814 501 -871 l34 -61 0 -1787 -1 -1786 -695 0 -694 0
+0 1600 0 1600 -23 38 c-13 20 -37 62 -54 92 -17 30 -80 141 -140 245 -60 105
+-242 422 -405 705 -163 283 -324 564 -358 624 -54 93 -64 106 -73 90 -6 -11
+-59 -102 -117 -204 -192 -334 -534 -929 -724 -1260 l-187 -324 -2 -1601 -2
+-1600 -692 -3 -693 -2 0 1392 c0 766 0 1574 0 1795 l0 402 161 278 c201 346
+398 689 544 943 62 107 190 330 285 495 151 262 224 388 303 525 11 19 35 62
+54 95 19 33 43 75 54 94 11 19 53 91 93 160 40 69 108 186 150 259 43 74 89
+155 103 180 15 26 52 90 83 142 31 52 74 127 95 165 21 39 54 96 73 128 l35
+57 396 0 396 0 20 -37z"/>
+</g>
 </svg>

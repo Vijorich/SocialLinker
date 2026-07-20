@@ -1,26 +1,20 @@
 # ponytail: order === display order. icon = brand slug, see _includes/icon.html for available list.
 items:
   - name: GitHub
-    url: https://github.com/your-username
+    url: https://github.com/Vijorich
     icon: github
-  - name: Telegram
-    url: https://t.me/your-username
-    icon: telegram
   - name: YouTube
-    url: https://youtube.com/@your-username
+    url: https://www.youtube.com/@vijor
     icon: youtube
-  - name: X / Twitter
-    url: https://x.com/your-username
-    icon: x
-  - name: Mastodon
-    url: https://mastodon.social/@your-username
-    icon: mastodon
-  - name: Discord
-    url: https://discord.gg/your-invite
-    icon: discord
-  - name: Instagram
-    url: https://instagram.com/your-username
-    icon: instagram
-  - name: Website
-    url: https://example.com
-    icon: globe
+  - name: YouTube Second
+    url: https://www.youtube.com/@vijorsup
+    icon: youtube
+  - name: YouTube Second
+    url: https://www.youtube.com/@vijorsup
+    icon: youtube
+  - name: Telegram channel
+    url: https://t.me/zerotaste
+    icon: telegram
+  - name: VK сообщество
+    url: https://vk.ru/vijorich
+    icon: vk

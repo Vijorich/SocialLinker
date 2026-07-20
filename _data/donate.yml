@@ -1,10 +1,7 @@
 items:
   - name: Boosty
-    url: https://boosty.to/your-username
+    url: https://boosty.to/vijor/donate
     icon: heart
-  - name: Buy Me a Coffee
-    url: https://www.buymeacoffee.com/your-username
-    icon: coffee
-  - name: PayPal
-    url: https://paypal.me/your-username
-    icon: paypal
+  - name: Donation Alerts
+    url: https://www.donationalerts.com/r/vijorich
+    icon: heart
