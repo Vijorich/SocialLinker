@@ -5,33 +5,20 @@
 (function () {
   var DEFAULT_LANG = "ru";
   var STORAGE_KEY = "sociallinker.lang";
-  var LANGS = ["ru", "en"];
-
-  function getLocale() { return window.__LOCALE__ || {}; }
-
-  function getStoredLang() {
-    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
-  }
-  function setStoredLang(lang) {
-    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
-  }
 
   function detectLang() {
-    var stored = getStoredLang();
-    if (stored) return stored;
-    var nav = (navigator.language || "").toLowerCase();
-    if (nav.indexOf("en") === 0) return "en";
-    return DEFAULT_LANG;
+    try { if (localStorage.getItem(STORAGE_KEY)) return localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    return (navigator.language || "").toLowerCase().indexOf("en") === 0 ? "en" : DEFAULT_LANG;
   }
 
   var activeLang = DEFAULT_LANG;
 
   function applyLang(lang) {
-    if (LANGS.indexOf(lang) === -1) lang = DEFAULT_LANG;
+    if (lang !== "en") lang = DEFAULT_LANG;
     activeLang = lang;
     document.documentElement.lang = lang;
 
-    var strings = getLocale()[lang] || {};
+    var strings = (window.__LOCALE__ || {})[lang] || {};
     var nodes = document.querySelectorAll("[data-i18n]");
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];
@@ -55,7 +42,7 @@
     if (btn) {
       btn.addEventListener("click", function () {
         var next = activeLang === "ru" ? "en" : "ru";
-        setStoredLang(next);
+        try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
         applyLang(next);
       });
     }

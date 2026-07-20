@@ -115,7 +115,7 @@ a { color: var(--accent); }
 }
 .bio-content ul, .bio-content ol, .post-content ul, .post-content ol { padding-left: 1.5rem; }
 
-/* Link list — cards share borders to read as one block */
+/* Link list — cards read as one block via clipped container */
 .link-list {
   list-style: none;
   margin: 0;
@@ -132,22 +132,15 @@ a { color: var(--accent); }
   padding: 0.9rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  --r-tl: 8px;
-  --r-tr: 8px;
-  --r-bl: 8px;
-  --r-br: 8px;
-  border-radius: var(--r-tl) var(--r-tr) var(--r-br) var(--r-bl);
+  border-radius: 8px;
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
-/* One card: fully rounded */
-.link-list li:only-child .link-card { --r-tl: 16px; --r-tr: 16px; --r-bl: 16px; --r-br: 16px; }
-/* First card: round top, square bottom */
-.link-list li:first-child .link-card { --r-tl: 16px; --r-tr: 16px; --r-bl: 8px; --r-br: 8px; }
-/* Last card: square top, round bottom */
-.link-list li:last-child .link-card { --r-tl: 8px; --r-tr: 8px; --r-bl: 16px; --r-br: 16px; }
+/* Cards form one block: outer corners rounded to 16, inner stay 8 */
+.link-list li:first-child .link-card { border-top-left-radius: 16px; border-top-right-radius: 16px; }
+.link-list li:last-child .link-card { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
 @media (hover: hover) {
 .link-card:hover {
   background: var(--bg-card-hover);
@@ -170,38 +163,28 @@ a { color: var(--accent); }
 }
 }
 
-/* Posts list */
-.post-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.post-item {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
-}
-.post-item:last-child { border-bottom: none; }
-.post-link {
+/* Posts list — reuses .link-list card block; click-only, no text selection */
+.post-card { user-select: none; -webkit-user-select: none; }
+.post-card-body { flex: 1; min-width: 0; }
+.post-card-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
-  text-decoration: none;
-  color: var(--fg);
 }
-.post-link:hover .post-title { color: var(--accent); }
+.post-card:hover .post-title { color: var(--accent); }
 .post-title { font-weight: 600; transition: color 0.15s; }
 .post-date { color: var(--fg-muted); font-size: 0.85rem; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .post-excerpt {
+  display: block;
   color: var(--fg-muted);
-  margin: 0.5rem 0 0;
+  margin: 0.35rem 0 0;
   font-size: 0.95rem;
 }
 
 /* Single post */
 .post-header { margin-bottom: 2rem; }
-.post-title { margin: 0 0 0.5rem; font-size: 1.75rem; letter-spacing: -0.02em; }
-.post-date { color: var(--fg-muted); font-size: 0.9rem; }
+.post-header .post-title { margin: 0 0 0.5rem; font-size: 1.75rem; letter-spacing: -0.02em; }
 .post-content { line-height: 1.75; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
 .post-content h1, .post-content h2, .post-content h3 { letter-spacing: -0.02em; }
@@ -217,6 +200,6 @@ a { color: var(--accent); }
 @media (max-width: 480px) {
   .container, .post-single { padding: 1.5rem 1rem 3rem; }
   .nick { font-size: 1.5rem; }
-  .post-link { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+  .post-card-head { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
   .lang-toggle { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 }
