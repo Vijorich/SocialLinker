@@ -197,6 +197,13 @@ a { color: var(--accent); }
 .not-found { text-align: center; padding-top: 4rem; }
 .not-found h1 { font-size: 3rem; margin: 0 0 0.5rem; letter-spacing: -0.03em; }
 
+.site-footer {
+  text-align: center;
+  padding: 0 1.25rem 2.5rem;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+}
+
 /* Mobile */
 @media (max-width: 480px) {
   .container, .post-single { padding: 1.5rem 1rem 3rem; }
