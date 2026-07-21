@@ -12,7 +12,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scrollbar-gutter: stable; background: #140d0d; }
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
@@ -74,7 +74,7 @@ a { color: var(--accent); }
   :last-child { margin-bottom: 0; }
   a { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
   code { background: var(--bg-card); padding: 0.25em 0.5em; border-radius: 0.25rem; font-size: 0.85em; border: 0.125rem solid var(--border); }
-  pre { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); overflow-x: auto; }
+  pre { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); overflow-x: auto; border: 0.125rem solid var(--border); }
   pre code { background: none; border: none; padding: 0; }
   blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); }
   ul, ol { padding-left: 1.5rem; }
@@ -103,7 +103,7 @@ a { color: var(--accent); }
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
-  transition: background 0.1s, color 0.1s, transform 0.1s;
+  transition: background 0.1s, color 0.1s, transform 0.1s, border-radius 0.15s;
 }
 
 .external-link-icon {
@@ -125,6 +125,7 @@ a { color: var(--accent); }
   background: rgba(40, 28, 28, 0.85);
 }
 }
+.link-list li .link-card:hover { border-radius: var(--radius); }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
 
 /* Donate block */
@@ -226,7 +227,7 @@ a { color: var(--accent); }
 .modal-container { scrollbar-width: thin; scrollbar-color: #b06a6a transparent; }
 .modal-container::-webkit-scrollbar { width: 0.75rem; }
 .modal-container::-webkit-scrollbar-track { background: transparent; margin-block: 0.5rem; }
-.modal-container::-webkit-scrollbar-button { display: none; }
+.modal-container::-webkit-scrollbar-button { width: 0; height: 0; display: none; }
 .modal-container::-webkit-scrollbar-thumb { background: #b06a6a; border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
 .modal-container::-webkit-scrollbar-thumb:hover { background: #c47a7a; border-color: transparent; background-clip: padding-box; }
 .modal-close {
