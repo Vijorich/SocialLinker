@@ -218,19 +218,13 @@ a { color: var(--accent); }
 .highlighter-rouge[data-lang]::before {
   content: attr(data-lang);
   position: absolute;
-  top: 0; left: 0;
-  padding: 0.2rem 0.7rem;
-  font-size: 0.65rem;
-  line-height: 1.4;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  top: 0.25rem;
+  left: 0.75rem;
+  font-size: 0.75rem;
   color: var(--fg-muted);
-  background: var(--bg);
-  border-radius: var(--radius) 0 0 0.5rem;
-  z-index: 1;
 }
 .highlighter-rouge[data-lang] pre {
-  padding-top: 2rem;
+  padding-top: 1.5rem;
 }
 
 /* Mobile */
