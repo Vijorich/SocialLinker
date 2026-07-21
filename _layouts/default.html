@@ -56,7 +56,7 @@ function closeModal(){
   modal.classList.remove('visible')
   modal.classList.add('hidden')
   document.body.style.overflow=''
-  content.innerHTML=''
+  setTimeout(function(){content.innerHTML=''},300)
 }
 
 document.querySelectorAll('.post-card').forEach(function(card){
