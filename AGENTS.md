@@ -14,14 +14,15 @@ bundle exec jekyll serve --baseurl ""
 
 ## Composition
 
-`index.html` renders in order: `hero` → `bio` → `socials` → `donate` → `articles`, wrapped by `_layouts/default.html`.
-
 `default.html` owns ALL shared chrome (head, meta, OG tags). Never duplicate it in includes.
+
+`index.html` iterates `_data/sections.yml` (order = render order, omit or add entries to show/hide sections). Each section type maps to a `_includes/*.html`. Titles: override via `title:` in sections.yml, omit for locale default, set `""` to hide.
 
 ## Where to edit content
 
 | What | File |
 |---|---|
+| Section order, titles, visibility | `_data/sections.yml` |
 | Nick, avatar path | `_data/profile.yml` |
 | Bio | `_data/profile.yml` (`bio`, `|` block scalar) |
 | Social links + order | `_data/social.yml` |
@@ -30,7 +31,7 @@ bundle exec jekyll serve --baseurl ""
 | Icons (inline SVG) | `_includes/icon.html` (`{% case %}`) |
 | Styles | `assets/style.css` |
 
-YAML item **order === display order** (top of list = top of card). Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` — appear in `articles.html` automatically.
+Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` — appear in `articles.html` automatically.
 
 ## Repo-specific quirks
 

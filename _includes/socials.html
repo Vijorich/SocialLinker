@@ -1,5 +1,5 @@
 <section class="section socials" id="links">
-  <h2 class="section-title">{{ site.data.locale.nav_links }}</h2>
+  {% assign t = include.title | default: site.data.locale.nav_links %}{% if t != "" %}<h2 class="section-title">{{ t }}</h2>{% endif %}
   <ul class="link-list">
     {% for item in site.data.social.items %}
     <li>

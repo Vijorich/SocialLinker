@@ -29,6 +29,6 @@
 {% endif %}
 {{ content }}
 <footer class="site-footer">Made with ❤ by Vijor</footer>
-<script>document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;c.style.transform=`perspective(400px) scale(1.03) rotateX(${(y-r.height/2)/r.height/2*-5}deg) rotateY(${(x-r.width/2)/r.width/2*5}deg)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})});document.querySelectorAll('.highlighter-rouge').forEach(function(e){var m=e.className.match(/language-(\w+)/);if(m)e.dataset.lang=m[1]})</script>
+<script>document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;c.style.transform=`perspective(400px) scale(1.03) rotateX(${(y-r.height/2)/r.height/2*-5}deg) rotateY(${(x-r.width/2)/r.width/2*5}deg)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})});var langLabel={'csharp':'C#','cs':'C#','js':'JS','ts':'TS','jsx':'JSX','tsx':'TSX','py':'Python','rb':'Ruby','go':'Go','rs':'Rust','sh':'Shell','ps':'PowerShell','yaml':'YAML','yml':'YAML','json':'JSON','md':'Markdown','html':'HTML','css':'CSS','sql':'SQL','xml':'XML','swift':'Swift','kt':'Kotlin','dart':'Dart','cpp':'C++','c':'C'};document.querySelectorAll('.highlighter-rouge').forEach(function(e){var m=e.className.match(/language-(\w+)/);if(m){var l=langLabel[m[1]]||m[1];e.dataset.lang=l}})</script>
 </body>
 </html>

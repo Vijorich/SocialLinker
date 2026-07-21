@@ -2,9 +2,18 @@
 layout: default
 ---
 <div class="container">
-  {% include hero.html %}
-  {% include bio.html %}
-  {% include socials.html %}
-  {% include donate.html %}
-  {% include articles.html %}
+  {% for s in site.data.sections %}
+    {% case s.type %}
+    {% when 'hero' %}
+      {% include hero.html %}
+    {% when 'bio' %}
+      {% include bio.html title=s.title %}
+    {% when 'socials' %}
+      {% include socials.html title=s.title %}
+    {% when 'donate' %}
+      {% include donate.html title=s.title %}
+    {% when 'articles' %}
+      {% include articles.html title=s.title %}
+    {% endcase %}
+  {% endfor %}
 </div>
