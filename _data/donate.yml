@@ -1,7 +1,7 @@
 items:
   - name: Donation Alerts
     url: https://www.donationalerts.com/r/vijorich
-    icon: heart
+    icon: donationalerts
   - name: Boosty
     url: https://boosty.to/vijor/donate
     icon: boosty
