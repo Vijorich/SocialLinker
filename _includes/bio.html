@@ -1,6 +1,6 @@
 <section class="section bio" id="bio">
   {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_bio %}<h2 class="section-title">{{ t }}</h2>{% endif %}
-  <div class="bio-content">
+  <div class="bio-content" style="text-align: {{ site.data.profile.bio_align | default: 'left' }}">
     {{ site.data.profile.bio | markdownify }}
   </div>
 </section>
