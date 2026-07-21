@@ -7,7 +7,7 @@ layout: default
     {% when 'hero' %}
       {% include hero.html %}
     {% when 'bio' %}
-      {% include bio.html title=s.title %}
+      {% include bio.html %}
     {% when 'projects' %}
       {% include projects.html title=s.title %}
     {% when 'socials' %}
@@ -16,6 +16,8 @@ layout: default
       {% include links.html items=site.data.donate.items style="donate" title=s.title %}
     {% when 'articles' %}
       {% include articles.html title=s.title %}
+    {% else %}
+      <!-- ponytail: unknown section type "{{ s.type }}" in _data/sections.yml — typo check -->
     {% endcase %}
   {% endfor %}
 </div>

@@ -5,4 +5,22 @@ _site/
 .bundle/
 vendor/
 .codegraph/
+
+# ponytail: secrets + OS/IDE noise. Trust boundary: blocks accidental commit of credentials.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.yml
+
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

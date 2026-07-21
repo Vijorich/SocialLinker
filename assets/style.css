@@ -1,12 +1,10 @@
 :root {
   --bg: #140d0d;
   --bg-card: #1f1616;
-  --bg-card-hover: #281c1c;
   --fg: #e7e4e4;
   --fg-muted: #af9c9c;
   --border: #2a2727;
   --accent: #fa7979;
-  --accent-bg: rgba(250, 137, 137, 0.1);
   --max-width: 40rem;
   --radius: 1rem;
 }
@@ -182,19 +180,6 @@ a { color: var(--accent); }
   font-weight: 400;
 }
 
-/* Stream dot on Twitch link */
-.stream-dot-live {
-  width: 0.5rem; height: 0.5rem;
-  border-radius: 50%;
-  background: #ff4444;
-  flex-shrink: 0;
-  animation: stream-pulse 1.5s ease-in-out infinite;
-}
-@keyframes stream-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
-}
-
 /* 404 */
 .not-found { text-align: center; padding-top: 3rem; }
 .not-found h1 { font-size: 3rem; margin: 0 0 0.5rem; letter-spacing: -0.03em; }
@@ -204,36 +189,6 @@ a { color: var(--accent); }
   padding: 0 1rem 2.5rem;
   color: var(--fg-muted);
   font-size: 1rem;
-}
-
-
-/* ponytail: rouge github-dark theme (regenerate: `rougify style github-dark > _sass/syntax.scss`) */
-.highlight .c, .highlight .c1, .highlight .cm, .highlight .cs, .highlight .cp { color: #8b949e; font-style: italic; }
-.highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt, .highlight .kc { color: #ff7b72; }
-.highlight .s, .highlight .s1, .highlight .s2, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx { color: #a5d6ff; }
-.highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .nx { color: #79c0ff; }
-.highlight .o, .highlight .ow, .highlight .nt { color: #ff7b72; }
-.highlight .mi, .highlight .mf, .highlight .mh, .highlight .mo, .highlight .il, .highlight .s { color: #a5d6ff; }
-.highlight .nb, .highlight .bp { color: #d2a8ff; }
-.highlight .nc, .highlight .nd, .highlight .ni, .highlight .no, .highlight .ne, .highlight .nn { color: #ffa657; }
-.highlight .nf, .highlight .fm { color: #d2a8ff; }
-.highlight .err { color: #f85149; }
-.highlight .gd { color: #ffdcd7; background: #67060c; }
-.highlight .gi { color: #aff5b4; background: #033a16; }
-.highlight .gs { font-weight: bold; }
-
-/* ponytail: language label via JS data-lang */
-.highlighter-rouge { position: relative; }
-.highlighter-rouge[data-lang]::before {
-  content: attr(data-lang);
-  position: absolute;
-  top: 0.25rem;
-  left: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--fg-muted);
-}
-.highlighter-rouge[data-lang] pre {
-  padding-top: 1.5rem;
 }
 
 /* Mobile */

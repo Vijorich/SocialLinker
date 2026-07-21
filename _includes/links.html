@@ -12,7 +12,7 @@
   <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}">
     {% for item in include.items %}
     <li>
-      <a href="{{ item.url }}" target="_blank" rel="{{ include.rel | default: _rel }}" class="link-card">
+      <a href="{{ item.url | escape }}" target="_blank" rel="{{ _rel }}" class="link-card">
         {% include icon.html name=item.icon %}
         <span>{{ item.name | escape }}</span>
         {% include icon.html name='external' %}

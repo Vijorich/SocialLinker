@@ -33,9 +33,6 @@
 
 <script>
 if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
-document.querySelectorAll('.highlighter-rouge[class*=language-]').forEach(e=>{e.dataset.lang=(e.className.match(/language-(\w+)/)||[])[1]})
-// ponytail: reads assets/stream-status.json updated by GH Action every 5 min.
-(function(){var b=('{{ "/" | relative_url }}'||'/').replace(/\/$/,'');fetch(b+'/assets/stream-status.json?t='+Date.now()).then(function(r){return r.json()}).then(function(d){if(!d||!d.live)return;var t=document.querySelector('a[href*="twitch.tv/vijor"]');if(!t)return;var a=document.createElement('span');a.className='stream-dot-live';t.insertBefore(a,t.querySelector('span'))})})();
 </script>
 </body>
 </html>

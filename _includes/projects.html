@@ -3,7 +3,7 @@
   <ul class="link-list project-list">
     {% for item in site.data.projects.items %}
     <li>
-      <a href="{{ item.url }}" target="_blank" rel="noopener" class="link-card project-card">
+      <a href="{{ item.url | escape }}" target="_blank" rel="noopener" class="link-card project-card">
         {% include icon.html name=item.icon %}
         <span class="post-card-body">
           <span class="project-name">{{ item.name | escape }}</span>
