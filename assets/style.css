@@ -172,22 +172,6 @@ a { color: var(--accent); }
 .post-back a { color: var(--accent); text-decoration: none; }
 .post-back a:hover { text-decoration: underline; }
 
-/* Skills */
-.skill-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.skill-tag {
-  display: inline-block;
-  padding: 0.4rem 0.9rem;
-  background: var(--bg-card);
-  border: 0.125rem solid var(--border);
-  border-radius: 2rem;
-  font-size: 1rem;
-  color: var(--fg-muted);
-}
-
 /* Projects */
 .project-name { font-weight: 600; }
 .project-desc {
@@ -198,26 +182,11 @@ a { color: var(--accent); }
   font-weight: 400;
 }
 
-/* Stream */
-.stream-placeholder { min-height: 3rem; display: flex; align-items: center; }
-.stream-loading, .stream-offline { color: var(--fg-muted); font-size: 1rem; }
-.stream-live {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  padding: 0.75rem 1rem;
-  background: rgba(145, 70, 255, 0.12);
-  border: 0.125rem solid rgba(145, 70, 255, 0.3);
-  border-radius: var(--radius);
-  color: var(--fg);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: background 0.3s ease;
-}
-.stream-live:hover { background: rgba(145, 70, 255, 0.22); color: var(--fg); }
-.stream-dot {
-  width: 0.7rem; height: 0.7rem;
+/* Stream dot on Twitch link */
+.stream-dot-live {
+  width: 0.5rem; height: 0.5rem;
   border-radius: 50%;
-  background: #9146ff;
+  background: #ff4444;
   flex-shrink: 0;
   animation: stream-pulse 1.5s ease-in-out infinite;
 }

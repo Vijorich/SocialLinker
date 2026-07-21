@@ -3,9 +3,7 @@
 - type: hero
 - type: bio
   title: false
-- type: skills
-- type: projects
-- type: stream
 - type: socials
 - type: donate
+- type: projects
 - type: articles
