@@ -10,6 +10,7 @@ baseurl: "/SocialLinker"
 
 # Build
 markdown: kramdown
+highlighter: rouge
 kramdown:
   input: GFM
 
