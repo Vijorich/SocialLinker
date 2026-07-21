@@ -12,7 +12,7 @@
             <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
           </span>
           {% if post.excerpt %}
-          <span class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</span>
+          <p class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
           {% endif %}
         </span>
       </a>
@@ -20,6 +20,6 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p data-i18n="posts_empty">{{ site.data.locale.ru.posts_empty }}</p>
+  <p class="post-excerpt" data-i18n="posts_empty">{{ site.data.locale.ru.posts_empty }}</p>
   {% endif %}
 </section>
