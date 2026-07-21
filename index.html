@@ -8,6 +8,12 @@ layout: default
       {% include hero.html %}
     {% when 'bio' %}
       {% include bio.html title=s.title %}
+    {% when 'skills' %}
+      {% include skills.html title=s.title %}
+    {% when 'projects' %}
+      {% include projects.html title=s.title %}
+    {% when 'stream' %}
+      {% include stream.html title=s.title %}
     {% when 'socials' %}
       {% include links.html items=site.data.social.items title=s.title %}
     {% when 'donate' %}

@@ -1,0 +1,6 @@
+# ponytail: order === display order. icon = brand slug, see _includes/icon.html.
+items:
+  - name: SocialLinker
+    url: https://github.com/Vijorich/SocialLinker
+    description: "Сайт-визитка на котором вы сейчас находитесь."
+    icon: github

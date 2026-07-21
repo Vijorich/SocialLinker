@@ -1,0 +1,17 @@
+<section class="section projects" id="projects">
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_projects %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  <ul class="link-list project-list">
+    {% for item in site.data.projects.items %}
+    <li>
+      <a href="{{ item.url }}" target="_blank" rel="noopener" class="link-card project-card">
+        {% include icon.html name=item.icon %}
+        <span class="post-card-body">
+          <span class="project-name">{{ item.name | escape }}</span>
+          {% if item.description %}<span class="project-desc">{{ item.description | escape }}</span>{% endif %}
+        </span>
+        {% include icon.html name='external' %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>

@@ -34,6 +34,8 @@
 <script>
 if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
 document.querySelectorAll('.highlighter-rouge[class*=language-]').forEach(e=>{e.dataset.lang=(e.className.match(/language-(\w+)/)||[])[1]})
+// ponytail: stream status via ivr.fi public API. Self-host or migrate to Twitch API if service dies.
+(function(){var e=document.getElementById('stream-status');if(!e)return;fetch('https://api.ivr.fi/v2/twitch/user?login=vijor').then(function(r){return r.json()}).then(function(d){if(!d||!d[0]||!d[0].stream){e.textContent='{{ site.data.locale.stream_offline }}';return}var a=document.createElement('a');a.href='https://twitch.tv/vijor';a.target='_blank';a.rel='noopener';a.className='stream-live';var dot=document.createElement('span');dot.className='stream-dot';a.appendChild(dot);a.appendChild(document.createTextNode(' '+d[0].stream.title));e.innerHTML='';e.appendChild(a)}).catch(function(){e.innerHTML=''})})();
 </script>
 </body>
 </html>

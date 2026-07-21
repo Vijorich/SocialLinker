@@ -1,0 +1,8 @@
+<section class="section skills" id="skills">
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_skills %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  <div class="skill-cloud">
+    {% for item in site.data.skills.items %}
+    <span class="skill-tag">{{ item.name | escape }}</span>
+    {% endfor %}
+  </div>
+</section>
