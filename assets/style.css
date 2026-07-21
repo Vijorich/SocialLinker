@@ -103,7 +103,7 @@ a { color: var(--accent); }
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
-  transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease;
 }
 
 .external-link-icon {
@@ -123,6 +123,7 @@ a { color: var(--accent); }
 @media (hover: hover) {
 .link-card:hover {
   background: rgba(40, 28, 28, 0.85);
+  scale: 1.03;
 }
 }
 .link-list li .link-card:hover { border-radius: var(--radius); }
