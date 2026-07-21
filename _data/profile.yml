@@ -5,8 +5,5 @@ background:
   image: /assets/Stars.gif          # e.g. /assets/bg.gif — omit for no bg
   mode: repeat     # cover | contain | repeat (default: cover)
 
-bio:
-  ru: |
-    Кто-то что делает что-то
-  en: |
-    Someone who is doing something
+bio: |
+  Кто-то что делает что-то
