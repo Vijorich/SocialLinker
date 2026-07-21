@@ -126,8 +126,14 @@ a { color: var(--accent); }
   scale: 1.03;
 }
 }
+@media (hover: hover) {
 .link-list li .link-card:hover { border-radius: var(--radius); }
+}
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
+/* ponytail: tap feedback for touch devices */
+@media (hover: none) {
+.link-card:active { scale: 0.97; transition: scale 0.15s; }
+}
 
 /* Donate block */
 .donate-list .link-card {

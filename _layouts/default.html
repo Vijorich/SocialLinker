@@ -39,10 +39,10 @@
 </div>
 
 <script>
-document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})});var langLabel={'csharp':'C#','cs':'C#','js':'JS','ts':'TS','jsx':'JSX','tsx':'TSX','py':'Python','rb':'Ruby','go':'Go','rs':'Rust','sh':'Shell','ps':'PowerShell','yaml':'YAML','yml':'YAML','json':'JSON','md':'Markdown','html':'HTML','css':'CSS','sql':'SQL','xml':'XML','swift':'Swift','kt':'Kotlin','dart':'Dart','cpp':'C++','c':'C'};document.querySelectorAll('.highlighter-rouge').forEach(function(e){var m=e.className.match(/language-(\w+)/);if(m){var l=langLabel[m[1]]||m[1];e.dataset.lang=l}})
+document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''});c.addEventListener('touchstart',()=>{c.style.transform=''})});var langLabel={'csharp':'C#','cs':'C#','js':'JS','ts':'TS','jsx':'JSX','tsx':'TSX','py':'Python','rb':'Ruby','go':'Go','rs':'Rust','sh':'Shell','ps':'PowerShell','yaml':'YAML','yml':'YAML','json':'JSON','md':'Markdown','html':'HTML','css':'CSS','sql':'SQL','xml':'XML','swift':'Swift','kt':'Kotlin','dart':'Dart','cpp':'C++','c':'C'};document.querySelectorAll('.highlighter-rouge').forEach(function(e){var m=e.className.match(/language-(\w+)/);if(m){var l=langLabel[m[1]]||m[1];e.dataset.lang=l}})
 
 // ponytail: modal post viewer
-var modal=document.getElementById('post-modal'),backdrop=modal.querySelector('.modal-backdrop'),container=modal.querySelector('.modal-container'),content=modal.querySelector('.modal-content'),closeBtn=modal.querySelector('.modal-close'),closeTimer=null,scrollY=0
+var modal=document.getElementById('post-modal'),backdrop=modal.querySelector('.modal-backdrop'),container=modal.querySelector('.modal-container'),content=modal.querySelector('.modal-content'),closeBtn=modal.querySelector('.modal-close'),closeTimer=null
 
 function showModal(html){
   if(closeTimer){clearTimeout(closeTimer);closeTimer=null}
@@ -51,8 +51,7 @@ function showModal(html){
     var m=e.className.match(/language-(\w+)/)
     if(m){var l=langLabel[m[1]]||m[1];e.dataset.lang=l}
   })
-  scrollY=window.scrollY
-  document.body.style.position='fixed';document.body.style.top='-'+scrollY+'px';document.body.style.width='100%'
+  document.documentElement.style.overflow='hidden'
   modal.classList.remove('hidden')
   modal.classList.add('visible')
   history.pushState({modal:true},'','')
@@ -61,8 +60,7 @@ function showModal(html){
 function closeModal(){
   modal.classList.remove('visible')
   modal.classList.add('hidden')
-  document.body.style.position='';document.body.style.top='';document.body.style.width=''
-  window.scrollTo(0,scrollY)
+  document.documentElement.style.overflow=''
   closeTimer=setTimeout(function(){content.innerHTML='';closeTimer=null},300)
 }
 
