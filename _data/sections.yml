@@ -1,8 +1,8 @@
 # Section order = render order.
-# title: omit for locale default, "" to hide heading, "Text" for custom.
+# title: omit for locale default, false to hide heading, "Text" for custom.
 - type: hero
 - type: bio
-  title: ""
+  title: false
 - type: socials
 - type: donate
 - type: articles

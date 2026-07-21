@@ -1,5 +1,5 @@
 <section class="section posts" id="posts">
-  {% assign t = include.title | default: site.data.locale.nav_posts %}{% if t != "" %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_posts %}<h2 class="section-title">{{ t }}</h2>{% endif %}
   {% assign posts = site.posts | sort: "date" | reverse %}
   {% if posts.size > 0 %}
   <ul class="link-list post-list">

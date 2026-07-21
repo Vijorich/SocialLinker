@@ -1,5 +1,5 @@
 <section class="section donate" id="support">
-  {% assign t = include.title | default: site.data.locale.nav_support %}{% if t != "" %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_support %}<h2 class="section-title">{{ t }}</h2>{% endif %}
   <ul class="link-list donate-list">
     {% for item in site.data.donate.items %}
     <li>

@@ -1,5 +1,5 @@
 <section class="section bio" id="bio">
-  {% assign t = include.title | default: site.data.locale.nav_bio %}{% if t != "" %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_bio %}<h2 class="section-title">{{ t }}</h2>{% endif %}
   <div class="bio-content">
     {{ site.data.profile.bio | markdownify }}
   </div>
