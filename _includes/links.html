@@ -1,0 +1,23 @@
+{% if include.style == 'donate' %}
+  {% assign _id = 'support' %}
+  {% assign _key = 'nav_support' %}
+  {% assign _rel = 'noopener' %}
+{% else %}
+  {% assign _id = 'links' %}
+  {% assign _key = 'nav_links' %}
+  {% assign _rel = 'noopener me' %}
+{% endif %}
+<section class="section" id="{{ include.section_id | default: _id }}">
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale[include.locale_key | default: _key] %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}">
+    {% for item in include.items %}
+    <li>
+      <a href="{{ item.url }}" target="_blank" rel="{{ include.rel | default: _rel }}" class="link-card">
+        {% include icon.html name=item.icon %}
+        <span>{{ item.name | escape }}</span>
+        {% include icon.html name='external' %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>

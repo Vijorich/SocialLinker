@@ -1,8 +1,8 @@
 nick: Vijor
-avatar: /assets/Avatar.webp
+avatar: /assets/avatar.webp
 
 background:
-  image: /assets/stars.webp
+  image: /assets/background.webp
   mode: repeat
 
 bio: |

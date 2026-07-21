@@ -14,9 +14,6 @@ highlighter: rouge
 kramdown:
   input: GFM
 
-# Plugins (GH Pages whitelist)
-plugins: []
-
 # Defaults
 defaults:
   - scope:
@@ -29,7 +26,3 @@ defaults:
 exclude:
   - README.md
   - AGENTS.md
-  - Gemfile
-  - Gemfile.lock
-  - node_modules
-  - vendor

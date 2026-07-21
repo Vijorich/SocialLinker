@@ -9,9 +9,9 @@ layout: default
     {% when 'bio' %}
       {% include bio.html title=s.title %}
     {% when 'socials' %}
-      {% include socials.html title=s.title %}
+      {% include links.html items=site.data.social.items title=s.title %}
     {% when 'donate' %}
-      {% include donate.html title=s.title %}
+      {% include links.html items=site.data.donate.items style="donate" title=s.title %}
     {% when 'articles' %}
       {% include articles.html title=s.title %}
     {% endcase %}
