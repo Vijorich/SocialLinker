@@ -1,7 +1,8 @@
 {% comment %}
 ponytail: inline SVGs from simpleicons.org. Add brand = add case.
-Avoids CDN dep, keeps site self-contained. Unknown name = globe fallback.
+Avoids CDN dep, keeps site self-contained. No name = nothing rendered.
 {% endcomment %}
+{% if include.name %}
 {% assign n = include.name | downcase | strip %}
 {% case n %}
 {% when 'github' %}
@@ -25,3 +26,4 @@ Avoids CDN dep, keeps site self-contained. Unknown name = globe fallback.
 {% else %}
 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/><path d="M12 2a15.3 15.3 0 0 0-4 10 15.3 15.3 0 0 0 4 10"/></svg>
 {% endcase %}
+{% endif %}

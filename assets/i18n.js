@@ -53,4 +53,21 @@
   } else {
     init();
   }
+
+  // ponytail: per-card translate3d parallax, no RAF. Upgrade: add RAF + perspective tilt.
+  document.querySelectorAll(".link-list").forEach(function (list) {
+    list.addEventListener("mousemove", function (e) {
+      list.querySelectorAll(".parallax-wrapper").forEach(function (w) {
+        var r = w.getBoundingClientRect();
+        var dx = (e.clientX - r.left - r.width / 2) * 0.05;
+        var dy = (e.clientY - r.top - r.height / 2) * 0.05;
+        w.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0)";
+      });
+    }, { passive: true });
+    list.addEventListener("mouseleave", function () {
+      list.querySelectorAll(".parallax-wrapper").forEach(function (w) {
+        w.style.transform = "";
+      });
+    });
+  });
 })();

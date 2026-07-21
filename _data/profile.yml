@@ -1,6 +1,10 @@
 nick: Vijor
 avatar: /assets/Avatar.webp
 
+background:
+  image: /assets/Stars.gif          # e.g. /assets/bg.gif — omit for no bg
+  mode: repeat     # cover | contain | repeat (default: cover)
+
 bio:
   ru: |
     Кто-то что делает что-то

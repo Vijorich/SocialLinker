@@ -17,7 +17,7 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg);
+  background: linear-gradient(180deg, #140d0d 0%, #1a1010 100%);
   color: var(--fg);
   line-height: 1.6;
   font-size: 1rem;
@@ -32,6 +32,9 @@ a { color: var(--accent); }
   padding: 2.5rem 1.25rem 4rem;
   /* ponytail: rem scale here matches body's 1rem=16px */
   font-size: 1rem;
+  position: relative;
+  border-radius: var(--radius);
+  background: rgba(13, 10, 10, 0.65);
 }
 
 /* Single post reuses .container */
@@ -127,12 +130,18 @@ a { color: var(--accent); }
   gap: 0.25rem;
 }
 .link-list li { margin: 0; }
+.parallax-wrapper {
+  will-change: transform;
+}
+
 .link-card {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.9rem 1rem;
-  background: var(--bg-card);
+  background: rgba(31, 22, 22, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 0.0625rem solid var(--border);
   border-radius: 0.5rem;
   color: var(--fg);
@@ -140,12 +149,24 @@ a { color: var(--accent); }
   font-weight: 500;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
+
+.external-link-icon {
+  margin-left: auto;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+.link-card:hover .external-link-icon {
+  opacity: 1;
+}
 /* Cards form one block: outer corners rounded to 16, inner stay 8 */
 .link-list li:first-child .link-card { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
 .link-list li:last-child .link-card { border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 @media (hover: hover) {
 .link-card:hover {
-  background: var(--bg-card-hover);
+  background: rgba(40, 28, 28, 0.85);
   border-color: var(--accent);
   transform: translateY(-0.0625rem);
 }
@@ -154,7 +175,9 @@ a { color: var(--accent); }
 
 /* Donate block */
 .donate-list .link-card {
-  background: var(--accent-bg);
+  background: rgba(250, 137, 137, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-color: rgba(250, 137, 137, 0.4); /* ponytail: color, not size */
 }
 @media (hover: hover) {
