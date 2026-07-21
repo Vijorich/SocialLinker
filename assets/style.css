@@ -30,11 +30,9 @@ a { color: var(--accent); }
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 2.5rem 1.25rem 4rem;
+  position: relative;
   /* ponytail: rem scale here matches body's 1rem=16px */
   font-size: 1rem;
-  position: relative;
-  border-radius: var(--radius);
-  background: rgba(13, 10, 10, 0.65);
 }
 
 /* Single post reuses .container */
@@ -130,9 +128,6 @@ a { color: var(--accent); }
   gap: 0.25rem;
 }
 .link-list li { margin: 0; }
-.parallax-wrapper {
-  will-change: transform;
-}
 
 .link-card {
   display: flex;
