@@ -103,13 +103,13 @@ a { color: var(--accent); }
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
-  transition: background 1s, color 1s, transform 1s, border-radius 1s;
+  transition: background 0.5s ease, color 0.5s ease, transform 0.5s ease, border-radius 0.5s ease;
 }
 
 .external-link-icon {
   margin-left: auto;
   opacity: 0.4;
-  transition: opacity 1s;
+  transition: opacity 0.5s ease;
   flex-shrink: 0;
   width: 1rem;
   height: 1rem;
