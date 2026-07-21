@@ -31,57 +31,9 @@
 {{ content }}
 <footer class="site-footer">Made with ❤ by Vijor</footer>
 
-<div id="post-modal" class="modal-overlay hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-container">
-    <button class="modal-close" aria-label="Close">&times;</button>
-    <div class="modal-content"></div>
-  </div>
-</div>
-
 <script>
-if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})};var langLabel={'csharp':'C#','cs':'C#','js':'JS','ts':'TS','jsx':'JSX','tsx':'TSX','py':'Python','rb':'Ruby','go':'Go','rs':'Rust','sh':'Shell','ps':'PowerShell','yaml':'YAML','yml':'YAML','json':'JSON','md':'Markdown','html':'HTML','css':'CSS','sql':'SQL','xml':'XML','swift':'Swift','kt':'Kotlin','dart':'Dart','cpp':'C++','c':'C'};document.querySelectorAll('.highlighter-rouge').forEach(function(e){var m=e.className.match(/language-(\w+)/);if(m){var l=langLabel[m[1]]||m[1];e.dataset.lang=l}})
-
-// ponytail: modal post viewer
-var modal=document.getElementById('post-modal'),backdrop=modal.querySelector('.modal-backdrop'),container=modal.querySelector('.modal-container'),content=modal.querySelector('.modal-content'),closeBtn=modal.querySelector('.modal-close'),closeTimer=null
-
-function showModal(html){
-  if(closeTimer){clearTimeout(closeTimer);closeTimer=null}
-  content.innerHTML=html
-  content.querySelectorAll('.highlighter-rouge').forEach(function(e){
-    var m=e.className.match(/language-(\w+)/)
-    if(m){var l=langLabel[m[1]]||m[1];e.dataset.lang=l}
-  })
-  document.documentElement.style.overflow='hidden'
-  modal.classList.remove('hidden')
-  modal.classList.add('visible')
-  history.pushState({modal:true},'','')
-}
-
-function closeModal(){
-  modal.classList.remove('visible')
-  modal.classList.add('hidden')
-  document.documentElement.style.overflow=''
-  closeTimer=setTimeout(function(){content.innerHTML='';closeTimer=null},300)
-}
-
-document.querySelectorAll('.post-card').forEach(function(card){
-  card.addEventListener('click',function(e){
-    e.preventDefault()
-    var url=this.getAttribute('href')
-    fetch(url).then(function(r){return r.text()}).then(function(html){
-      var tmp=document.createElement('div')
-      tmp.innerHTML=html
-      var post=tmp.querySelector('.post-single')||tmp.querySelector('.post-content')
-      if(post)showModal(post.outerHTML)
-    })
-  })
-})
-
-closeBtn.addEventListener('click',closeModal)
-backdrop.addEventListener('click',closeModal)
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()})
-window.addEventListener('popstate',function(e){if(!e.state||!e.state.modal)closeModal()})
+if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
+document.querySelectorAll('.highlighter-rouge[class*=language-]').forEach(e=>{e.dataset.lang=(e.className.match(/language-(\w+)/)||[])[1]})
 </script>
 </body>
 </html>
