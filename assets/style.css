@@ -226,7 +226,7 @@ a { color: var(--accent); }
   letter-spacing: 0.05em;
   color: var(--fg-muted);
   background: var(--bg);
-  border-bottom-right-radius: 0.5rem;
+  border-radius: var(--radius) 0 0 0.5rem;
   z-index: 1;
 }
 .highlighter-rouge[data-lang] pre {
