@@ -1,0 +1,23 @@
+name: Stream Status
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch stream status
+        run: |
+          DATA=$(curl -s "https://api.ivr.fi/v2/twitch/user?login=vijor")
+          LIVE=$(echo "$DATA" | jq -r 'if .[0].stream != null then "true" else "false" end')
+          echo "{\"live\": $LIVE}" > assets/stream-status.json
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update stream status [skip ci]"
+          file_pattern: assets/stream-status.json
