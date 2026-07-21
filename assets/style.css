@@ -12,6 +12,7 @@
 }
 
 * { box-sizing: border-box; }
+::selection { background: var(--accent); color: #0d0d14; }
 html { scroll-behavior: smooth; }
 
 body {
