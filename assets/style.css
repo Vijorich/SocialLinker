@@ -13,9 +13,9 @@
 
 * { box-sizing: border-box; }
 ::selection { background: var(--accent); color: #0d0d14; }
-html { scroll-behavior: smooth; scrollbar-gutter: stable; scrollbar-color: #b06a6a transparent; }
+html { scroll-behavior: smooth; scrollbar-gutter: stable; scrollbar-color: #b06a6a var(--bg); }
 html::-webkit-scrollbar { width: 1rem; }
-html::-webkit-scrollbar-track { background: var(--scrollbar-track, transparent); }
+html::-webkit-scrollbar-track { background: var(--scrollbar-track, var(--bg)); }
 html::-webkit-scrollbar-button { width: 0; height: 0; display: none; }
 html::-webkit-scrollbar-thumb { background: #b06a6a; border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
 html::-webkit-scrollbar-thumb:hover { background: #c47a7a; }
