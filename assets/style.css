@@ -138,6 +138,7 @@ a { color: var(--accent); }
 /* ponytail: tap feedback for touch devices */
 @media (hover: none) {
 .link-card:active { scale: 0.97; transition: scale 0.15s; }
+.post-close:active { scale: 0.92; transition: scale 0.15s; }
 }
 
 /* Donate block */
@@ -297,12 +298,29 @@ a { color: var(--accent); }
   ::view-transition-new(*) { animation: none; }
 }
 
-/* Mobile */
-@media (max-width: 480px) {
-  .container { padding: 1.5rem 1rem 2.5rem; }
-  .post-single { padding: 4.5rem 1rem 2.5rem; }
-  .post-close { top: 1rem; right: 1rem; width: 2.75rem; height: 2.75rem; }
+/* Phone adaptation (< 768px). Desktop is the base; phones get denser spacing,
+   stacked card head, smaller hero + close button. Tablet portrait folds in here. */
+@media (max-width: 768px) {
+  body { font-size: 1.125rem; }
+  .container { padding: 1.5rem 1rem 2rem; }
+  .hero { margin-bottom: 1.5rem; padding-top: 0.5rem; }
+  .avatar { width: 5rem; height: 5rem; margin-bottom: 0.75rem; }
+  .nick { font-size: 2.25rem; }
+  .section { margin-bottom: 1.5rem; }
+  .link-card { padding: 0.875rem; gap: 0.75rem; }
+  .link-card svg { width: 1.75rem; height: 1.75rem; }
+  .post-card-head { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+  .post-single { padding: 4.5rem 1rem 2rem; }
   .post-article { padding: 1.25rem; }
+  .post-header .post-title { font-size: 1.5rem; }
+  .post-close { top: 1rem; right: 1rem; width: 2.75rem; height: 2.75rem; }
+  .post-close svg { width: 1.35rem; height: 1.35rem; }
+  .site-footer { padding: 1.5rem 1rem; }
+}
+
+/* Small phone refinement (< 380px): tighter density on tiny screens */
+@media (max-width: 380px) {
+  body { font-size: 1rem; }
   .nick { font-size: 2rem; }
-  .post-card-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .link-card { padding: 0.75rem; }
 }
