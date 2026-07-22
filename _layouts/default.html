@@ -33,6 +33,7 @@
 
 <script>
 if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
+document.querySelectorAll('.post-card').forEach(c=>{c.addEventListener('click',()=>{c.style.viewTransitionName='post-hero'})});window.addEventListener('pageshow',()=>{document.querySelectorAll('.post-card').forEach(c=>{c.style.viewTransitionName=''})});
 </script>
 </body>
 </html>

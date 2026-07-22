@@ -238,6 +238,30 @@ a { color: var(--accent); }
   font-size: 1rem;
 }
 
+/* View Transitions: cross-document. Clicked post-card morphs into post-header,
+   rest of page cross-fades. ponytail: native API, 0 deps.
+   Chrome/Edge/Safari 26+. Firefox/older = normal nav (graceful degradation). */
+@view-transition { navigation: auto; }
+
+.post-header { view-transition-name: post-hero; }
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.35s;
+    animation-timing-function: ease;
+  }
+  ::view-transition-group(post-hero) {
+    animation-duration: 0.45s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none; }
+}
+
 /* Mobile */
 @media (max-width: 480px) {
   .container, .post-single { padding: 1.5rem 1rem 2.5rem; }
