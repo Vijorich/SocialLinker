@@ -130,7 +130,7 @@ a { color: var(--accent); }
 .link-list li:first-child .link-card { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
 .link-list li:last-child .link-card { border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 @media (hover: hover) {
-.link-card:hover { background: rgba(40, 38, 28, 0.85); scale: 1.03; }
+.link-card:hover { background: rgba(40, 28, 28, 0.85); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
 .donate-list .link-card:hover { background: var(--gold); color: #14120d; }
 .link-card:hover .external-link-icon { opacity: 1; }
