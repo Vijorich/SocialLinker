@@ -6,7 +6,7 @@
   --border: #2a2727;
   --accent: #fa7979;
   --max-width: 40rem;
-  --radius: 1rem;
+  --radius: 2rem;
 }
 
 * { box-sizing: border-box; }
@@ -110,7 +110,7 @@ a { color: var(--accent); }
   background: rgba(31, 22, 22, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   color: var(--fg);
   text-decoration: none;
   font-weight: 500;
@@ -125,7 +125,7 @@ a { color: var(--accent); }
   width: 2rem;
   height: 2rem;
 }
-/* Cards form one block: outer corners rounded to 16, inner stay 8 */
+
 .link-list li:first-child .link-card { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
 .link-list li:last-child .link-card { border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 @media (hover: hover) {
