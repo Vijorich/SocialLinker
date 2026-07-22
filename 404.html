@@ -2,7 +2,7 @@
 layout: default
 ---
 <div class="container not-found">
-  <h1>404</h1>
-  <p>{{ site.data.locale.not_found | default: "Page not found." }}</p>
-  <p><a href="{{ '/' | relative_url }}">{{ site.data.locale.back_home | default: "← Home" }}</a></p>
+  <div class="not-found-code">404</div>
+  <p class="not-found-text">{{ site.data.locale.not_found | default: "Page not found." }}</p>
+  <a class="not-found-home" href="{{ '/' | relative_url }}">{{ site.data.locale.back_home | default: "← Home" }}</a>
 </div>

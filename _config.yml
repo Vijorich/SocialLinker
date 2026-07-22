@@ -1,11 +1,11 @@
 # Site
 title: SocialLinker
-description: "Personal business card."
+description: "Личная визитка."
 author: Vijor
 lang: ru
 
 # ponytail: project-page URL. For user page (user.github.io), set url + leave baseurl empty.
-url: ""
+url: "https://vijorich.github.io"
 baseurl: "/SocialLinker"
 
 # Build

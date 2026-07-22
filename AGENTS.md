@@ -10,7 +10,7 @@ bundle exec jekyll serve --baseurl ""
 ```
 
 > [!IMPORTANT]
-> Always pass `--baseurl ""`. `_config.yml` sets `baseurl: "/SocialLinker"` for the live Pages URL, so a plain `jekyll serve` renders broken asset paths locally. The `github-pages` gem is pinned in `Gemfile` so local build matches production.
+> Always pass `--baseurl ""`. `_config.yml` sets `baseurl: "/SocialLinker"` for the live Pages URL, so a plain `jekyll serve` renders broken asset paths locally. `Gemfile` pins the `github-pages` gem so local build matches the Pages runtime exactly (Jekyll 3.9.x + curated plugin allowlist); transitive deps land in `vendor/` (gitignored).
 
 ## Composition
 
