@@ -2,9 +2,9 @@ nick: Vijor
 avatar: /assets/avatar.webp
 
 # ponytail: фон отключён = цвет. Хочешь фон — кинь файл в assets/background.webp и раскомментируй блок:
-# background:
-#   image: /assets/background.webp
-#   mode: repeat   # repeat | cover | contain
+background:
+  image: /assets/background.gif
+  mode: repeat   # repeat | cover | contain
 
 bio: |
   Кто-то что делает что-то
