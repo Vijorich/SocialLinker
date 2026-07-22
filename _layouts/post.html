@@ -1,13 +1,15 @@
 ---
 layout: default
 ---
-<article class="post-single">
-  <p class="post-back"><a href="{{ '/' | relative_url }}">{{ site.data.locale.back_home | default: "← Home" }}</a></p>
-  <header class="post-header">
-    <h1 class="post-title">{{ page.title | escape }}</h1>
-    <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
-  </header>
-  <div class="post-content">
-    {{ content }}
-  </div>
-</article>
+<div class="post-single">
+  <a class="post-back" href="{{ '/' | relative_url }}">{{ site.data.locale.back_home | default: "← Home" }}</a>
+  <article class="post-article">
+    <header class="post-header">
+      <h1 class="post-title">{{ page.title | escape }}</h1>
+      <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+    </header>
+    <div class="post-content">
+      {{ content }}
+    </div>
+  </article>
+</div>

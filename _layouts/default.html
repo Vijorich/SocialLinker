@@ -33,7 +33,7 @@
 
 <script>
 if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
-document.querySelectorAll('.post-card').forEach(c=>{c.addEventListener('click',()=>{c.style.viewTransitionName='post-hero'})});window.addEventListener('pageshow',()=>{document.querySelectorAll('.post-card').forEach(c=>{c.style.viewTransitionName=''})});
+(function(){const cards=document.querySelectorAll('.post-card');if(!cards.length)return;const back=sessionStorage.getItem('vt-post-href');if(back){sessionStorage.removeItem('vt-post-href');const m=document.querySelector('.post-card[href="'+back+'"]');if(m)m.style.viewTransitionName='post-hero'}cards.forEach(c=>c.addEventListener('click',()=>{cards.forEach(x=>x.style.viewTransitionName='');sessionStorage.setItem('vt-post-href',c.getAttribute('href'));c.style.viewTransitionName='post-hero'}))})();
 </script>
 </body>
 </html>
