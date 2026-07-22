@@ -43,8 +43,8 @@ a { color: var(--accent); }
   width: 100%;
 }
 
-/* Single post reuses .container */
-.post-single { max-width: var(--max-width); margin: 0 auto; padding: 2rem 1.5rem 3rem; font-size: 1.25rem; flex: 1; width: 100%; }
+/* Single post reuses .container; padding-top clears the fixed close button */
+.post-single { max-width: var(--max-width); margin: 0 auto; padding: 5rem 1.5rem 3rem; font-size: 1.25rem; flex: 1; width: 100%; }
 
 /* Hero */
 .hero {
@@ -181,28 +181,32 @@ a { color: var(--accent); }
 .post-content { line-height: 1.5; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
 .post-content h1, .post-content h2, .post-content h3 { letter-spacing: -0.02em; }
-/* Back button — pill, matches link-card hover language */
-.post-back {
+/* Close button — fixed top-right, circular, same card-bg/blur language */
+.post-close {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
   display: inline-flex;
   align-items: center;
-  padding: 0.6rem 1.25rem;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
   background: rgba(31, 22, 22, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 0.125rem solid var(--border);
-  border-radius: 999px;
+  border-radius: 50%;
   color: var(--fg);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+  cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, scale 0.3s ease;
 }
-.post-back:hover {
+.post-close svg { width: 1.5rem; height: 1.5rem; }
+.post-close:hover {
   background: rgba(40, 28, 28, 0.85);
   border-color: var(--accent);
   color: var(--accent);
-  scale: 1.03;
+  scale: 1.08;
 }
 
 /* Projects */
@@ -295,7 +299,9 @@ a { color: var(--accent); }
 
 /* Mobile */
 @media (max-width: 480px) {
-  .container, .post-single { padding: 1.5rem 1rem 2.5rem; }
+  .container { padding: 1.5rem 1rem 2.5rem; }
+  .post-single { padding: 4.5rem 1rem 2.5rem; }
+  .post-close { top: 1rem; right: 1rem; width: 2.75rem; height: 2.75rem; }
   .post-article { padding: 1.25rem; }
   .nick { font-size: 2rem; }
   .post-card-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
