@@ -132,7 +132,7 @@ a { color: var(--accent); }
 @media (hover: hover) {
 .link-card:hover { background: rgba(40, 28, 28, 0.85); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
-.donate-list .link-card:hover { background: var(--accent); color: #0d0d14; }
+.donate-list .link-card:hover { background: var(--gold); color: rgba(250, 229, 137, 0.08); }
 .link-card:hover .external-link-icon { opacity: 1; }
 }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
