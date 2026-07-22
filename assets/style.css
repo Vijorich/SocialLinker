@@ -5,7 +5,7 @@
   --fg-muted: #af9c9c;
   --border: #2a2727;
   --accent: #fa7979;
-  --gold: #fadc79;
+  --gold: #fad879;
   --max-width: 40rem;
   --radius: 2rem;
 }
@@ -132,7 +132,7 @@ a { color: var(--accent); }
 @media (hover: hover) {
 .link-card:hover { background: rgba(40, 28, 28, 0.85); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
-.donate-list .link-card:hover { background: var(--gold); color: #14120d; }
+.donate-list .link-card:hover { background: var(--gold); color: #14110d; }
 .link-card:hover .external-link-icon { opacity: 1; }
 }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
@@ -144,7 +144,7 @@ a { color: var(--accent); }
 
 /* Donate block */
 .donate-list .link-card {
-  background: rgba(250, 220, 137, 0.08);
+  background: rgba(250, 210, 137, 0.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: var(--gold);
