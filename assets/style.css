@@ -84,8 +84,8 @@ a { color: var(--accent); }
   :first-child { margin-top: 0; }
   :last-child { margin-bottom: 0; }
   a { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
-  code { background: var(--bg-card); padding: 0.25em 0.5em; border-radius: 0.25rem; font-size: 0.85em; border: 0.125rem solid var(--border); }
-  pre { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); overflow-x: auto; border: 0.125rem solid var(--border); }
+  code { background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
+  pre { background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
   pre code { background: none; border: none; padding: 0; }
   blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); }
   ul, ol { padding-left: 1.5rem; }
@@ -173,7 +173,6 @@ a { color: var(--accent); }
   background: rgba(31, 22, 22, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 0.125rem solid var(--border);
   border-radius: var(--radius);
   padding: 2rem;
 }
@@ -197,7 +196,6 @@ a { color: var(--accent); }
   background: rgba(31, 22, 22, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 0.125rem solid var(--border);
   border-radius: 50%;
   color: var(--fg);
   cursor: pointer;
