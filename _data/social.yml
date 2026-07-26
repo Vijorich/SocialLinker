@@ -1,4 +1,8 @@
 # ponytail: order === display order. icon = brand slug, see _includes/icon.html for available list.
+# badge: "Live"/"New!" chip next to the name, shown by assets/badges.js when fresh.
+#   type: twitch (login), youtube (channel_id), telegram (channel).
+#   youtube channel_id empty -> badge never renders. Find yours: youtube.com/account_advanced
+badge_days: 3
 items:
   - name: GitHub
     url: https://github.com/Vijorich
@@ -6,15 +10,19 @@ items:
   - name: Twitch
     url: https://www.twitch.tv/vijor
     icon: twitch
+    badge: { type: twitch, login: vijor }
   - name: YouTube
     url: https://www.youtube.com/@vijor
     icon: youtube
+    badge: { type: youtube, channel_id: "" }
   - name: YouTube Second
     url: https://www.youtube.com/@vijorsup
     icon: youtube
+    badge: { type: youtube, channel_id: "" }
   - name: Telegram channel
     url: https://t.me/zerotaste
     icon: telegram
+    badge: { type: telegram, channel: zerotaste }
   - name: VK community
     url: https://vk.ru/vijorich
     icon: vk

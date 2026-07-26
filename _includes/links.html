@@ -9,12 +9,23 @@
 {% endif %}
 <section class="section" id="{{ include.section_id | default: _id }}">
   {% if include.title != false %}{% assign t = include.title | default: _default_title %}<h2 class="section-title">{{ t }}</h2>{% endif %}
-  <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}">
+  <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}" data-badge-days="{{ site.data.social.badge_days | default: 3 }}">
     {% for item in include.items %}
+    {% assign b = item.badge %}
+    {% if b and b.type == 'youtube' and b.channel_id == '' %}{% assign b = nil %}{% endif %}
     <li>
       <a href="{{ item.url | escape }}" target="_blank" rel="{{ _rel }}" class="link-card">
         {% include icon.html name=item.icon %}
         <span>{{ item.name | escape }}</span>
+        {% if b %}
+        <span class="badge badge-{% if b.type == 'twitch' %}live{% else %}new{% endif %}" hidden
+              data-badge-type="{{ b.type }}"
+              {%- if b.login %} data-badge-login="{{ b.login }}"{% endif %}
+              {%- if b.channel_id %} data-badge-id="{{ b.channel_id }}"{% endif %}
+              {%- if b.channel %} data-badge-channel="{{ b.channel }}"{% endif %}>
+          {%- if b.type == 'twitch' %}{{ site.data.locale.badge_live }}{% else %}{{ site.data.locale.badge_new }}{% endif -%}
+        </span>
+        {% endif %}
         {% include icon.html name='external' %}
       </a>
     </li>

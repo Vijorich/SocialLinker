@@ -26,6 +26,7 @@ bundle exec jekyll serve --baseurl ""
 | Nick, avatar path | `_data/profile.yml` |
 | Bio | `_data/profile.yml` (`bio`, `|` block scalar) |
 | Social links + order | `_data/social.yml` |
+| Live/New! badges | `_data/social.yml` (`badge` per item, `badge_days`) |
 | Donate block | `_data/donate.yml` |
 | UI strings | `_data/locale.yml` |
 | Icons (inline SVG) | `_includes/icon.html` (`{% case %}`) |
@@ -36,5 +37,6 @@ Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` 
 ## Repo-specific quirks
 
 - **Icons**: `icon.html` renders a `{% when %}` per brand from simpleicons.org; unknown `name` falls back to a globe SVG. Add a `case` to add a brand.
+- **Badges (Live/New!)**: client-side only — `assets/badges.js` reveals hidden chips rendered by `links.html`. Sources: decapi.me (Twitch uptime), api.allorigins.win as CORS proxy (YouTube RSS, t.me/s). All keyless; any fetch/parse error leaves the chip hidden. No VK support: VK blocks public proxies, needs an API token — add only if one appears. YouTube needs `channel_id` in `social.yml` (owner finds it at youtube.com/account_advanced); empty = chip never renders.
 - **Single-language (RU)**: server-rendered from `locale.yml` and `profile.yml`. No client-side i18n. Add strings to `locale.yml`, reference via `{{ site.data.locale.key }}`.
 - **Deploy**: push to `main`; Settings → Pages → Deploy from a branch, `/main`, root. Builds in ~1 min. Keep `baseurl`/`url` in `_config.yml` synced to the repo name.

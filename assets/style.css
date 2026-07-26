@@ -142,6 +142,44 @@ a { color: var(--accent); }
 .post-close:active { scale: 0.92; transition: scale 0.15s; }
 }
 
+/* Badges — "Live"/"New!" chips on link cards. Rendered hidden, shown by badges.js.
+   bob = float up/down + slight wobble; dot = recording-style pulse. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  animation: badge-bob 2.5s ease-in-out infinite;
+}
+.badge[hidden] { display: none; }
+.badge-new { background: var(--accent); color: #140d0d; }
+.badge-live { background: #e91916; color: #fff; }
+.badge-live::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #fff;
+  animation: badge-dot 1.2s ease-in-out infinite;
+}
+@keyframes badge-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-0.25rem) rotate(2deg); }
+}
+@keyframes badge-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge, .badge-live::before { animation: none; }
+}
+
 /* Donate block */
 .donate-list .link-card {
   background: rgba(250, 210, 137, 0.08);
