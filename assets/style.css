@@ -60,6 +60,7 @@ a { color: var(--accent); }
   border-radius: 50%;
   display: block;
   margin: 0 auto 1rem;
+  border: 0.125rem solid var(--accent);
 }
 .nick {
   font-size: 3rem;
