@@ -3,39 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% if page.title %}{{ page.title }}{% else %}{{ site.data.profile.nick }}{% endif %}</title>
+  {% assign t = page.title | default: site.data.profile.nick %}
+  <title>{{ t }}</title>
   <meta name="description" content="{{ site.description | escape }}">
   <meta name="author" content="{{ site.author | escape }}">
-  <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.data.profile.nick }}{% endif %}">
+  <meta property="og:title" content="{{ t }}">
   <meta property="og:description" content="{{ site.description | escape }}">
   <meta property="og:type" content="website">
   <meta property="og:image" content="{{ site.data.profile.avatar | absolute_url }}">
   <link rel="icon" href="{{ site.data.profile.avatar | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
   <script src="{{ '/assets/badges.js' | relative_url }}" defer></script>
-  {% if site.data.profile.background.image %}<style>html { --scrollbar-track: url('{{ site.data.profile.background.image | relative_url }}'); }</style>{% endif %}
-  <script>history.scrollRestoration='manual'</script>
 </head>
-{% if site.data.profile.background.image %}
-{% assign bg = site.data.profile.background %}
-{% assign bg_mode = bg.mode | default: 'cover' %}
-{% if bg_mode == 'repeat' %}
-  {% assign bg_size = 'auto' %}
-  {% assign bg_repeat = 'repeat' %}
-{% else %}
-  {% assign bg_size = bg_mode %}
-  {% assign bg_repeat = 'no-repeat' %}
-{% endif %}
-<body style="background-image: url('{{ bg.image | relative_url }}'); background-size: {{ bg_size }}; background-repeat: {{ bg_repeat }}; background-position: center;">
-{% else %}
 <body>
-{% endif %}
 {{ content }}
 
 <script>
 if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
 (function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
-(function(){const cards=document.querySelectorAll('.post-card');if(!cards.length)return;const sc=sessionStorage.getItem('home-scroll');if(sc!==null){sessionStorage.removeItem('home-scroll');window.scrollTo(0,+sc)}const back=sessionStorage.getItem('vt-post-href');if(back){sessionStorage.removeItem('vt-post-href');const m=document.querySelector('.post-card[href="'+back+'"]');if(m)m.style.viewTransitionName='post-hero'}cards.forEach(c=>c.addEventListener('click',()=>{cards.forEach(x=>x.style.viewTransitionName='');sessionStorage.setItem('vt-post-href',c.getAttribute('href'));sessionStorage.setItem('home-scroll',window.scrollY);c.style.viewTransitionName='post-hero'}));window.addEventListener('pageshow',()=>{if(document.querySelectorAll('.post-card').length)sessionStorage.removeItem('home-scroll')})})();
+(function(){const cards=document.querySelectorAll('.post-card');if(!cards.length)return;const back=sessionStorage.getItem('vt-post-href');if(back){sessionStorage.removeItem('vt-post-href');const m=document.querySelector('.post-card[href="'+back+'"]');if(m)m.style.viewTransitionName='post-hero'}cards.forEach(c=>c.addEventListener('click',()=>{cards.forEach(x=>x.style.viewTransitionName='');sessionStorage.setItem('vt-post-href',c.getAttribute('href'));c.style.viewTransitionName='post-hero'}))})();
 </script>
 </body>
 </html>
