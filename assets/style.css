@@ -13,11 +13,14 @@
 * { box-sizing: border-box; }
 ::selection { background: var(--accent); color: #140d0d; }
 html { scroll-behavior: smooth; scrollbar-gutter: stable; scrollbar-color: #b06a6a var(--bg); background: var(--bg); }
-html::-webkit-scrollbar { width: 1rem; }
-html::-webkit-scrollbar-track { background: var(--bg); }
-html::-webkit-scrollbar-button { width: 0; height: 0; display: none; }
-html::-webkit-scrollbar-thumb { background: #b06a6a; border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
-html::-webkit-scrollbar-thumb:hover { background: #c47a7a; }
+/* ponytail: @supports guard silences "bad selector" warnings in Firefox (no -webkit- pseudos) */
+@supports selector(::-webkit-scrollbar) {
+  html::-webkit-scrollbar { width: 1rem; }
+  html::-webkit-scrollbar-track { background: var(--bg); }
+  html::-webkit-scrollbar-button { width: 0; height: 0; display: none; }
+  html::-webkit-scrollbar-thumb { background: #b06a6a; border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
+  html::-webkit-scrollbar-thumb:hover { background: #c47a7a; }
+}
 
 body {
   margin: 0;
@@ -320,7 +323,10 @@ a { color: var(--accent); }
 /* View Transitions: cross-document. Whole .post-card morphs into .post-article
    (container transform — card unfolds into the article card, bg/radius persist).
    ponytail: native API, 0 deps. Chrome/Edge/Safari 26+. Firefox/older = normal nav. */
-@view-transition { navigation: auto; }
+/* ponytail: guard silences "unrecognized at-rule" in Firefox, which lacks view transitions */
+@supports (view-transition-name: none) {
+  @view-transition { navigation: auto; }
+}
 
 .post-article { view-transition-name: post-hero; }
 
