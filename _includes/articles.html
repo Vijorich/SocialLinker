@@ -19,6 +19,10 @@
     </li>
     {% endfor %}
   </ul>
+  <dialog id="post-modal" class="post-modal">
+    <button class="post-close" type="button" aria-label="Закрыть">{% include icon.html name='close' %}</button>
+    <div class="post-modal-body"></div>
+  </dialog>
   {% else %}
   <p class="post-excerpt">{{ site.data.locale.posts_empty }}</p>
   {% endif %}

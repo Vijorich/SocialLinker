@@ -33,7 +33,7 @@ bundle exec jekyll serve --baseurl ""
 | Icons (inline SVG) | `_includes/icon.html` (`{% case %}`) |
 | Styles | `assets/style.css` |
 
-Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` — appear in `articles.html` automatically.
+Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` — appear in `articles.html` automatically. On the index they open in a modal (`<dialog id="post-modal">`): JS fetches the post page, extracts `.post-article`, and morphs card → dialog via same-document View Transition (`post-hero`, same name as the standalone page). Standalone post pages remain as no-JS/direct-link fallback. No history/URL sync on the modal — add pushState/popstate if ever requested.
 
 ## Repo-specific quirks
 
