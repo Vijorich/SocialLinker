@@ -16,7 +16,7 @@ bundle exec jekyll serve --baseurl ""
 
 `default.html` owns ALL shared chrome (head, meta, OG tags). Never duplicate it in includes.
 
-`index.html` iterates `_data/sections.yml` (order = render order, omit or add entries to show/hide sections). Each section type maps to a `_includes/*.html`. Titles: override via `title:` in sections.yml, omit for locale default, set `""` to hide.
+`index.html` iterates `_data/sections.yml` (order = render order, omit or add entries to show/hide sections). Each section `type` maps to a `_includes/*.html`. Titles: override via `title:` in sections.yml, omit for locale default, `false` to hide the heading.
 
 ## Where to edit content
 
@@ -27,6 +27,7 @@ bundle exec jekyll serve --baseurl ""
 | Bio | `_data/profile.yml` (`bio`, `|` block scalar) |
 | Social links + order | `_data/social.yml` |
 | Live/New! badges | `_data/social.yml` (`badge` per item, `badge_days`) |
+| Projects list | `_data/projects.yml` |
 | Donate block | `_data/donate.yml` |
 | UI strings | `_data/locale.yml` |
 | Icons (inline SVG) | `_includes/icon.html` (`{% case %}`) |
@@ -37,6 +38,6 @@ Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` 
 ## Repo-specific quirks
 
 - **Icons**: `icon.html` renders a `{% when %}` per brand from simpleicons.org; unknown `name` falls back to a globe SVG. Add a `case` to add a brand.
-- **Badges (Live/New!)**: client-side only — `assets/badges.js` reveals hidden chips rendered by `links.html`. Sources: decapi.me (Twitch uptime), public CORS proxy chain in `badges.js` (corsproxy.io → allorigins.win → codetabs.com) for YouTube RSS and t.me/s. All keyless; any fetch/parse error leaves the chip hidden. No VK support: VK blocks public proxies, needs an API token — add only if one appears. YouTube needs `channel_id` in `social.yml` (owner finds it at youtube.com/account_advanced); empty = chip never renders.
+- **Badges (Live/New!)**: client-side only — `assets/badges.js` reveals hidden chips rendered by `links.html`. Sources: decapi.me (Twitch uptime), public CORS proxy chain in `badges.js` (corsproxy.io → allorigins.win → codetabs.com) for YouTube RSS and t.me/s. All keyless; any fetch/parse error leaves the chip hidden. No VK support: VK blocks public proxies, needs an API token — add only if one appears. YouTube needs `channel_id` in `social.yml` (owner finds it at youtube.com/account_advanced); empty = chip suppressed at render in `links.html`, never reaches the client.
 - **Single-language (RU)**: server-rendered from `locale.yml` and `profile.yml`. No client-side i18n. Add strings to `locale.yml`, reference via `{{ site.data.locale.key }}`.
 - **Deploy**: push to `main`; Settings → Pages → Deploy from a branch, `/main`, root. Builds in ~1 min. Keep `baseurl`/`url` in `_config.yml` synced to the repo name.
