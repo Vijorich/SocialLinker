@@ -1,32 +1,43 @@
 :root {
   color-scheme: dark;
-  --bg: #140d0d;
-  --bg-card: #481f1f;
-  --bg-card-hover: #a12727;
-  --fg: #e7e4e4;
-  --fg-muted: #af9c9c;
-  --accent: #da2c2c;
-  /* Signal Red lifted to a readable tint: link text on dark/card surfaces (≥4.5:1). */
-  --accent-link: #ff6b59;
-  /* Deep signal red: high-contrast fill behind light text (New! badge). */
-  --accent-deep: #b6261f;
-  /* Hotter signal red for the Live badge fill; pure-white text clears AA on this, bone-white does not. */
-  --accent-live: #d0342c;
-  --gold: #fad879;
+  /* Ember Stage — OKLCH lightness ramp. Every role has a defined lightness so
+     contrast is structural, not accidental. Anchor hue 27 (ember red); neutrals
+     drift warm at h30 low-chroma. One signal hue in three steps: Deep (light-text
+     fill), Live (hotter badge fill), Bright (text/icon on any surface incl. Ember). */
+  --bg: #0d0706;            /* Cinder  — page ground */
+  --bg-grad: #140c0b;       /* Cinder² — vertical-gradient bottom */
+  --bg-card: #301512;       /* Oxblood — card surface */
+  --bg-card-hover: #7b2a25; /* Ember   — heated surface (hover/focus) */
+  --bg-donate: #4c2f19;     /* Hearth  — donate surface, warm toward gold */
+  --fg: #eee4e0;            /* Bone    — primary text */
+  --fg-muted: #b1a09d;      /* Ash     — muted text (clears 4.5:1 on every surface) */
+  --accent: #d1433c;        /* Signal  — resting accent: fills, borders, rings, rails */
+  /* Signal lifted to a readable tint: accent as TEXT/ICON anywhere, including on
+     the heated Ember surface (clears 3:1 icons; 4.5:1 text on Cinder & Oxblood). */
+  --accent-link: #f67e6c;
+  /* Deep signal red: high-contrast fill behind light text (New! badge; bone ≈ 5.1:1). */
+  --accent-deep: #af302b;
+  /* Hotter signal red for the Live badge fill; white text clears ≈ 5.5:1. */
+  --accent-live: #bb3c35;
+  /* Selection surface — tuned so Cinder text clears 4.5:1 on it. */
+  --accent-sel: #d65048;
+  --gold: #fdd171;          /* Spotlight — donate block only */
   /* Warm ember scrollbar — tonal with the maroon ramp, not neutral gray. */
-  --scrollbar: #b06a6a;
-  --scrollbar-hover: #c47a7a;
+  --scrollbar: #795b56;
+  --scrollbar-hover: #997770;
   --max-width: 40rem;
   --radius: 2rem;
 
-  /* Type scale — the documented DESIGN.md ramp as the single source of truth.
-     One system stack (One-Stack Rule); hierarchy by size, weight, tracking, case. */
-  --text-display: 3rem;      /* .nick — the only oversized text on the page */
-  --text-headline: 1.75rem;  /* post titles */
+  /* Type — one system stack (One-Stack Rule). Fluid clamp scale: roles breathe
+     smoothly across the viewport instead of jumping at breakpoints; endpoints
+     preserve the chat-readable phone sizes and desktop presence. Hierarchy by
+     size, weight, tracking, case. */
+  --text-display: clamp(2rem, 1.41rem + 2.48vw, 3rem);        /* .nick — focal hero */
+  --text-headline: clamp(1.4rem, 1.19rem + 0.87vw, 1.75rem);  /* post titles, prose h1 */
   --text-title: 1rem;        /* section labels (uppercase, tracked) */
-  --text-body: 1.25rem;      /* default body — large for phone-from-chat reading */
+  --text-body: clamp(1rem, 0.76rem + 1.03vw, 1.25rem);        /* default body */
   --text-meta: 1rem;         /* muted secondary: dates, excerpts, descriptions, nav, footer */
-  --text-tagline: 1.125rem;  /* hero one-liner — one step above meta */
+  --text-tagline: clamp(0.95rem, 0.85rem + 0.43vw, 1.125rem); /* hero one-liner */
   --text-label: 0.75rem;     /* badges */
   /* Leading tuned to size: tight at display, generous for reading. The arc mirrors
      the Negative-Tracking Rule — tightness belongs to the big stuff, air to the small. */
@@ -34,10 +45,15 @@
   --leading-headline: 1.2;
   --leading-body: 1.5;
   --leading-read: 1.7;
+  /* ponytail: deeper fallbacks (Noto Sans for Linux, Helvetica Neue/Arial tail) +
+     optical sizing + kerning. Zero new assets — the system stack just renders its
+     best on every platform. Mono stack so code reads as code, not costume-sans. */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
-::selection { background: var(--accent); color: #140d0d; }
+::selection { background: var(--accent-sel); color: var(--bg); }
 html { scrollbar-color: var(--scrollbar) var(--bg); background: var(--bg); }
 /* scrollbar-gutter reserves layout space for the bar — only worth it where a real bar
    shows (fine pointer). Touch/overlay scrollbars are zero-width, so reserving space on
@@ -61,11 +77,16 @@ body {
   min-height: 100vh;       /* fallback for pre-dvh browsers */
   min-height: 100dvh;      /* dynamic viewport — no jump when iOS Safari's bars collapse/expand */
   align-items: center;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(180deg, #140d0d 0%, #1a1010 100%);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-grad) 100%);
   color: var(--fg);
   line-height: var(--leading-body);
   font-size: var(--text-body);
+  /* ponytail: light-on-dark compensation — a hair of tracking aids legibility
+     without breaking the Negative-Tracking Rule's spirit (reads ~0 at a glance). */
+  letter-spacing: 0.005em;
   text-wrap: pretty;
   -webkit-font-smoothing: antialiased;
 }
@@ -157,8 +178,8 @@ a { color: var(--accent-link); }
    Sonar pulse reuses the badge-dot timing; glow allowed as live-activity state. */
 .avatar.live { animation: avatar-live 1.2s ease-in-out infinite; }
 @keyframes avatar-live {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(218, 44, 44, 0.55); }
-  50% { box-shadow: 0 0 0 0.5rem rgba(218, 44, 44, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(209, 67, 60, 0.55); }
+  50% { box-shadow: 0 0 0 0.5rem rgba(209, 67, 60, 0); }
 }
 
 /* ── Ember Stage ────────────────────────────────────────────────────────
@@ -180,7 +201,7 @@ a { color: var(--accent-link); }
   width: 30rem; height: 30rem;
   margin-left: -15rem;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(218, 44, 44, 0.85) 0%, rgba(218, 44, 44, 0) 65%);
+  background: radial-gradient(circle, rgba(209, 67, 60, 0.85) 0%, rgba(209, 67, 60, 0) 65%);
   filter: blur(48px);
   pointer-events: none;
   z-index: 0;
@@ -253,8 +274,8 @@ a { color: var(--accent-link); }
   :first-child { margin-top: 0; }
   :last-child { margin-bottom: 0; }
   a { color: var(--accent-link); text-decoration: underline; text-underline-offset: 0.15em; &:hover { color: var(--fg); text-decoration-thickness: 2px; } }
-  code { background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
-  pre { background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
+  code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
+  pre { font-family: var(--font-mono); background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
   pre code { background: none; border: none; padding: 0; }
   blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); }
   ul, ol { padding-left: 1.5rem; }
@@ -293,13 +314,13 @@ a { color: var(--accent-link); }
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 107, 89, 0.18), transparent 70%);
+  background: radial-gradient(circle at center, rgba(246, 126, 108, 0.18), transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 .donate-list .link-card::before {
-  background: radial-gradient(circle at center, rgba(250, 216, 121, 0.28), transparent 70%);
+  background: radial-gradient(circle at center, rgba(253, 209, 113, 0.28), transparent 70%);
 }
 /* Visited dimming — tracks clicked destinations by tone, never by changing the card surface.
    Donate keeps its gold (later rule wins); hover restores full bone-white (contrast on ember). */
@@ -333,6 +354,13 @@ a { color: var(--accent-link); }
 .link-card:hover { background: var(--bg-card-hover); color: var(--fg); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
 .donate-list .link-card:hover { background: var(--gold); color: var(--bg); }
+/* Heat-On-Touch lifts muted secondary lines too — Ash on the heated Ember surface
+   would dip below 4.5:1, so descriptions/excerpts/dates brighten with the card.
+   Donate variant goes Cinder on gold (dark text on the spotlight fill). */
+.link-card:hover .link-desc,
+.link-card:hover .post-excerpt,
+.link-card:hover .post-date { color: var(--fg); }
+.donate-list .link-card:hover .link-desc { color: var(--bg); }
 .link-card:hover::before { opacity: 1; }
 .link-card:hover .external-link-icon { opacity: 1; }
 }
@@ -346,6 +374,10 @@ a { color: var(--accent-link); }
 }
 .link-card:focus-visible::before { opacity: 1; }
 .donate-list .link-card:focus-visible { background: var(--gold); color: var(--bg); }
+.link-card:focus-visible .link-desc,
+.link-card:focus-visible .post-excerpt,
+.link-card:focus-visible .post-date { color: var(--fg); }
+.donate-list .link-card:focus-visible .link-desc { color: var(--bg); }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
 /* ponytail: tap feedback for touch devices */
 @media (hover: none) {
@@ -374,7 +406,7 @@ a { color: var(--accent-link); }
 }
 .badge[hidden] { display: none; }
 .badge-new { background: var(--accent-deep); color: var(--fg); }
-/* ponytail: text/dot stay #ffffff (not var(--fg)) — bone-white on this red ≈ 3.95:1, fails AA small-bold. */
+/* ponytail: text/dot stay #ffffff — white on the hotter Live fill clears ≈ 5.5:1; bone would pass too, white reads loudest for "on air". */
 .badge-live { background: var(--accent-live); color: #ffffff; }
 .badge-live::before {
   content: "";
@@ -420,7 +452,7 @@ a { color: var(--accent-link); }
 /* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
    above Oxblood so the warm peak reads at rest; touch has no hover to reveal it. */
 .donate-list .link-card {
-  background: #6a4628;
+  background: var(--bg-donate);
   color: var(--gold);
 }
 /* Gold light-sweep: a diagonal sheen crosses the gold fill on hover — light catching
@@ -474,7 +506,10 @@ a { color: var(--accent-link); }
 .post-header .post-title { margin: 0 0 0.5rem; font-size: var(--text-headline); line-height: var(--leading-headline); letter-spacing: -0.02em; text-wrap: balance; }
 .post-header .post-date { font-size: var(--text-meta); color: var(--fg-muted); }
 .post-content { line-height: var(--leading-read); max-width: 44rem; }
-.post-content h1, .post-content h2, .post-content h3 { margin: 2rem 0 0.75rem; letter-spacing: -0.02em; }
+.post-content h1 { font-size: var(--text-headline); }
+.post-content h2 { font-size: clamp(1.15rem, 1rem + 0.4vw, 1.4rem); }
+.post-content h3 { font-size: clamp(1.05rem, 0.92rem + 0.33vw, 1.25rem); }
+.post-content h1, .post-content h2, .post-content h3 { margin: 2rem 0 0.75rem; font-weight: 600; letter-spacing: -0.02em; line-height: var(--leading-headline); text-wrap: balance; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
 /* Post nav — prev/next at the foot of the article. Lives inside .post-article so the
    index modal copies it; modal JS swaps content instead of navigating there. */
@@ -484,7 +519,7 @@ a { color: var(--accent-link); }
   gap: 1rem;
   margin-top: 2.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgba(231, 228, 228, 0.12);
+  border-top: 1px solid rgba(238, 228, 224, 0.12);
   font-size: var(--text-meta);
 }
 .post-nav a {
@@ -546,7 +581,7 @@ a { color: var(--accent-link); }
   view-transition-name: post-hero;
 }
 .post-modal[open] { display: flex; flex-direction: column; }
-.post-modal::backdrop { background: rgba(10, 6, 6, 0.6); }
+.post-modal::backdrop { background: rgba(13, 7, 6, 0.6); }
 .post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: var(--scrollbar) transparent; }
 /* Transient loading state shown in the modal body while the post fetch is in flight. */
 .post-loading { margin: 0; padding: 2rem 0; color: var(--fg-muted); text-align: center; }
@@ -634,8 +669,9 @@ a { color: var(--accent-link); }
   60% { transform: scale(1); }
 }
 
-/* View Transitions: cross-document. Whole .post-card morphs into .post-article
-   (container transform — card unfolds into the article card, bg/radius persist).
+/* View Transitions: cross-document (card → standalone article) and same-document
+   (card → modal). Material-3 container transform: the box morphs (bounds/radius/color),
+   title + time fly as shared elements, body content staggers in after the fetch.
    ponytail: native API, 0 deps. Chrome/Edge/Safari 26+. Firefox/older = normal nav. */
 /* ponytail: guard silences "unrecognized at-rule" in Firefox, which lacks view transitions */
 @supports (view-transition-name: none) {
@@ -645,16 +681,40 @@ a { color: var(--accent-link); }
 .post-article { view-transition-name: post-hero; }
 
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 0.4s;
+  /* Emphasized entry (M3 standard decelerate). Box + the two shared text elements share
+     one timing so the morph reads as a single motion; only transform/opacity/radius run. */
+  ::view-transition-group(post-hero),
+  ::view-transition-group(post-title),
+  ::view-transition-group(post-time) {
+    animation-duration: 0.38s;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* Box snapshots cross-fade fast — bg is constant oxblood, so this hides the vertical
+     stretch as the card image grows into the modal surface. */
+  ::view-transition-old(post-hero),
+  ::view-transition-new(post-hero) {
+    animation-duration: 0.2s;
     animation-timing-function: ease;
   }
-  /* Group = the morphing box (pos/size/radius). Snapshots cross-fade inside at default 0.25s,
-     so the stretched card image fades fast while the box finishes growing (hides vertical stretch). */
-  ::view-transition-group(post-hero) {
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Shared text cross-fades quickly while its group flies it to the new position. */
+  ::view-transition-old(post-title), ::view-transition-new(post-title),
+  ::view-transition-old(post-time),  ::view-transition-new(post-time) {
+    animation-duration: 0.18s;
+    animation-timing-function: ease;
+  }
+  /* Scrim + page continuity lag the container a touch: the morph leads, the scrim follows. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.34s;
+    animation-delay: 0.05s;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* Close = mirrored reverse on the emphasized exit curve (faster, slight overshoot). */
+  :root.vt-closing::view-transition-group(post-hero),
+  :root.vt-closing::view-transition-group(post-title),
+  :root.vt-closing::view-transition-group(post-time) {
+    animation-timing-function: cubic-bezier(0.3, 0, 0.8, 0.15);
+    animation-duration: 0.3s;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -663,11 +723,28 @@ a { color: var(--accent-link); }
   ::view-transition-new(*) { animation: none; }
 }
 
+/* Content reveal: once the article lands in the modal, body + nav fade-translate in with a
+   short sibling stagger (--i set per child in JS). Title/time are already placed by the morph,
+   so only the remaining content animates — transform/opacity only. */
+@media (prefers-reduced-motion: no-preference) {
+  .post-modal-body.entering .post-content > *,
+  .post-modal-body.entering .post-nav {
+    animation: post-content-in 0.42s cubic-bezier(0.2, 0, 0, 1) both;
+    animation-delay: calc(var(--i, 0) * 36ms);
+  }
+}
+@keyframes post-content-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Reduced-motion / no-VT fallback: a plain 150ms fade-in (added via JS). */
+.post-modal.fade { animation: modal-fade-in 0.15s ease both; }
+@keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* Phone adaptation (< 768px). Desktop is the base; phones get denser spacing,
    stacked card head, smaller hero + close button. Tablet portrait folds in here. */
 @media (max-width: 768px) {
-  /* Responsive intent lives here once: the big roles shrink together. */
-  :root { --text-body: 1.125rem; --text-display: 2.25rem; --text-tagline: 1rem; --text-headline: 1.5rem; }
+  /* Type is fluid now (clamp scale above) — only layout/spacing adapt here. */
   .container { padding: max(1.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 2rem max(1rem, env(safe-area-inset-left)); }
   .hero { margin-bottom: 1.5rem; padding-top: 0.5rem; }
   .avatar { width: 5rem; height: 5rem; margin-bottom: 0.75rem; }
@@ -686,7 +763,6 @@ a { color: var(--accent-link); }
 
 /* Small phone refinement (< 380px): tighter density on tiny screens */
 @media (max-width: 380px) {
-  :root { --text-body: 1rem; --text-display: 2rem; }
   .link-card { padding: 0.75rem; }
 }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#140d0d">
+  <meta name="theme-color" content="#0d0706">
   {% assign t = page.title | default: site.data.profile.nick %}
   <title>{{ t }}</title>
   <meta name="description" content="{{ site.description | escape }}">
@@ -25,22 +25,44 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
 (function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
 (function(){const cards=document.querySelectorAll('.post-card');if(!cards.length)return;const dlg=document.getElementById('post-modal');
 if(!dlg){const back=sessionStorage.getItem('vt-post-href');if(back){sessionStorage.removeItem('vt-post-href');const m=document.querySelector('.post-card[href="'+back+'"]');if(m)m.style.viewTransitionName='post-hero'}cards.forEach(c=>c.addEventListener('click',()=>{cards.forEach(x=>x.style.viewTransitionName='');sessionStorage.setItem('vt-post-href',c.getAttribute('href'));c.style.viewTransitionName='post-hero'}));return}
-/* Modal path: open shows a loading state and morphs card -> dialog, then the fetch resolves
-   into the open modal (the click is never silent). URL synced: a successful fill pushes the
-   post URL (refresh lands on the standalone page = no-JS fallback); Back closes, Forward reopens. */
-const body=dlg.querySelector('.post-modal-body');const vt=document.startViewTransition?document.startViewTransition.bind(document):null;let activeCard=null,busy=false,gen=0;
+/* Modal path: Material-3 container transform. The clicked card morphs into the dialog
+   (bounds/radius/color on the box); title + time fly as shared elements; body content
+   fades in staggered once the fetch lands. Open is never silent — the card unfolds at once.
+   URL synced: a successful fill pushes the post URL (refresh = standalone page = no-JS
+   fallback); Back closes, Forward reopens. */
+const body=dlg.querySelector('.post-modal-body');
+const q=(el,s)=>el&&typeof el.querySelector==='function'?el.querySelector(s):null;
+const cls=(el,f,c)=>{if(el&&el.classList&&el.classList[f])el.classList[f](c)};
+const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canVT=()=>('startViewTransition'in document)&&!reduced();
+let activeCard=null,busy=false,gen=0;
 async function fetchArticle(url){try{const r=await fetch(url);if(r.ok)return new DOMParser().parseFromString(await r.text(),'text/html').querySelector('.post-article')}catch{}return null}
 function fill(card,article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t)dlg.setAttribute('aria-label',t.textContent);activeCard=card}
 /* gen: any history event or close invalidates in-flight fetches/VTs, so a stale completion
    can't reopen the modal, push out of order, or clobber a newer morph. */
-async function open(card,push){if(dlg.open||busy)return;busy=true;const g=++gen;const url=card.getAttribute('href');activeCard=card;body.innerHTML='<p class="post-loading">Загрузка…</p>';dlg.setAttribute('aria-label','Загрузка');const show=()=>{card.style.viewTransitionName='';if(g!==gen)return;dlg.showModal()};if(vt){card.style.viewTransitionName='post-hero';vt(show)}else show();const article=await fetchArticle(url);if(g!==gen){busy=false;return}if(!article){busy=false;location.href=url;return}fill(card,article);body.scrollTop=0;if(push!==false)history.pushState({postModal:url},'',url);busy=false}
-async function swap(url,push){const g=++gen;const article=await fetchArticle(url);if(!article){if(g===gen)location.href=url;return}if(g!==gen)return;const card=[...cards].find(c=>c.getAttribute('href')===url);fill(card||activeCard,article);body.scrollTop=0;if(push!==false)history.pushState({postModal:url},'',url)}
-function closeMorph(){const card=activeCard;activeCard=null;const g=++gen;const cleanup=()=>{if(card&&g===gen)card.style.viewTransitionName=''};if(vt&&card){const t=vt(()=>{dlg.close();card.style.viewTransitionName='post-hero'});t.finished.then(cleanup,cleanup)}else{dlg.close();cleanup()}}
+/* Shared-element names are set inline only on the active card + the modal's current header,
+   then cleared after each morph — never more than one of each name in a snapshot. Card→dialog
+   on open; dialog→card (mirrored) on close. */
+function cardNames(card,on){if(!card)return;card.style.viewTransitionName=on?'post-hero':'';const t=q(card,'.post-title'),d=q(card,'.post-date');if(t&&t.style)t.style.viewTransitionName=on?'post-title':'';if(d&&d.style)d.style.viewTransitionName=on?'post-time':''}
+function modalNames(on){const t=q(dlg,'.post-title'),d=q(dlg,'.post-date');if(t&&t.style)t.style.viewTransitionName=on?'post-title':'';if(d&&d.style)d.style.viewTransitionName=on?'post-time':''}
+/* Skeleton pre-fills the header from the card so the shared elements have a known end
+   position at click time (no fetch needed for the morph); the body loads until the article
+   lands, then cross-fades in with a stagger. */
+function skeleton(card){const ti=q(card,'.post-title'),da=q(card,'.post-date');body.innerHTML='<header class="post-header"><h1 class="post-title">'+(ti?ti.textContent:'')+'</h1><span class="post-date">'+(da?da.innerHTML:'')+'</span></header><div class="post-content"><p class="post-loading">Загрузка…</p></div>'}
+function reveal(){if(reduced()||typeof body.querySelectorAll!=='function'||!body.classList)return;let i=0;body.querySelectorAll('.post-content > *, .post-nav').forEach(el=>{if(el&&el.style)el.style.setProperty('--i',Math.min(i++,6))});const c=body.querySelector('.post-content');if(c){void c.offsetWidth;cls(body,'add','entering')}}
+async function open(card,push){if(dlg.open||busy)return;busy=true;const g=++gen;const url=card.getAttribute('href');activeCard=card;skeleton(card);dlg.setAttribute('aria-label','Загрузка');let done;const show=()=>{cardNames(card,false);if(g!==gen)return;dlg.showModal()};if(canVT()){cardNames(card,true);const t=document.startViewTransition(()=>{modalNames(true);show()});done=t.finished.catch(()=>{})}else{show();cls(dlg,'add','fade');done=Promise.resolve()}const article=await fetchArticle(url);if(g!==gen){busy=false;return}if(!article){busy=false;location.href=url;return}await done;if(g!==gen){busy=false;return}fill(card,article);body.scrollTop=0;reveal();if(push!==false)history.pushState({postModal:url},'',url);busy=false}
+async function swap(url,push){const g=++gen;const article=await fetchArticle(url);if(!article){if(g===gen)location.href=url;return}if(g!==gen)return;const card=[...cards].find(c=>c.getAttribute('href')===url);fill(card||activeCard,article);body.scrollTop=0;reveal();if(push!==false)history.pushState({postModal:url},'',url)}
+function closeMorph(){const card=activeCard;activeCard=null;const g=++gen;const cleanup=()=>{if(card&&g===gen)cardNames(card,false);modalNames(false);cls(dlg,'remove','fade');cls(document.documentElement,'remove','vt-closing');if(dlg.style){dlg.style.transform='';dlg.style.opacity='';dlg.style.transition=''}};if(canVT()&&card){modalNames(true);cls(document.documentElement,'add','vt-closing');const t=document.startViewTransition(()=>{cardNames(card,true);modalNames(false);dlg.close()});t.finished.then(cleanup,cleanup)}else{dlg.close();cleanup()}}
 function close(){if(!dlg.open)return;if(history.state&&history.state.postModal){history.back();return}closeMorph()}
 cards.forEach(c=>c.addEventListener('click',e=>{e.preventDefault();open(c)}));dlg.querySelector('.post-close').addEventListener('click',close);
 dlg.addEventListener('click',e=>{if(e.target===dlg){close();return}const nav=e.target.closest('.post-nav a');if(nav&&dlg.contains(nav)){e.preventDefault();swap(nav.getAttribute('href'))}});
 dlg.addEventListener('cancel',e=>{e.preventDefault();close()});
-window.addEventListener('popstate',e=>{gen++;const u=e.state&&e.state.postModal;if(!u){if(dlg.open)closeMorph();return}const card=[...cards].find(c=>c.getAttribute('href')===u);if(!card){if(dlg.open)closeMorph();location.href=u;return}if(!dlg.open)open(card,false);else if(activeCard!==card)swap(u,false)})})();
+window.addEventListener('popstate',e=>{gen++;const u=e.state&&e.state.postModal;if(!u){if(dlg.open)closeMorph();return}const card=[...cards].find(c=>c.getAttribute('href')===u);if(!card){if(dlg.open)closeMorph();location.href=u;return}if(!dlg.open)open(card,false);else if(activeCard!==card)swap(u,false)});
+/* Drag-to-dismiss from the post header: pull down to scrub a live preview; release past the
+   threshold commits to the mirrored close VT, below it springs back. Header-only so it never
+   fights body scroll. */
+(function(){if(reduced())return;let y0=0,dy=0,on=false;const THR=120;const end=()=>{if(!on)return;on=false;const commit=dy>THR;if(commit){close()}else{dlg.style.transition='transform .3s cubic-bezier(0.2,0,0,1),opacity .3s';dlg.style.transform='';dlg.style.opacity='';setTimeout(()=>{if(dlg.style)dlg.style.transition=''},320)}};dlg.addEventListener('pointerdown',e=>{if(busy||!dlg.open)return;if(e.button!==undefined&&e.button!==0)return;if(!e.target.closest||!e.target.closest('.post-header'))return;if((body.scrollTop||0)>0)return;on=true;y0=e.clientY;dy=0;try{dlg.setPointerCapture(e.pointerId)}catch{}});dlg.addEventListener('pointermove',e=>{if(!on)return;dy=Math.max(0,e.clientY-y0);const k=Math.min(dy/(dlg.offsetHeight||1),1);dlg.style.transition='none';dlg.style.transform='translateY('+dy+'px)';dlg.style.opacity=String(1-k*0.6)});dlg.addEventListener('pointerup',end);dlg.addEventListener('pointercancel',end)})();
+})();
 </script>
 </body>
 </html>

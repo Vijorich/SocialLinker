@@ -2,52 +2,75 @@
 name: SocialLinker
 description: Nocturnal ember-red business card — one page that routes viewers to every place Vijor lives online.
 colors:
-  cinder-black: "#140d0d"
-  oxblood: "#481f1f"
-  ember-red: "#a12727"
-  signal-red: "#da2c2c"
-  signal-link: "#ff6b59"
-  signal-deep: "#b6261f"
-  signal-live: "#d0342c"
-  spotlight-gold: "#fad879"
-  hearth-brown: "#6a4628"
-  ash-rose: "#af9c9c"
-  bone-white: "#e7e4e4"
-  scrollbar: "#b06a6a"
-  scrollbar-hover: "#c47a7a"
+  # OKLCH lightness ramp — every role has a defined lightness so contrast is
+  # structural, not accidental. Anchor hue 27 (ember red); neutrals drift warm
+  # at h30 low-chroma. One signal hue in three steps: Deep/Live (fills) →
+  # Bright (text/icon on any surface incl. Ember hover).
+  cinder-black: "#0d0706"
+  cinder-grad: "#140c0b"
+  oxblood: "#301512"
+  ember-red: "#7b2a25"
+  hearth-brown: "#4c2f19"
+  signal-red: "#d1433c"
+  signal-link: "#f67e6c"
+  signal-deep: "#af302b"
+  signal-live: "#bb3c35"
+  signal-sel: "#d65048"
+  spotlight-gold: "#fdd171"
+  ash-rose: "#b1a09d"
+  bone-white: "#eee4e0"
+  scrollbar: "#795b56"
+  scrollbar-hover: "#997770"
 typography:
+  # Fluid clamp scale — roles breathe across the viewport instead of jumping at
+  # breakpoints; endpoints preserve chat-readable phone sizes and desktop presence.
+  # One system stack (One-Stack Rule); deeper fallbacks + optical sizing + kerning.
+  fontSans: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+  fontMono: "ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace"
   display:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: "3rem"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontSize: "clamp(2rem, 1.41rem + 2.48vw, 3rem)"
     fontWeight: 500
     letterSpacing: "-0.02em"
     lineHeight: 1.1
   headline:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: "1.75rem"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontSize: "clamp(1.4rem, 1.19rem + 0.87vw, 1.75rem)"
+    fontWeight: 600
+    letterSpacing: "-0.02em"
+    lineHeight: 1.2
+  prose-h2:
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontSize: "clamp(1.15rem, 1rem + 0.4vw, 1.4rem)"
+    fontWeight: 600
+    letterSpacing: "-0.02em"
+    lineHeight: 1.2
+  prose-h3:
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontSize: "clamp(1.05rem, 0.92rem + 0.33vw, 1.25rem)"
     fontWeight: 600
     letterSpacing: "-0.02em"
     lineHeight: 1.2
   title:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "1rem"
     fontWeight: 500
     letterSpacing: "0.1em"
   body:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: "1.25rem"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontSize: "clamp(1rem, 0.76rem + 1.03vw, 1.25rem)"
     fontWeight: 400
     lineHeight: 1.5
   meta:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
   tagline:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: "1.125rem"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontSize: "clamp(0.95rem, 0.85rem + 0.43vw, 1.125rem)"
     fontWeight: 400
   label:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 700
     letterSpacing: "0.05em"
@@ -94,7 +117,7 @@ components:
     size: "48px"
   post-close-hover:
     backgroundColor: "{colors.ember-red}"
-    textColor: "{colors.signal-red}"
+    textColor: "{colors.signal-link}"
 ---
 
 # Design System: SocialLinker
@@ -118,60 +141,63 @@ Confirmed anti-references: never a sterile light-mode SaaS look, never purple/bl
 
 ## Colors
 
-Warm maroon family from near-black to hot red, with a single gold that appears exactly once per page.
+A warm maroon family graded as an **OKLCH lightness ramp** from near-black ground to hot red, with a single gold that appears exactly once per page. Every role has a defined lightness, so contrast is structural rather than accidental — the palette was rebuilt this way to retire the contrast patches the old hex-by-feel values forced.
 
-### Primary
-- **Signal Red** (`{colors.signal-red}`): the accent — used for *fills, borders, and decorative state*: avatar ring, blockquote rails, selection background, the 404 code gradient, badge hovers. The voice of the page. As saturated *text* on dark surfaces it only clears ~3:1, so it is not used for link text directly (see Signal Link).
-- **Signal Link** (`{colors.signal-link}`): the readable rendering of Signal Red as link text and the keyboard focus ring on dark/card surfaces — same red lifted to ≥4.5:1. All in-prose links, post-nav hovers, and `:focus-visible` rings use this.
-- **Signal Deep** (`{colors.signal-deep}`): a deeper Signal Red for high-contrast fills behind light text (the New! badge). Needed because saturated Signal Red + dark text ≈ 3.9:1, failing AA for small bold.
-- **Signal Live** (`{colors.signal-live}`): the hotter Live-badge fill. Bone White on this red ≈ 3.95:1 (fails AA small-bold), so the Live badge pairs it with pure white text/dot — the only place pure white appears instead of Bone White.
-- **Ember Red** (`{colors.ember-red}`): hover state for every card. Cards literally heat up when touched.
+### Primary — one signal hue, three roles
+The signal red lives at anchor hue 27 (ember) and appears in three lightness steps with non-overlapping jobs:
+- **Signal** (`{colors.signal-red}`, L≈0.585): the resting accent — *fills, borders, rails, and the avatar ring.* Not used as text; as a non-text accent it clears 3:1 on Cinder and Oxblood. Selection uses **Signal Sel** (`{colors.signal-sel}`), a half-step tuned so Cinder text clears 4.5:1 on it.
+- **Signal Bright** (`{colors.signal-link}`, L≈0.725): the accent as **text or icon on any surface**, including the heated Ember hover. This is the single readable rendering of the red — all in-prose links, focus rings, post-nav hovers, and the close-button hover icon use it. It clears 4.5:1 as text on Cinder/Oxblood and 3:1 as an icon on Ember (the close-button tension that was previously *Open* is now resolved — no more red-on-red failure on hover).
+- **Signal Deep** (`{colors.signal-deep}`, L≈0.505) / **Signal Live** (`{colors.signal-live}`, L≈0.54): the two fill steps behind light text. New! uses Deep (Bone ≈ 5.1:1); Live uses the half-step-hotter Live fill (white ≈ 5.5:1) so "on air" reads visibly hotter than "fresh."
+- **Ember** (`{colors.ember-red}`, L≈0.405): the heated surface — hover/focus state for every card. Cards literally heat (lighten + gain chroma) when touched.
 
 ### Secondary
 - **Spotlight Gold** (`{colors.spotlight-gold}`): donate block only — the section title plus card text on Hearth Brown at rest, full gold fill on hover. Its scarcity is the point.
 
 ### Neutral
-- **Cinder Black** (`{colors.cinder-black}`): page ground (with a subtle vertical gradient to `#1a1010`), backdrop under the modal.
+- **Cinder Black** (`{colors.cinder-black}`): page ground (with a subtle vertical gradient to `{colors.cinder-grad}`), backdrop under the modal.
 - **Oxblood** (`{colors.oxblood}`): the card surface. Every interactive surface starts here.
-- **Hearth Brown** (`{colors.hearth-brown}`): donate card surface; a warm brown lifted to a clear tonal step above Oxblood, reaching toward gold so the donate block reads as a warm peak at rest.
+- **Hearth Brown** (`{colors.hearth-brown}`): donate card surface; a warm brown (hue drifts toward gold, h55) lifted to a clear tonal step above Oxblood so the donate block reads as a warm peak at rest.
 - **Bone White** (`{colors.bone-white}`): primary text.
-- **Ash Rose** (`{colors.ash-rose}`): muted text — section titles, dates, excerpts, footer.
+- **Ash Rose** (`{colors.ash-rose}`): muted text — section titles, dates, excerpts, descriptions, footer. Lifted to clear 4.5:1 on every resting surface including Hearth (the old value failed on the donate card).
 - **Scrollbar** / **Scrollbar Hover** (`{colors.scrollbar}` / `{colors.scrollbar-hover}`): warm ember scrollbar tones, tonal with the maroon ramp rather than neutral gray.
 
 ### Named Rules
 **The One Spotlight Rule.** Gold appears only in the donate block. Anywhere else it stops meaning "support" and starts meaning "decoration."
-**The Heat-On-Touch Rule.** Ember Red (`#a12727`) is a state, not a surface. It exists only under a hovered or activated element.
-**The Readable-Red Rule.** Signal Red is the accent for fills, borders, rings, and selection. When the same red appears as *text* on a dark surface (links, focus outlines, hover icons on red), use **Signal Link** so contrast clears WCAG AA 4.5:1. For a light-text fill that must read as Signal Red, use **Signal Deep**.
+**The Heat-On-Touch Rule.** Ember (`#7b2a25`) is a state, not a surface. It exists only under a hovered or activated element — and heat lifts everything on the card: the surface, the primary text, and the muted description/excerpt/date lines all brighten together (Ash would dip below 4.5:1 on the heated surface, so secondary lines promote to Bone on hover/focus).
+**The Readable-Red Rule.** Signal is the accent for fills, borders, rails, and (as Signal Sel) selection. The moment that red appears as *text or an icon* — links, focus rings, hover icons — use **Signal Bright**, which clears AA on every surface including its own Ember hover.
 
 ## Typography
 
-**Display/Body/Label Font:** system-ui (with -apple-system, Segoe UI, Roboto fallback) — one stack for everything.
+**Sans stack:** `system-ui` with `-apple-system`, `Segoe UI`, `Roboto`, `Helvetica Neue`, `Noto Sans`, `Arial` fallback — one stack for everything. **Mono stack:** `ui-monospace` with SF Mono / Cascadia / Roboto Mono / Menlo / Consolas fallback for `code` and `pre`, so code reads as code rather than costume-sans. Both stacks enable `font-optical-sizing: auto` and `font-kerning: normal`.
 
 **Character:** No webfonts by design. The system stack keeps the site zero-asset and instant on any device; hierarchy is carried by size, weight, tracking, and case — not by typeface contrast.
 
 ### Hierarchy
-- **Display** (500, 3rem / 2.25rem phone, -0.02em, leading 1.1): the nick in the hero. The only oversized text on the page.
-- **Headline** (600, 1.75rem / 1.5rem phone, -0.02em, leading 1.2): article titles on post pages and in the modal.
+The size ramp is **fluid** — each scalable role is a `clamp()` that breathes between a small-viewport floor (380px) and a desktop ceiling, instead of jumping at breakpoints. Endpoints preserve the chat-readable phone sizes and desktop presence.
+- **Display** (500, `clamp(2rem → 3rem)`, -0.02em, leading 1.1): the nick in the hero. The only oversized text on the page.
+- **Headline** (600, `clamp(1.4rem → 1.75rem)`, -0.02em, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
+- **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both 600 weight, -0.02em, leading 1.2 — a real sub-scale inside long-form copy (previously prose headings had no size or weight of their own).
 - **Title** (500, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
-- **Body** (400, 1.25rem, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Drops to 1.125rem (<768px) and 1rem (<380px). Long-form prose (`.post-content`) opens to leading 1.7.
+- **Body** (400, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
 - **Meta** (400, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. The quiet information that surrounds the primary text.
-- **Tagline** (400, 1.125rem / 1rem phone, Ash Rose): the optional hero one-liner, one step above meta.
+- **Tagline** (400, `clamp(0.95rem → 1.125rem)`, Ash Rose): the optional hero one-liner, one step above meta.
 - **Label** (700, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
 
 ### Named Rules
 **The One-Stack Rule.** Never add a webfont. If hierarchy is needed, reach for weight, size, tracking, or case — in that order.
-**The Negative-Tracking Rule.** Tight letter-spacing (-0.02em) is reserved for display and headline sizes only; body and labels stay at natural or positive tracking.
-**The Leading-Arc Rule.** Leading tightens as size grows: 1.1 display → 1.2 headline → 1.5 body → 1.7 long-form prose. Big type never inherits the body's air. Headings use `text-wrap: balance`; body and prose use `text-wrap: pretty` — native, zero-cost, no asset.
+**The Negative-Tracking Rule.** Tight letter-spacing (-0.02em) is reserved for display, headline, and prose-heading sizes; labels stay positive. The sole exception is a hair of dark-surface compensation on the body itself (see below).
+**The Dark-Compensation Note.** Light text on dark surfaces reads looser, so body gets `letter-spacing: 0.005em` (near-imperceptible) plus the Leading-Arc air — a clarity adjustment, not a style change.
+**The Leading-Arc Rule.** Leading tightens as size grows: 1.1 display → 1.2 headline/prose-headings → 1.5 body → 1.7 long-form prose. Big type never inherits the body's air. Headings use `text-wrap: balance`; body and prose use `text-wrap: pretty` — native, zero-cost, no asset.
 
 ## Layout
 
 One centered column does all the work. `.container` caps at 40rem with 2rem/1.5rem/3rem padding; the post modal widens to `min(56rem, 100vw - 2rem)` for comfortable reading. Sections stack with 2rem gaps (1.5rem on phone), cards inside a list sit 0.5rem apart.
 
-Desktop is the base stylesheet; phones adapt at 768px (denser padding, 2.25rem nick, stacked post-card heads) with a small-phone refinement at 380px. There is no tablet-specific layout — portrait tablets fold into the phone rules.
+Desktop is the base stylesheet; type is a fluid `clamp` scale, so phones adapt at 768px only in layout (denser padding, stacked post-card heads) with a small-phone refinement at 380px. There is no tablet-specific layout — portrait tablets fold into the phone rules.
 
 ## Elevation & Depth
 
-Flat by doctrine. No element casts a shadow at rest; depth is conveyed by tonal steps — Cinder Black page → Oxblood card → Ember Red hover — and by motion (hover scale 1.03, press scale 0.97). Soft ambient glows are permitted only as a state response: hover, focus, or live activity. The modal's dim backdrop (`rgba(10,6,6,0.6)`) is the sole overlay treatment.
+Flat by doctrine. No element casts a shadow at rest; depth is conveyed by tonal steps — Cinder Black page → Oxblood card → Ember hover — and by motion (hover scale 1.03, press scale 0.97). Soft ambient glows are permitted only as a state response: hover, focus, or live activity. The modal's dim backdrop (`rgba(13,7,6,0.6)`) is the sole overlay treatment.
 
 ### Named Rules
 **The Flat-At-Rest Rule.** If a surface needs to feel closer, move it (scale) or heat it (Ember Red). Do not give it a resting shadow.
@@ -201,7 +227,7 @@ Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on 
 - **Style:** pill (999px), Label type, bob animation (2.5s float with ±2° wobble)
 - **Reveal:** one-shot scale-in pop (0.35s, slight overshoot) when un-hidden — freshness arrival feels earned, not silent. Then bob takes over.
 - **Live-pin afterglow:** on confirmed Twitch live, the freshly-pinned card flashes hot (Ember Red → Oxblood over 1.4s) so the eye finds it after the reorder morph.
-- **Live:** Signal Live fill, pure white text and pulsing dot (1.2s recording pulse). Pure white is AA-mandated here — Bone White on Signal Live ≈ 3.95:1.
+- **Live:** Signal Live fill, pure white text and pulsing dot (1.2s recording pulse). White clears ≈ 5.5:1 (Bone would pass too at this lightness; white reads loudest for "on air").
 - **New!:** Signal Deep fill, Bone White text (passes AA for 12px/700). Saturated Signal Red + dark text failed at ~3.9:1, so the deeper red was introduced for this fill.
 - **Motion safety:** animations off under `prefers-reduced-motion`
 
@@ -213,18 +239,18 @@ Post cards reuse the link-card block with `user-select: none`; the single-articl
 
 ### Close Button
 - **Style:** 48px circle, Oxblood, no border
-- **Hover:** Ember Red background, Signal Link icon, scale 1.08. (Known tension: Signal Link on Ember ≈ 2.6:1, still under the 3:1 non-text floor — the resting Bone White icon on Oxblood carries the visible affordance, and the focus ring guarantees keyboard visibility. A bone-white hover icon would pass; kept Signal Link to hold the "red on heat" intent. Open.)
+- **Hover:** Ember background, Signal Bright icon, scale 1.08. (Resolved: Signal Bright on Ember ≈ 3.7:1, clearing the 3:1 non-text floor — the close button no longer carries the documented contrast tension. Kept the "red on heat" intent without dropping to a bone-white icon.)
 - **Focus (`:focus-visible`):** double ring (Cinder gap + Signal Link), no bg change.
 - **Touch:** press scales to 0.92
 
 ### Hero & Avatar
-The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Arrival is the first authored beat: on load the glow wakes from cold to its resting breath (0.8s) and the hero content settles out of a soft blur (0.6s, role-staggered) — the dark room coming into focus. Only the stage animates; link cards are ready at first paint so the one-click action surface is never delayed. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (0.9s, brightness+scale surge) hands off to a hotter, larger breath, and the avatar ring heats to Signal Link. The sonar ring pulse (1.2s, Signal Red glow fading outward) remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing; content visible with no settle).
+The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Arrival is the first authored beat: on load the glow wakes from cold to its resting breath (0.8s) and the hero content settles out of a soft blur (0.6s, role-staggered) — the dark room coming into focus. Only the stage animates; link cards are ready at first paint so the one-click action surface is never delayed. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (0.9s, brightness+scale surge) hands off to a hotter, larger breath, and the avatar ring heats to Signal Bright. The sonar ring pulse (1.2s, Signal Red glow fading outward) remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing; content visible with no settle).
 
 ### Tagline
 Optional one-liner (`profile.tagline`) under the nick: Ash Rose, 1.125rem (1rem phone), centered with the hero. Absent key = absent element.
 
 ### Post Nav
-Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separated by a hairline Bone-White-at-12% rule. Muted links (1rem, ellipsis-truncated titles) heating to Signal Red on hover. Lives inside the article so the index modal copies it; modal JS swaps content instead of navigating.
+Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separated by a hairline Bone-White-at-12% rule. Muted links (1rem, ellipsis-truncated titles) heating to Signal Bright on hover. Lives inside the article so the index modal copies it; modal JS swaps content instead of navigating.
 
 ## Do's and Don'ts
 
