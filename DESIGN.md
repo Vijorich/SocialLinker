@@ -21,11 +21,13 @@ typography:
     fontSize: "3rem"
     fontWeight: 500
     letterSpacing: "-0.02em"
+    lineHeight: 1.1
   headline:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     fontSize: "1.75rem"
     fontWeight: 600
     letterSpacing: "-0.02em"
+    lineHeight: 1.2
   title:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     fontSize: "1rem"
@@ -36,6 +38,14 @@ typography:
     fontSize: "1.25rem"
     fontWeight: 400
     lineHeight: 1.5
+  meta:
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+  tagline:
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
   label:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     fontSize: "0.75rem"
@@ -140,15 +150,18 @@ Warm maroon family from near-black to hot red, with a single gold that appears e
 **Character:** No webfonts by design. The system stack keeps the site zero-asset and instant on any device; hierarchy is carried by size, weight, tracking, and case — not by typeface contrast.
 
 ### Hierarchy
-- **Display** (500, 3rem / 2.25rem phone, -0.02em): the nick in the hero. The only oversized text on the page.
-- **Headline** (600, 1.75rem, -0.02em): article titles on post pages and in the modal.
+- **Display** (500, 3rem / 2.25rem phone, -0.02em, leading 1.1): the nick in the hero. The only oversized text on the page.
+- **Headline** (600, 1.75rem / 1.5rem phone, -0.02em, leading 1.2): article titles on post pages and in the modal.
 - **Title** (500, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
-- **Body** (400, 1.25rem, 1.5): everything else. Generous size — this page is read on phones from stream chats. Drops to 1.125rem (<768px) and 1rem (<380px).
+- **Body** (400, 1.25rem, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Drops to 1.125rem (<768px) and 1rem (<380px). Long-form prose (`.post-content`) opens to leading 1.7.
+- **Meta** (400, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. The quiet information that surrounds the primary text.
+- **Tagline** (400, 1.125rem / 1rem phone, Ash Rose): the optional hero one-liner, one step above meta.
 - **Label** (700, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
 
 ### Named Rules
 **The One-Stack Rule.** Never add a webfont. If hierarchy is needed, reach for weight, size, tracking, or case — in that order.
 **The Negative-Tracking Rule.** Tight letter-spacing (-0.02em) is reserved for display and headline sizes only; body and labels stay at natural or positive tracking.
+**The Leading-Arc Rule.** Leading tightens as size grows: 1.1 display → 1.2 headline → 1.5 body → 1.7 long-form prose. Big type never inherits the body's air. Headings use `text-wrap: balance`; body and prose use `text-wrap: pretty` — native, zero-cost, no asset.
 
 ## Layout
 
@@ -205,7 +218,7 @@ Post cards reuse the link-card block with `user-select: none`; the single-articl
 - **Touch:** press scales to 0.92
 
 ### Hero & Avatar
-The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (0.9s, brightness+scale surge) hands off to a hotter, larger breath, and the avatar ring heats to Signal Link. The sonar ring pulse (1.2s, Signal Red glow fading outward) remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing).
+The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Arrival is the first authored beat: on load the glow wakes from cold to its resting breath (0.8s) and the hero content settles out of a soft blur (0.6s, role-staggered) — the dark room coming into focus. Only the stage animates; link cards are ready at first paint so the one-click action surface is never delayed. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (0.9s, brightness+scale surge) hands off to a hotter, larger breath, and the avatar ring heats to Signal Link. The sonar ring pulse (1.2s, Signal Red glow fading outward) remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing; content visible with no settle).
 
 ### Tagline
 Optional one-liner (`profile.tagline`) under the nick: Ash Rose, 1.125rem (1rem phone), centered with the hero. Absent key = absent element.

@@ -7,7 +7,7 @@
   {% assign _rel = 'noopener me' %}
   {% assign _default_title = site.data.locale.nav_links %}
 {% endif %}
-<section class="section" id="{{ include.section_id | default: _id }}">
+<section class="section" id="{{ include.section_id | default: _id }}"{% if _id == 'links' %} tabindex="-1"{% endif %}>
   {% if include.title != false %}{% assign t = include.title | default: _default_title %}<h2 class="section-title">{{ t }}</h2>{% endif %}
   <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}" data-badge-days="{{ site.data.social.badge_days | default: 3 }}">
     {% for item in include.items %}

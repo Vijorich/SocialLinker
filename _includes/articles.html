@@ -20,7 +20,7 @@
     {% endfor %}
   </ul>
   <dialog id="post-modal" class="post-modal">
-    <button class="post-close" type="button" aria-label="Закрыть">{% include icon.html name='close' %}</button>
+    <button class="post-close" type="button" aria-label="{{ site.data.locale.close }}">{% include icon.html name='close' %}</button>
     <div class="post-modal-body"></div>
   </dialog>
   {% else %}
