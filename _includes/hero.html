@@ -1,4 +1,5 @@
 <header class="hero">
   <img class="avatar" src="{{ site.data.profile.avatar | relative_url | escape }}" alt="{{ site.data.profile.nick | escape }}" width="96" height="96">
   <h1 class="nick">{{ site.data.profile.nick | escape }}</h1>
+  {% if site.data.profile.tagline %}<p class="tagline">{{ site.data.profile.tagline | escape }}</p>{% endif %}
 </header>

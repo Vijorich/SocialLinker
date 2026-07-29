@@ -9,7 +9,7 @@
         <span class="post-card-body">
           <span class="post-card-head">
             <span class="post-title">{{ post.title | escape }}</span>
-            <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+            <span class="post-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time> · {{ post.content | strip_html | number_of_words | divided_by: 200 | at_least: 1 }} {{ site.data.locale.reading_min }}</span>
           </span>
           {% if post.excerpt %}
           <p class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</p>

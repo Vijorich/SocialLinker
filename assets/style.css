@@ -5,21 +5,30 @@
   --fg: #e7e4e4;
   --fg-muted: #af9c9c;
   --accent: #da2c2c;
+  /* Signal Red lifted to a readable tint: link text on dark/card surfaces (≥4.5:1). */
+  --accent-link: #ff6b59;
+  /* Deep signal red: high-contrast fill behind light text (New! badge). */
+  --accent-deep: #b6261f;
   --gold: #fad879;
+  /* Warm ember scrollbar — tonal with the maroon ramp, not neutral gray. */
+  --scrollbar: #b06a6a;
+  --scrollbar-hover: #c47a7a;
   --max-width: 40rem;
   --radius: 2rem;
 }
 
 * { box-sizing: border-box; }
 ::selection { background: var(--accent); color: #140d0d; }
-html { scroll-behavior: smooth; scrollbar-gutter: stable; scrollbar-color: #b06a6a var(--bg); background: var(--bg); }
+html { scrollbar-gutter: stable; scrollbar-color: var(--scrollbar) var(--bg); background: var(--bg); }
+/* Smooth scroll is motion — gated so reduced-motion users get instant anchors. */
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 /* ponytail: @supports guard silences "bad selector" warnings in Firefox (no -webkit- pseudos) */
 @supports selector(::-webkit-scrollbar) {
   html::-webkit-scrollbar { width: 1rem; }
   html::-webkit-scrollbar-track { background: var(--bg); }
   html::-webkit-scrollbar-button { width: 0; height: 0; display: none; }
-  html::-webkit-scrollbar-thumb { background: #b06a6a; border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
-  html::-webkit-scrollbar-thumb:hover { background: #c47a7a; }
+  html::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
+  html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 }
 
 body {
@@ -36,7 +45,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--accent); }
+a { color: var(--accent-link); }
+
+/* Focus — visible keyboard ring on every control. Ring counts as a state response
+   (allowed glow); link cards also heat so the focused row is unambiguous. */
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-link);
+  outline-offset: 2px;
+}
 
 .container {
   max-width: var(--max-width);
@@ -71,6 +87,18 @@ a { color: var(--accent); }
   letter-spacing: -0.02em;
   font-weight: 500;
 }
+.tagline {
+  margin: 0.25rem 0 0;
+  color: var(--fg-muted);
+  font-size: 1rem;
+}
+/* Live avatar ring — badges.js adds .live on confirmed Twitch uptime.
+   Sonar pulse reuses the badge-dot timing; glow allowed as live-activity state. */
+.avatar.live { animation: avatar-live 1.2s ease-in-out infinite; }
+@keyframes avatar-live {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(218, 44, 44, 0.55); }
+  50% { box-shadow: 0 0 0 0.5rem rgba(218, 44, 44, 0); }
+}
 /* Sections */
 .section { margin-bottom: 2rem; }
 .section-title {
@@ -86,7 +114,7 @@ a { color: var(--accent); }
 .bio-content, .post-content {
   :first-child { margin-top: 0; }
   :last-child { margin-bottom: 0; }
-  a { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
+  a { color: var(--accent-link); text-decoration: underline; text-underline-offset: 0.15em; &:hover { color: var(--fg); text-decoration-thickness: 2px; } }
   code { background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
   pre { background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
   pre code { background: none; border: none; padding: 0; }
@@ -119,6 +147,19 @@ a { color: var(--accent); }
   transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
 }
 
+/* Card body: name + optional muted description line (social.yml `description:`) */
+.link-card-body { min-width: 0; }
+.link-desc {
+  display: block;
+  color: var(--fg-muted);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 0.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .external-link-icon {
   margin-left: auto;
   opacity: 0.4;
@@ -133,9 +174,18 @@ a { color: var(--accent); }
 @media (hover: hover) {
 .link-card:hover { background: var(--bg-card-hover); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
-.donate-list .link-card:hover { background: var(--gold); color: #14110d; }
+.donate-list .link-card:hover { background: var(--gold); color: var(--bg); }
 .link-card:hover .external-link-icon { opacity: 1; }
 }
+/* Keyboard focus: not gated by hover capability — mirrors the hover heat + adds a
+   double-ring (gap in --bg, ring in --accent-link) that reads on any surface. */
+.link-card:focus-visible {
+  background: var(--bg-card-hover);
+  border-radius: var(--radius);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
+}
+.donate-list .link-card:focus-visible { background: var(--gold); color: var(--bg); }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
 /* ponytail: tap feedback for touch devices */
 @media (hover: none) {
@@ -159,14 +209,14 @@ a { color: var(--accent); }
   animation: badge-bob 2.5s ease-in-out infinite;
 }
 .badge[hidden] { display: none; }
-.badge-new { background: var(--accent); color: #140d0d; }
-.badge-live { background: #d0342c; color: #fff; }
+.badge-new { background: var(--accent-deep); color: #ffffff; }
+.badge-live { background: #d0342c; color: #ffffff; }
 .badge-live::before {
   content: "";
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: #fff;
+  background: #ffffff;
   animation: badge-dot 1.2s ease-in-out infinite;
 }
 @keyframes badge-bob {
@@ -178,7 +228,7 @@ a { color: var(--accent); }
   50% { opacity: 0.25; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .badge, .badge-live::before { animation: none; }
+  .badge, .badge-live::before, .avatar.live { animation: none; }
 }
 
 /* Donate block */
@@ -214,9 +264,33 @@ a { color: var(--accent); }
 .post-header { margin-bottom: 2rem; }
 .post-header .post-title { margin: 0 0 0.5rem; font-size: 1.75rem; letter-spacing: -0.02em; }
 .post-header .post-date { font-size: 1rem; color: var(--fg-muted); }
-.post-content { line-height: 1.5; }
+.post-content { line-height: 1.7; max-width: 44rem; }
+.post-content h1, .post-content h2, .post-content h3 { margin: 2rem 0 0.75rem; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
 .post-content h1, .post-content h2, .post-content h3 { letter-spacing: -0.02em; }
+/* Post nav — prev/next at the foot of the article. Lives inside .post-article so the
+   index modal copies it; modal JS swaps content instead of navigating there. */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(231, 228, 228, 0.12);
+  font-size: 1rem;
+}
+.post-nav a {
+  color: var(--fg-muted);
+  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+.post-nav a:hover { color: var(--accent-link); }
+.post-nav-next { margin-left: auto; text-align: right; }
+
 /* Close button — fixed top-right, circular, same card language */
 .post-close {
   position: fixed;
@@ -238,8 +312,14 @@ a { color: var(--accent); }
 .post-close svg { width: 1.5rem; height: 1.5rem; }
 .post-close:hover {
   background: var(--bg-card-hover);
-  color: var(--accent);
+  /* ponytail: accent-link (lifted tint) reads on the ember hover bg; plain --accent is ~1.5:1 red-on-red.
+     Residual ~2.6:1 vs the 3:1 non-text floor — flagged in DESIGN.md for a spec decision. */
+  color: var(--accent-link);
   scale: 1.08;
+}
+.post-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
 
 /* Post modal — dialog morphs from clicked .post-card (same post-hero view-transition).
@@ -307,8 +387,12 @@ a { color: var(--accent); }
 }
 .not-found-home:hover {
   background: var(--bg-card-hover);
-  color: var(--accent);
+  color: var(--accent-link);
   scale: 1.03;
+}
+.not-found-home:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
 
 .site-footer {

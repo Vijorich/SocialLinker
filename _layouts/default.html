@@ -19,15 +19,25 @@
 {{ content }}
 
 <script>
-if(window.matchMedia('(hover:hover)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
+if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
 (function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
 (function(){const cards=document.querySelectorAll('.post-card');if(!cards.length)return;const dlg=document.getElementById('post-modal');
 if(!dlg){const back=sessionStorage.getItem('vt-post-href');if(back){sessionStorage.removeItem('vt-post-href');const m=document.querySelector('.post-card[href="'+back+'"]');if(m)m.style.viewTransitionName='post-hero'}cards.forEach(c=>c.addEventListener('click',()=>{cards.forEach(x=>x.style.viewTransitionName='');sessionStorage.setItem('vt-post-href',c.getAttribute('href'));c.style.viewTransitionName='post-hero'}));return}
-/* Modal path: fetch post page, morph card -> dialog. ponytail: no history/URL sync (add pushState+popstate if asked). */
-const body=dlg.querySelector('.post-modal-body');const vt=document.startViewTransition?document.startViewTransition.bind(document):null;let activeCard=null,busy=false;
-async function open(card){if(dlg.open||busy)return;busy=true;const url=card.getAttribute('href');let article=null;try{const r=await fetch(url);if(r.ok)article=new DOMParser().parseFromString(await r.text(),'text/html').querySelector('.post-article')}catch{}if(!article){busy=false;location.href=url;return}body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t)dlg.setAttribute('aria-label',t.textContent);activeCard=card;const show=()=>{card.style.viewTransitionName='';dlg.showModal();busy=false};if(vt){card.style.viewTransitionName='post-hero';vt(show)}else show()}
-function close(){if(!dlg.open)return;const card=activeCard;activeCard=null;const cleanup=()=>{if(card)card.style.viewTransitionName=''};if(vt&&card){const t=vt(()=>{dlg.close();card.style.viewTransitionName='post-hero'});t.finished.then(cleanup,cleanup)}else{dlg.close();cleanup()}}
-cards.forEach(c=>c.addEventListener('click',e=>{e.preventDefault();open(c)}));dlg.querySelector('.post-close').addEventListener('click',close);dlg.addEventListener('click',e=>{if(e.target===dlg)close()});dlg.addEventListener('cancel',e=>{e.preventDefault();close()})})();
+/* Modal path: fetch post page, morph card -> dialog. URL synced: open/swap push the post URL
+   (refresh lands on the standalone page = no-JS fallback); Back closes, Forward reopens. */
+const body=dlg.querySelector('.post-modal-body');const vt=document.startViewTransition?document.startViewTransition.bind(document):null;let activeCard=null,busy=false,gen=0;
+async function fetchArticle(url){try{const r=await fetch(url);if(r.ok)return new DOMParser().parseFromString(await r.text(),'text/html').querySelector('.post-article')}catch{}return null}
+function fill(card,article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t)dlg.setAttribute('aria-label',t.textContent);activeCard=card}
+/* gen: any history event or close invalidates in-flight fetches/VTs, so a stale completion
+   can't reopen the modal, push out of order, or clobber a newer morph. */
+async function open(card,push){if(dlg.open||busy)return;busy=true;const g=++gen;const url=card.getAttribute('href');const article=await fetchArticle(url);if(!article){busy=false;if(g===gen)location.href=url;return}if(g!==gen){busy=false;return}fill(card,article);const show=()=>{card.style.viewTransitionName='';if(g!==gen){busy=false;return}dlg.showModal();busy=false;if(push!==false)history.pushState({postModal:url},'',url)};if(vt){card.style.viewTransitionName='post-hero';vt(show)}else show()}
+async function swap(url,push){const g=++gen;const article=await fetchArticle(url);if(!article){if(g===gen)location.href=url;return}if(g!==gen)return;const card=[...cards].find(c=>c.getAttribute('href')===url);fill(card||activeCard,article);body.scrollTop=0;if(push!==false)history.pushState({postModal:url},'',url)}
+function closeMorph(){const card=activeCard;activeCard=null;const g=++gen;const cleanup=()=>{if(card&&g===gen)card.style.viewTransitionName=''};if(vt&&card){const t=vt(()=>{dlg.close();card.style.viewTransitionName='post-hero'});t.finished.then(cleanup,cleanup)}else{dlg.close();cleanup()}}
+function close(){if(!dlg.open)return;if(history.state&&history.state.postModal){history.back();return}closeMorph()}
+cards.forEach(c=>c.addEventListener('click',e=>{e.preventDefault();open(c)}));dlg.querySelector('.post-close').addEventListener('click',close);
+dlg.addEventListener('click',e=>{if(e.target===dlg){close();return}const nav=e.target.closest('.post-nav a');if(nav&&dlg.contains(nav)){e.preventDefault();swap(nav.getAttribute('href'))}});
+dlg.addEventListener('cancel',e=>{e.preventDefault();close()});
+window.addEventListener('popstate',e=>{gen++;const u=e.state&&e.state.postModal;if(!u){if(dlg.open)closeMorph();return}const card=[...cards].find(c=>c.getAttribute('href')===u);if(!card){if(dlg.open)closeMorph();location.href=u;return}if(!dlg.open)open(card,false);else if(activeCard!==card)swap(u,false)})})();
 </script>
 </body>
 </html>

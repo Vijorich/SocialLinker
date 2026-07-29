@@ -1,23 +1,28 @@
 # ponytail: order === display order. icon = brand slug, see _includes/icon.html for available list.
+# Standing rule: Twitch leads; at runtime a card whose badge reveals is pinned to the top
+# (assets/badges.js, stable in this order). So keep badged items in priority order here.
+# description: optional muted line under the card name (disambiguates same-brand links). Omit to hide.
 # badge: "Live"/"New!" chip next to the name, shown by assets/badges.js when fresh.
 #   type: twitch (login), youtube (channel_id), telegram (channel).
 #   youtube channel_id empty -> badge never renders. Find yours: youtube.com/account_advanced
 badge_days: 3
 items:
-  - name: GitHub
-    url: https://github.com/Vijorich
-    icon: github
   - name: Twitch
     url: https://www.twitch.tv/vijor
     icon: twitch
     badge: { type: twitch, login: vijor }
+  - name: GitHub
+    url: https://github.com/Vijorich
+    icon: github
   - name: YouTube
     url: https://www.youtube.com/@vijor
     icon: youtube
+    description: основной канал
     badge: { type: youtube, channel_id: "" }
   - name: YouTube Second
     url: https://www.youtube.com/@vijorsup
     icon: youtube
+    description: второй канал
     badge: { type: youtube, channel_id: "" }
   - name: Telegram channel
     url: https://t.me/zerotaste

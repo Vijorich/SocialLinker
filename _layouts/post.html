@@ -6,10 +6,16 @@ layout: default
   <article class="post-article">
     <header class="post-header">
       <h1 class="post-title">{{ page.title | escape }}</h1>
-      <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+      <span class="post-date"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time> · {{ content | strip_html | number_of_words | divided_by: 200 | at_least: 1 }} {{ site.data.locale.reading_min }}</span>
     </header>
     <div class="post-content">
       {{ content }}
     </div>
+    {% comment %} Nav lives inside .post-article so the index modal copies it for free;
+         modal JS intercepts these links and swaps content instead of navigating. {% endcomment %}
+    <nav class="post-nav">
+      {% if page.previous %}<a class="post-nav-prev" href="{{ page.previous.url | relative_url }}" title="{{ site.data.locale.post_newer | escape }}">← {{ page.previous.title | escape }}</a>{% endif %}
+      {% if page.next %}<a class="post-nav-next" href="{{ page.next.url | relative_url }}" title="{{ site.data.locale.post_older | escape }}">{{ page.next.title | escape }} →</a>{% endif %}
+    </nav>
   </article>
 </div>

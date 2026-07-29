@@ -16,7 +16,10 @@
     <li>
       <a href="{{ item.url | escape }}" target="_blank" rel="{{ _rel }}" class="link-card">
         {% include icon.html name=item.icon %}
-        <span>{{ item.name | escape }}</span>
+        <span class="link-card-body">
+          <span>{{ item.name | escape }}</span>
+          {% if item.description %}<span class="link-desc">{{ item.description | escape }}</span>{% endif %}
+        </span>
         {% if b %}
         <span class="badge badge-{% if b.type == 'twitch' %}live{% else %}new{% endif %}" hidden
               data-badge-type="{{ b.type }}"
