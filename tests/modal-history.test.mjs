@@ -104,8 +104,9 @@ function makeWorld(cardUrls) {
   assert.equal(w.st.navigated, null, 'T2 no navigation');
 }
 
-// T3: history navigation during a slow fetch kills the pending open —
-// no modal resurrection, no out-of-order push, no stuck view-transition name.
+// T3: history navigation during a slow open — the pending open is superseded
+// (its late fetch can't push or fill), but the modal stays open serving the entry
+// the user navigated to. Loading-on-open means the modal is no longer closed here.
 {
   const w = makeWorld(['/posts/a/', '/posts/b/']);
   w.clickCard('/posts/a/');
@@ -113,13 +114,14 @@ function makeWorld(cardUrls) {
   await tick(); // open A, entry pushed
   w.history.back();
   await tick(); // closed, idx 0
-  w.clickCard('/posts/b/'); // slow fetch pending (busy)
-  w.history.forward(); // user navigates to A entry before fetch resolves
-  w.fetches[1].resolve(okResp('/posts/b/'));
+  w.clickCard('/posts/b/'); // opens B (loading), slow fetch pending
+  assert.ok(w.dlg.open, 'T3 modal opened for B with loading (no silent fetch)');
+  w.history.forward(); // user navigates to A entry while B fetches → swap(A)
+  w.fetches[1].resolve(okResp('/posts/b/')); // B resolves late — must be dropped
   await tick();
-  assert.ok(!w.dlg.open, 'T3 stale open did not reopen modal');
-  assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T3 no late push');
-  assert.equal(w.cards[1].style.viewTransitionName ?? '', '', 'T3 no stuck VT name');
+  assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T3 stale B fetch pushed nothing');
+  assert.equal(w.cards[1].style.viewTransitionName ?? '', '', 'T3 no stuck VT name on B');
+  assert.ok(!w.body.innerHTML.includes('body-of /posts/b/'), 'T3 stale B content did not land');
 }
 
 // T4: rapid prev/next swaps — last click wins, exactly one push, content matches.
@@ -148,15 +150,16 @@ function makeWorld(cardUrls) {
   assert.equal(w.st.navigated, '/posts/zzz/', 'T5 unknown post URL loads standalone page');
 }
 
-// T6: fetch failure falls back to full navigation, modal stays closed.
+// T6: fetch failure shows the loading state first, then falls back to full navigation.
 {
   const w = makeWorld(['/posts/a/']);
   w.clickCard('/posts/a/');
+  assert.ok(w.dlg.open, 'T6 modal opens with loading immediately (no silent fetch)');
+  assert.ok(w.body.innerHTML.includes('Загрузка'), 'T6 loading state shown before fallback');
   w.fetches[0].resolve({ ok: false });
   await tick();
-  assert.ok(!w.dlg.open, 'T6 modal not opened');
-  assert.equal(w.st.navigated, '/posts/a/', 'T6 navigated to post page');
-  assert.deepEqual(w.st.pushed, [], 'T6 nothing pushed');
+  assert.equal(w.st.navigated, '/posts/a/', 'T6 falls back to standalone page after showing state');
+  assert.deepEqual(w.st.pushed, [], 'T6 nothing pushed (failed fetch has no URL sync)');
 }
 
 console.log('modal-history: 6/6 checks passed');

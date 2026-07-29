@@ -90,7 +90,7 @@ a { color: var(--accent-link); }
 .tagline {
   margin: 0.25rem 0 0;
   color: var(--fg-muted);
-  font-size: 1rem;
+  font-size: 1.125rem;
 }
 /* Live avatar ring — badges.js adds .live on confirmed Twitch uptime.
    Sonar pulse reuses the badge-dot timing; glow allowed as live-activity state. */
@@ -146,6 +146,9 @@ a { color: var(--accent-link); }
   font-weight: 500;
   transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
 }
+/* Visited dimming — tracks clicked destinations by tone, never by changing the card surface.
+   Donate keeps its gold (later rule wins); hover restores full bone-white (contrast on ember). */
+.link-card:visited { color: var(--fg-muted); }
 
 /* Card body: name + optional muted description line (social.yml `description:`) */
 .link-card-body { min-width: 0; }
@@ -172,7 +175,7 @@ a { color: var(--accent-link); }
 .link-list li:first-child .link-card { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
 .link-list li:last-child .link-card { border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 @media (hover: hover) {
-.link-card:hover { background: var(--bg-card-hover); scale: 1.03; }
+.link-card:hover { background: var(--bg-card-hover); color: var(--fg); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
 .donate-list .link-card:hover { background: var(--gold); color: var(--bg); }
 .link-card:hover .external-link-icon { opacity: 1; }
@@ -209,7 +212,7 @@ a { color: var(--accent-link); }
   animation: badge-bob 2.5s ease-in-out infinite;
 }
 .badge[hidden] { display: none; }
-.badge-new { background: var(--accent-deep); color: #ffffff; }
+.badge-new { background: var(--accent-deep); color: var(--fg); }
 .badge-live { background: #d0342c; color: #ffffff; }
 .badge-live::before {
   content: "";
@@ -339,6 +342,8 @@ a { color: var(--accent-link); }
 .post-modal[open] { display: flex; flex-direction: column; }
 .post-modal::backdrop { background: rgba(10, 6, 6, 0.6); }
 .post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: #b06a6a transparent; }
+/* Transient loading state shown in the modal body while the post fetch is in flight. */
+.post-loading { margin: 0; padding: 2rem 0; color: var(--fg-muted); text-align: center; }
 .post-modal .post-close { position: absolute; top: 1rem; right: 1rem; }
 
 /* Projects */
@@ -403,6 +408,9 @@ a { color: var(--accent-link); }
 
   a { color: inherit; text-decoration: none; }
 }
+/* Inline-SVG heart (replaces emoji) — signal red, sized to the cap height. */
+.footer-heart { display: inline-flex; vertical-align: -0.15em; color: var(--accent); }
+.footer-heart svg { width: 1em; height: 1em; }
 
 /* View Transitions: cross-document. Whole .post-card morphs into .post-article
    (container transform — card unfolds into the article card, bg/radius persist).
@@ -441,6 +449,7 @@ a { color: var(--accent-link); }
   .hero { margin-bottom: 1.5rem; padding-top: 0.5rem; }
   .avatar { width: 5rem; height: 5rem; margin-bottom: 0.75rem; }
   .nick { font-size: 2.25rem; }
+  .tagline { font-size: 1rem; }
   .section { margin-bottom: 1.5rem; }
   .link-card { padding: 0.875rem; gap: 0.75rem; }
   .link-card svg { width: 1.75rem; height: 1.75rem; }
