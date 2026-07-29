@@ -9,6 +9,8 @@
   --accent-link: #ff6b59;
   /* Deep signal red: high-contrast fill behind light text (New! badge). */
   --accent-deep: #b6261f;
+  /* Hotter signal red for the Live badge fill; pure-white text clears AA on this, bone-white does not. */
+  --accent-live: #d0342c;
   --gold: #fad879;
   /* Warm ember scrollbar — tonal with the maroon ramp, not neutral gray. */
   --scrollbar: #b06a6a;
@@ -46,6 +48,33 @@ body {
 }
 
 a { color: var(--accent-link); }
+
+/* Screen-reader-only — visible content stays hidden from sighted users, still announced. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — first focusable, sr-only until keyboard focus reveals it top-left. */
+.skip-link {
+  position: fixed;
+  top: .5rem; left: .5rem;
+  z-index: 100;
+  padding: .5rem .9rem;
+  background: var(--accent-link);
+  color: var(--bg);
+  font-weight: 600;
+  border-radius: .6rem;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform .15s ease-out;
+}
+.skip-link:focus { transform: translateY(0); }
 
 /* Focus — visible keyboard ring on every control. Ring counts as a state response
    (allowed glow); link cards also heat so the focused row is unambiguous. */
@@ -99,6 +128,57 @@ a { color: var(--accent-link); }
   0%, 100% { box-shadow: 0 0 0 0 rgba(218, 44, 44, 0.55); }
   50% { box-shadow: 0 0 0 0.5rem rgba(218, 44, 44, 0); }
 }
+
+/* ── Ember Stage ────────────────────────────────────────────────────────
+   Ambient glow behind the hero: the stage at rest breathes (~6s), ignites
+   when .avatar.live lands (badges.js). :has() lights the stage in pure CSS.
+   ponytail: Heat-On-Touch targets surfaces (cards); this is stage-light —
+   the Ember Stage north star literally calls for "a dark room, an ember-red
+   glow." Ignition escalates intensity (scale/opacity), not hue — hotter =
+   bigger + brighter, same fire. Tuning knob: the rgba alpha below.
+   overflow:hidden clips the glow to the hero on narrow screens (no h-scroll). */
+.hero { position: relative; overflow: hidden; }
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -10rem;
+  left: 50%;
+  width: 30rem; height: 30rem;
+  margin-left: -15rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(218, 44, 44, 0.85) 0%, rgba(218, 44, 44, 0) 65%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
+  animation: ember-breath 6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+/* Hero content sits above the glow. */
+.hero > * { position: relative; z-index: 1; }
+/* Rest: coal warming/cooling. Conservative opacity keeps tagline (ash-rose)
+   above the 4.5:1 floor — the glow center is at the avatar, fading by the tagline. */
+@keyframes ember-breath {
+  0%, 100% { opacity: 0.10; transform: scale(1); }
+  50%      { opacity: 0.15; transform: scale(1.05); }
+}
+/* Ignition: one-time catch flare (match-strike surge) hands off to a hotter breath.
+   flare's 100% matches ember-ignited's baseline so the seam is invisible. */
+@keyframes ember-flare {
+  0%   { opacity: 0.10; transform: scale(1);    filter: blur(48px) brightness(1); }
+  35%  { opacity: 0.45; transform: scale(1.25); filter: blur(40px) brightness(1.5); }
+  100% { opacity: 0.20; transform: scale(1.08); filter: blur(48px) brightness(1); }
+}
+@keyframes ember-ignited {
+  0%, 100% { opacity: 0.20; transform: scale(1.08); }
+  50%      { opacity: 0.28; transform: scale(1.14); }
+}
+.hero:has(.avatar.live)::before {
+  animation: ember-flare 0.9s cubic-bezier(0.16, 1, 0.3, 1) both,
+             ember-ignited 6s ease-in-out infinite 0.9s;
+}
+/* Ring heats in sync with the stage catching. */
+.avatar { transition: border-color 0.6s ease; }
+.avatar.live { border-color: var(--accent-link); }
 /* Sections */
 .section { margin-bottom: 2rem; }
 .section-title {
@@ -145,6 +225,23 @@ a { color: var(--accent-link); }
   text-decoration: none;
   font-weight: 500;
   transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+/* Heat-on-touch bloom: soft radial ember glow inside the card on hover/focus.
+   Strengthens the Heat-On-Touch rule — cards literally heat, not just recolor.
+   overflow:hidden clips the bloom to the pill. Donate variant glows gold. */
+.link-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 107, 89, 0.18), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.donate-list .link-card::before {
+  background: radial-gradient(circle at center, rgba(250, 216, 121, 0.28), transparent 70%);
 }
 /* Visited dimming — tracks clicked destinations by tone, never by changing the card surface.
    Donate keeps its gold (later rule wins); hover restores full bone-white (contrast on ember). */
@@ -178,6 +275,7 @@ a { color: var(--accent-link); }
 .link-card:hover { background: var(--bg-card-hover); color: var(--fg); scale: 1.03; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
 .donate-list .link-card:hover { background: var(--gold); color: var(--bg); }
+.link-card:hover::before { opacity: 1; }
 .link-card:hover .external-link-icon { opacity: 1; }
 }
 /* Keyboard focus: not gated by hover capability — mirrors the hover heat + adds a
@@ -188,6 +286,7 @@ a { color: var(--accent-link); }
   outline: none;
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
+.link-card:focus-visible::before { opacity: 1; }
 .donate-list .link-card:focus-visible { background: var(--gold); color: var(--bg); }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
 /* ponytail: tap feedback for touch devices */
@@ -209,11 +308,16 @@ a { color: var(--accent-link); }
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1.4;
-  animation: badge-bob 2.5s ease-in-out infinite;
+  /* Reveal pop: one-shot scale-in when badges.js un-hides the chip — freshness
+     arrival feels earned, not silent. Runs once (hidden→shown render), then the
+     idle bob takes over. Overshoot lives in the 70% keyframe; ease stays exponential. */
+  animation: badge-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both,
+             badge-bob 2.5s ease-in-out infinite 0.35s;
 }
 .badge[hidden] { display: none; }
 .badge-new { background: var(--accent-deep); color: var(--fg); }
-.badge-live { background: #d0342c; color: #ffffff; }
+/* ponytail: text/dot stay #ffffff (not var(--fg)) — bone-white on this red ≈ 3.95:1, fails AA small-bold. */
+.badge-live { background: var(--accent-live); color: #ffffff; }
 .badge-live::before {
   content: "";
   width: 0.5rem;
@@ -221,6 +325,11 @@ a { color: var(--accent-link); }
   border-radius: 50%;
   background: #ffffff;
   animation: badge-dot 1.2s ease-in-out infinite;
+}
+@keyframes badge-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 @keyframes badge-bob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
@@ -230,15 +339,54 @@ a { color: var(--accent-link); }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
 }
+/* Pin afterglow: badges.js adds .just-pinned to the live card's <li> on confirm.
+   Brief ember flash (bg-card-hover = the heated surface) settles to oxblood —
+   literally "this card just got hot." One-shot, ties the pin to the ignition theme. */
+.link-list li.just-pinned .link-card {
+  animation: pin-afterglow 1.4s ease-out;
+}
+@keyframes pin-afterglow {
+  0%   { background-color: var(--bg-card-hover); }
+  100% { background-color: var(--bg-card); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .badge, .badge-live::before, .avatar.live { animation: none; }
+  .badge, .badge-live::before, .avatar.live,
+  .link-list li.just-pinned .link-card,
+  .donate-list .link-card:hover::after,
+  .footer-heart { animation: none; }
+  /* Glow stays (it's ambient light, not motion) — just stop breathing. */
+  .hero::before { animation: none; opacity: 0.12; }
+  .hero:has(.avatar.live)::before { opacity: 0.20; }
 }
 
-/* Donate block */
+/* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
+   above Oxblood so the warm peak reads at rest; touch has no hover to reveal it. */
 .donate-list .link-card {
-  background: #473323;
+  background: #6a4628;
   color: var(--gold);
 }
+/* Gold light-sweep: a diagonal sheen crosses the gold fill on hover — light catching
+   metal, elevating the One Spotlight. transform-driven (no layout props), hover-gated,
+   overflow:hidden on the card clips it to the pill. */
+.donate-list .link-card::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 60%; height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-250%) skewX(-20deg);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .donate-list .link-card:hover::after { animation: gold-sweep 0.9s ease-out; }
+}
+@keyframes gold-sweep {
+  0%   { transform: translateX(-250%) skewX(-20deg); }
+  100% { transform: translateX(400%) skewX(-20deg); }
+}
+/* Donate title takes the spotlight: gold over the usual Ash Rose (One Spotlight Rule).
+   ponytail: :has() targets the section owning the donate list; unsupported = title stays Ash Rose. */
+.section:has(.donate-list) .section-title { color: var(--gold); }
 
 /* Posts list — reuses .link-list card block; click-only, no text selection */
 .post-card { user-select: none; }
@@ -341,7 +489,7 @@ a { color: var(--accent-link); }
 }
 .post-modal[open] { display: flex; flex-direction: column; }
 .post-modal::backdrop { background: rgba(10, 6, 6, 0.6); }
-.post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: #b06a6a transparent; }
+.post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: var(--scrollbar) transparent; }
 /* Transient loading state shown in the modal body while the post fetch is in flight. */
 .post-loading { margin: 0; padding: 2rem 0; color: var(--fg-muted); text-align: center; }
 .post-modal .post-close { position: absolute; top: 1rem; right: 1rem; }
@@ -408,9 +556,17 @@ a { color: var(--accent-link); }
 
   a { color: inherit; text-decoration: none; }
 }
-/* Inline-SVG heart (replaces emoji) — signal red, sized to the cap height. */
-.footer-heart { display: inline-flex; vertical-align: -0.15em; color: var(--accent); }
+/* Inline-SVG heart (replaces emoji) — signal red, sized to the cap height.
+   One-shot double-thump on load (lub-dub), delayed so it plays after settle. */
+.footer-heart { display: inline-flex; vertical-align: -0.15em; color: var(--accent); animation: heart-beat 0.8s ease-in-out 0.4s 1; }
 .footer-heart svg { width: 1em; height: 1em; }
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.12); }
+  60% { transform: scale(1); }
+}
 
 /* View Transitions: cross-document. Whole .post-card morphs into .post-article
    (container transform — card unfolds into the article card, bg/radius persist).

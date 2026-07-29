@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ site.lang }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,6 +16,7 @@
   <script src="{{ '/assets/badges.js' | relative_url }}" defer></script>
 </head>
 <body>
+<a class="skip-link" href="#links">{{ site.data.locale.skip_to_links }}</a>
 {{ content }}
 
 <script>

@@ -1,7 +1,9 @@
 <section class="section projects" id="projects">
   {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_projects %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  {% assign items = site.data.projects.items %}
+  {% if items.size > 0 %}
   <ul class="link-list project-list">
-    {% for item in site.data.projects.items %}
+    {% for item in items %}
     <li>
       <a href="{{ item.url | escape }}" target="_blank" rel="noopener" class="link-card project-card">
         {% include icon.html name=item.icon %}
@@ -14,4 +16,7 @@
     </li>
     {% endfor %}
   </ul>
+  {% else %}
+  <p class="post-excerpt">{{ site.data.locale.projects_empty }}</p>
+  {% endif %}
 </section>

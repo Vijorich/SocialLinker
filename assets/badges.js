@@ -47,6 +47,13 @@
         // Primary live signal: pulse the hero avatar ring. Absent avatar (post pages) = skip.
         const av = document.querySelector('.avatar');
         if (av) av.classList.add('live');
+        // Afterglow: tag the freshly-pinned live card so CSS can flash it hot,
+        // drawing the eye after the pin reorder morph lands. CSS ignores under reduced motion.
+        const li = el.closest('li');
+        if (li) setTimeout(() => {
+          li.classList.add('just-pinned');
+          setTimeout(() => li.classList.remove('just-pinned'), 1500);
+        }, 350);
       }, DIRECT);
     } else if (d.badgeType === 'youtube') {
       get('https://www.youtube.com/feeds/videos.xml?channel_id=' + d.badgeId, xml => {

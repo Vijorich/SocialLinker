@@ -8,8 +8,9 @@ colors:
   signal-red: "#da2c2c"
   signal-link: "#ff6b59"
   signal-deep: "#b6261f"
+  signal-live: "#d0342c"
   spotlight-gold: "#fad879"
-  hearth-brown: "#473323"
+  hearth-brown: "#6a4628"
   ash-rose: "#af9c9c"
   bone-white: "#e7e4e4"
   scrollbar: "#b06a6a"
@@ -72,7 +73,7 @@ components:
     rounded: "{rounded.full}"
     padding: "3px 10px"
   badge-live:
-    backgroundColor: "#d0342c"
+    backgroundColor: "{colors.signal-live}"
     textColor: "#ffffff"
     rounded: "{rounded.full}"
     padding: "3px 10px"
@@ -113,15 +114,16 @@ Warm maroon family from near-black to hot red, with a single gold that appears e
 - **Signal Red** (`{colors.signal-red}`): the accent — used for *fills, borders, and decorative state*: avatar ring, blockquote rails, selection background, the 404 code gradient, badge hovers. The voice of the page. As saturated *text* on dark surfaces it only clears ~3:1, so it is not used for link text directly (see Signal Link).
 - **Signal Link** (`{colors.signal-link}`): the readable rendering of Signal Red as link text and the keyboard focus ring on dark/card surfaces — same red lifted to ≥4.5:1. All in-prose links, post-nav hovers, and `:focus-visible` rings use this.
 - **Signal Deep** (`{colors.signal-deep}`): a deeper Signal Red for high-contrast fills behind light text (the New! badge). Needed because saturated Signal Red + dark text ≈ 3.9:1, failing AA for small bold.
+- **Signal Live** (`{colors.signal-live}`): the hotter Live-badge fill. Bone White on this red ≈ 3.95:1 (fails AA small-bold), so the Live badge pairs it with pure white text/dot — the only place pure white appears instead of Bone White.
 - **Ember Red** (`{colors.ember-red}`): hover state for every card. Cards literally heat up when touched.
 
 ### Secondary
-- **Spotlight Gold** (`{colors.spotlight-gold}`): donate block only — text on Hearth Brown at rest, full gold fill on hover. Its scarcity is the point.
+- **Spotlight Gold** (`{colors.spotlight-gold}`): donate block only — the section title plus card text on Hearth Brown at rest, full gold fill on hover. Its scarcity is the point.
 
 ### Neutral
 - **Cinder Black** (`{colors.cinder-black}`): page ground (with a subtle vertical gradient to `#1a1010`), backdrop under the modal.
 - **Oxblood** (`{colors.oxblood}`): the card surface. Every interactive surface starts here.
-- **Hearth Brown** (`{colors.hearth-brown}`): donate card surface; the warm brown halfway between oxblood and gold.
+- **Hearth Brown** (`{colors.hearth-brown}`): donate card surface; a warm brown lifted to a clear tonal step above Oxblood, reaching toward gold so the donate block reads as a warm peak at rest.
 - **Bone White** (`{colors.bone-white}`): primary text.
 - **Ash Rose** (`{colors.ash-rose}`): muted text — section titles, dates, excerpts, footer.
 - **Scrollbar** / **Scrollbar Hover** (`{colors.scrollbar}` / `{colors.scrollbar-hover}`): warm ember scrollbar tones, tonal with the maroon ramp rather than neutral gray.
@@ -140,7 +142,7 @@ Warm maroon family from near-black to hot red, with a single gold that appears e
 ### Hierarchy
 - **Display** (500, 3rem / 2.25rem phone, -0.02em): the nick in the hero. The only oversized text on the page.
 - **Headline** (600, 1.75rem, -0.02em): article titles on post pages and in the modal.
-- **Title** (500, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet.
+- **Title** (500, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
 - **Body** (400, 1.25rem, 1.5): everything else. Generous size — this page is read on phones from stream chats. Drops to 1.125rem (<768px) and 1rem (<380px).
 - **Label** (700, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
 
@@ -175,7 +177,7 @@ The product's core unit — every social link, project, and post is one.
 - **Shape:** gently rounded (1rem) inside lists, full pill (2rem) at list ends and on hover
 - **Default:** Oxblood background, Bone White 500-weight text, 1rem padding, 2rem brand icon left, external-link glyph right at 40% opacity
 - **Description line:** optional `description:` (social.yml) renders one muted line (Ash Rose, 1rem, 400-weight, ellipsis) under the card name — disambiguates same-brand links (YouTube vs YouTube Second)
-- **Hover:** background heats to Ember Red, scale 1.03, radius inflates to 2rem, glyph fades to full opacity (0.3s ease). Hover styles are gated behind `@media (hover: hover)`; touch devices never receive them.
+- **Hover:** background heats to Ember Red, scale 1.03, radius inflates to 2rem, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted; gold-tinted on the donate variant) — the Heat-On-Touch rule made literal. Hover styles are gated behind `@media (hover: hover)`; touch devices never receive them.
 - **Focus (`:focus-visible`):** mirrors hover heat + a double keyboard ring (`box-shadow: 0 0 0 2px Cinder, 0 0 0 4px Signal Link`) so the focused row is unambiguous. Donate variant heats to full gold + dark text. Focus is not hover-gated — keyboard users on any device get the ring. Mouse clicks suppress it via `:focus-visible`.
 - **Touch:** no hover — press scales to 0.97 (0.15s)
 - **Donate variant:** Hearth Brown + Spotlight Gold text at rest; full gold fill with dark text on hover
@@ -184,7 +186,9 @@ The product's core unit — every social link, project, and post is one.
 Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on confirmed fresh data.
 - **Pinning (standing rule):** a revealed badge moves its card to the top of the list — live/fresh destinations always lead. Stable in `social.yml` order (Twitch leads statically); the reorder morphs via View Transition, instant under reduced motion. Pinning moves the real DOM node, so tab and AT order always match the visual order.
 - **Style:** pill (999px), Label type, bob animation (2.5s float with ±2° wobble)
-- **Live:** hot red fill, white text, white pulsing dot (1.2s recording pulse)
+- **Reveal:** one-shot scale-in pop (0.35s, slight overshoot) when un-hidden — freshness arrival feels earned, not silent. Then bob takes over.
+- **Live-pin afterglow:** on confirmed Twitch live, the freshly-pinned card flashes hot (Ember Red → Oxblood over 1.4s) so the eye finds it after the reorder morph.
+- **Live:** Signal Live fill, pure white text and pulsing dot (1.2s recording pulse). Pure white is AA-mandated here — Bone White on Signal Live ≈ 3.95:1.
 - **New!:** Signal Deep fill, Bone White text (passes AA for 12px/700). Saturated Signal Red + dark text failed at ~3.9:1, so the deeper red was introduced for this fill.
 - **Motion safety:** animations off under `prefers-reduced-motion`
 
@@ -200,8 +204,8 @@ Post cards reuse the link-card block with `user-select: none`; the single-articl
 - **Focus (`:focus-visible`):** double ring (Cinder gap + Signal Link), no bg change.
 - **Touch:** press scales to 0.92
 
-### Avatar
-96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. On confirmed Twitch live, `badges.js` adds `.live`: a sonar ring pulse (1.2s, Signal Red glow fading outward) — the page's primary "on air now" signal, badges stay secondary. Off under `prefers-reduced-motion`.
+### Hero & Avatar
+The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (0.9s, brightness+scale surge) hands off to a hotter, larger breath, and the avatar ring heats to Signal Link. The sonar ring pulse (1.2s, Signal Red glow fading outward) remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing).
 
 ### Tagline
 Optional one-liner (`profile.tagline`) under the nick: Ash Rose, 1.125rem (1rem phone), centered with the hero. Absent key = absent element.
@@ -214,7 +218,7 @@ Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separate
 ### Do:
 - **Do** build every new interactive row as a link card: Oxblood at rest, Ember Red + scale on hover, full pill on breakout.
 - **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the maroon ramp.
-- **Do** animate state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`.
+- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (0.9s) and the live-pin afterglow (1.4s) are the exceptions — exit-style state feedback, not choreography users wait through.
 - **Do** keep badges honest: hidden by default, revealed only on confirmed data, silent on any fetch error.
 - **Do** use native platform features (View Transitions, `<dialog>`, system stack) before writing JS or adding assets.
 
