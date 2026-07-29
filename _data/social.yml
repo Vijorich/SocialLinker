@@ -1,4 +1,4 @@
-# ponytail: order === display order. icon = brand slug, see _includes/icon.html for available list.
+# order === display order. icon = brand slug, see _includes/icon.html for available list.
 # Standing rule: Twitch leads; at runtime a card whose badge reveals is pinned to the top
 # (assets/badges.js, stable in this order). So keep badged items in priority order here.
 # description: optional muted line under the card name (disambiguates same-brand links). Omit to hide.
@@ -14,20 +14,18 @@ items:
   - name: GitHub
     url: https://github.com/Vijorich
     icon: github
-  - name: YouTube
+  - name: YouTube основа
     url: https://www.youtube.com/@vijor
     icon: youtube
-    description: основной канал
-    badge: { type: youtube, channel_id: "" }
-  - name: YouTube Second
+    badge: { type: youtube, channel_id: "UCtTvQl-7zOJjTZw0s2m82aQ" }
+  - name: YouTube второй канал
     url: https://www.youtube.com/@vijorsup
     icon: youtube
-    description: второй канал
     badge: { type: youtube, channel_id: "" }
-  - name: Telegram channel
+  - name: Telegram канал
     url: https://t.me/zerotaste
     icon: telegram
     badge: { type: telegram, channel: zerotaste }
-  - name: VK community
+  - name: VK сообщество
     url: https://vk.ru/vijorich
     icon: vk

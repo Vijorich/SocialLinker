@@ -1,9 +1,7 @@
 nick: Vijor
 avatar: /assets/avatar.webp
-# tagline: optional one-liner under the nick. Delete the line to hide.
-tagline: Стримлю, снимаю, иногда кодю
+tagline: Кодер, немного стример, люблю делать разное и делиться этим.
 
 bio: |
-  Все места, где я живу в сети, — на одной странице.
-  Горит «Live» — значит, я прямо сейчас в эфире: заходи смотреть.
+  Все места, где я живу в сети — на одной странице.
 bio_align: center
