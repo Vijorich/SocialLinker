@@ -104,21 +104,22 @@ function makeWorld(cardUrls) {
   assert.equal(w.st.navigated, null, 'T2 no navigation');
 }
 
-// T3: history navigation during a slow open — the pending open is superseded
-// (its late fetch can't push or fill), but the modal stays open serving the entry
-// the user navigated to. Loading-on-open means the modal is no longer closed here.
+// T3: history navigation during a slow open — the pending open is superseded (its late
+// fetch can't push or fill), and Forward reopens the cached entry the user navigated to.
+// Fetch-first means no modal opens until the article resolves.
 {
   const w = makeWorld(['/posts/a/', '/posts/b/']);
   w.clickCard('/posts/a/');
   w.fetches[0].resolve(okResp('/posts/a/'));
-  await tick(); // open A, entry pushed
+  await tick(); // open A, entry pushed, A now cached
   w.history.back();
   await tick(); // closed, idx 0
-  w.clickCard('/posts/b/'); // opens B (loading), slow fetch pending
-  assert.ok(w.dlg.open, 'T3 modal opened for B with loading (no silent fetch)');
-  w.history.forward(); // user navigates to A entry while B fetches → swap(A)
+  w.clickCard('/posts/b/'); // open B: fetch pending, modal not yet open (fetch-first)
+  assert.ok(!w.dlg.open, 'T3 no modal until the article resolves');
+  w.history.forward(); // user navigates to the A entry → A reopens from cache
   w.fetches[1].resolve(okResp('/posts/b/')); // B resolves late — must be dropped
   await tick();
+  assert.ok(w.dlg.open, 'T3 A reopened from cache via Forward');
   assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T3 stale B fetch pushed nothing');
   assert.equal(w.cards[1].style.viewTransitionName ?? '', '', 'T3 no stuck VT name on B');
   assert.ok(!w.body.innerHTML.includes('body-of /posts/b/'), 'T3 stale B content did not land');
@@ -150,15 +151,15 @@ function makeWorld(cardUrls) {
   assert.equal(w.st.navigated, '/posts/zzz/', 'T5 unknown post URL loads standalone page');
 }
 
-// T6: fetch failure shows the loading state first, then falls back to full navigation.
+// T6: fetch failure falls back to the standalone page (the no-JS/direct-link route).
+// Fetch-first means no modal opens on failure — the click resolves straight to navigation.
 {
   const w = makeWorld(['/posts/a/']);
   w.clickCard('/posts/a/');
-  assert.ok(w.dlg.open, 'T6 modal opens with loading immediately (no silent fetch)');
-  assert.ok(w.body.innerHTML.includes('Загрузка'), 'T6 loading state shown before fallback');
+  assert.ok(!w.dlg.open, 'T6 no modal until the article resolves');
   w.fetches[0].resolve({ ok: false });
   await tick();
-  assert.equal(w.st.navigated, '/posts/a/', 'T6 falls back to standalone page after showing state');
+  assert.equal(w.st.navigated, '/posts/a/', 'T6 falls back to standalone page');
   assert.deepEqual(w.st.pushed, [], 'T6 nothing pushed (failed fetch has no URL sync)');
 }
 
