@@ -14,13 +14,14 @@ function makeWorld(cardUrls) {
   const cardClicks = new Map();
   let closeClick = null;
   const dlgListeners = {};
-  const body = { innerHTML: '', scrollTop: 0 };
+  const body = { innerHTML: '', scrollTop: 0, animate: () => ({}) };
   const cards = cardUrls.map(url => ({
     style: {},
     getAttribute: n => (n === 'href' ? url : null),
     addEventListener: (ev, fn) => cardClicks.set(url, fn),
   }));
   const dlg = {
+    style: {},
     open: false,
     showModal() { this.open = true; },
     close() { this.open = false; },
@@ -46,7 +47,7 @@ function makeWorld(cardUrls) {
     clickCard: url => cardClicks.get(url)({ preventDefault() {} }),
     clickClose: () => closeClick(),
     navClick: url => dlgListeners.click({
-      target: { closest: s => (s === '.post-nav a' ? { getAttribute: () => url } : null) },
+      target: { closest: s => (s === '.post-nav a' ? { getAttribute: () => url, classList: { contains: () => false } } : null) },
       preventDefault() {},
     }),
     firePop,

@@ -128,7 +128,7 @@ components:
 
 A late-night stream made tangible: a dark room, an ember-red glow, one gold spotlight reserved for the donate block. The palette is warm and nocturnal — near-black maroon ground, oxblood cards, a hot signal red that acts as both accent and alarm. Nothing here is corporate, nothing is daylight.
 
-The personality is playful inside the dark frame. Cards scale up when touched, badges bob and wobble with a recording-dot pulse, and clicking an article opens it in a modal instantly (no transition). Motion is the brand's voice; the static page is just the intermission.
+The personality is playful inside the dark frame. Cards scale up when touched, badges float gently with a recording-dot pulse, and clicking an article morphs the card into a modal via a shared-element View Transition (with a directional slide for prev/next). Motion is the brand's voice; the static page is just the intermission.
 
 Confirmed anti-references: never a sterile light-mode SaaS look, never purple/blue gamer gradients, never corporate blue links on white. The ember palette is the identity; departure from it is departure from the product.
 
@@ -219,12 +219,12 @@ The product's core unit — every social link, project, and post is one.
 - **Hover:** background heats to Ember Red, scale 1.03, radius inflates to 2rem, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted; gold-tinted on the donate variant) — the Heat-On-Touch rule made literal. Hover styles are gated behind `@media (hover: hover)`; touch devices never receive them.
 - **Focus (`:focus-visible`):** mirrors hover heat + a double keyboard ring (`box-shadow: 0 0 0 2px Cinder, 0 0 0 4px Signal Link`) so the focused row is unambiguous. Donate variant heats to full gold + dark text. Focus is not hover-gated — keyboard users on any device get the ring. Mouse clicks suppress it via `:focus-visible`.
 - **Touch:** no hover — press scales to 0.97 (0.15s)
-- **Donate variant:** Hearth Brown + Spotlight Gold text at rest; full gold fill with dark text on hover
+- **Donate variant:** Hearth Brown + Spotlight Gold text at rest; full gold fill with dark text and a soft gold glow on hover
 
 ### Badges
 Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on confirmed fresh data.
 - **Pinning (standing rule):** a revealed badge moves its card to the top of the list — live/fresh destinations always lead. Stable in `social.yml` order (Twitch leads statically); the reorder morphs via View Transition, instant under reduced motion. Pinning moves the real DOM node, so tab and AT order always match the visual order.
-- **Style:** pill (999px), Label type, bob animation (2.5s float with ±2° wobble)
+- **Style:** pill (999px), Label type, bob animation (3s gentle float: translateY + soft scale, lifting the whole chip rather than pivoting a side)
 - **Reveal:** one-shot scale-in pop (0.35s, slight overshoot) when un-hidden — freshness arrival feels earned, not silent. Then bob takes over.
 - **Live-pin afterglow:** on confirmed Twitch live, the freshly-pinned card flashes hot (Ember Red → Oxblood over 1.4s) so the eye finds it after the reorder morph.
 - **Live:** Signal Live fill, pure white text and pulsing dot (1.2s recording pulse). White clears ≈ 5.5:1 (Bone would pass too at this lightness; white reads loudest for "on air").
@@ -232,10 +232,10 @@ Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on 
 - **Motion safety:** animations off under `prefers-reduced-motion`
 
 ### Post Cards & Article
-Post cards reuse the link-card block with `user-select: none`; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` and shows it instantly (no transition); the fallback is plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
+Post cards reuse the link-card block with `user-select: none`; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` and morphs the clicked card into the dialog via a shared-element View Transition; it morphs back to the card on close. The dialog is shown/closed synchronously inside the transition, so continuity never delays the action surface; the fallback is plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
 
 ### Modal
-`<dialog>` opening instantly over the page: Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim maroon backdrop, circular close button top-right.
+`<dialog>` morphing into place over the page via a shared-element View Transition — the clicked card expands into the dialog on open and morphs back on close (`view-transition-name: post-morph`, ~0.34s confident-arrival): Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim maroon backdrop, circular close button top-right. Falls back to instant open/close under `prefers-reduced-motion` or where View Transitions are unavailable.
 
 ### Close Button
 - **Style:** 48px circle, Oxblood, no border
@@ -244,20 +244,20 @@ Post cards reuse the link-card block with `user-select: none`; the single-articl
 - **Touch:** press scales to 0.92
 
 ### Hero & Avatar
-The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Arrival is the first authored beat: on load the glow wakes from cold to its resting breath (0.8s) and the hero content settles out of a soft blur (0.6s, role-staggered) — the dark room coming into focus. Only the stage animates; link cards are ready at first paint so the one-click action surface is never delayed. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (0.9s, brightness+scale surge) hands off to a hotter, larger breath, and the avatar ring heats to Signal Bright. The sonar ring pulse (1.2s, Signal Red glow fading outward) remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing; content visible with no settle).
+The hero is the Ember Stage at rest: a soft radial Signal-Red glow (`.hero::before`, blurred, low-opacity) breathes behind the avatar (~6s scale/opacity oscillation) so the room reads as warm and lived-in, never dead. Avatar is a 96px circle (80px phone) with a 2px Signal Red ring — the only bordered element in the system. The glow is stage-light, not a surface: the Heat-On-Touch Rule targets cards; the north star itself calls for "a dark room, an ember-red glow," so the brief earns this one ambient exception. Arrival is the first authored beat: on load the glow wakes from cold to its resting breath (1s) and the hero content settles out of a soft blur (0.6s, role-staggered) — the dark room coming into focus. Only the stage animates; link cards are ready at first paint so the one-click action surface is never delayed. Ignition is the authored focal moment: when `badges.js` confirms Twitch live and adds `.avatar.live`, the stage catches — a one-time match-strike flare (1s, brightness+scale surge) hands off to a hotter, larger, glowing breath (7s, brighter on the inhale so it reads like real breathing), and the avatar ring heats to Signal Bright over 0.9s. The sonar ring ping (1.6s, Signal Red expanding outward) plus a persistent soft glow remains the page's primary "on air now" signal; badges stay secondary. All hero motion off under `prefers-reduced-motion` (glow stays static, just no breathing; content visible with no settle).
 
 ### Tagline
 Optional one-liner (`profile.tagline`) under the nick: Ash Rose, 1.125rem (1rem phone), centered with the hero. Absent key = absent element.
 
 ### Post Nav
-Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separated by a hairline Bone-White-at-12% rule. Muted links (1rem, ellipsis-truncated titles) heating to Signal Bright on hover. Lives inside the article so the index modal copies it; modal JS swaps content instead of navigating.
+Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separated by a hairline Bone-White-at-12% rule. Muted links (1rem, ellipsis-truncated titles) heating to Signal Bright on hover. Lives inside the article so the index modal copies it; modal JS swaps content instead of navigating — the new article slides in from the clicked button's side (240ms WAAPI: Новее from the left, Старее from the right), explaining the newer/older step. Instant under `prefers-reduced-motion`.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** build every new interactive row as a link card: Oxblood at rest, Ember Red + scale on hover, full pill on breakout.
 - **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the maroon ramp.
-- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (0.9s) and the live-pin afterglow (1.4s) are the exceptions — exit-style state feedback, not choreography users wait through.
+- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the card⇄modal morph (~0.34s) are the exceptions — the morph is continuity (the dialog shows synchronously inside the transition, so nothing waits), the others are exit-style state feedback.
 - **Do** keep badges honest: hidden by default, revealed only on confirmed data, silent on any fetch error.
 - **Do** use native platform features (View Transitions, `<dialog>`, system stack) before writing JS or adding assets.
 
