@@ -128,7 +128,7 @@ components:
 
 A late-night stream made tangible: a dark room, an ember-red glow, one gold spotlight reserved for the donate block. The palette is warm and nocturnal — near-black maroon ground, oxblood cards, a hot signal red that acts as both accent and alarm. Nothing here is corporate, nothing is daylight.
 
-The personality is playful inside the dark frame. Cards scale up when touched, badges bob and wobble with a recording-dot pulse, and clicking an article makes the card itself unfold into the reading surface via a native View Transition morph. Motion is the brand's voice; the static page is just the intermission.
+The personality is playful inside the dark frame. Cards scale up when touched, badges bob and wobble with a recording-dot pulse, and clicking an article opens it in a modal instantly (no transition). Motion is the brand's voice; the static page is just the intermission.
 
 Confirmed anti-references: never a sterile light-mode SaaS look, never purple/blue gamer gradients, never corporate blue links on white. The ember palette is the identity; departure from it is departure from the product.
 
@@ -232,10 +232,10 @@ Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on 
 - **Motion safety:** animations off under `prefers-reduced-motion`
 
 ### Post Cards & Article
-Post cards reuse the link-card block with `user-select: none`; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. The card and article share `view-transition-name: post-hero`, so opening a post morphs the card into the reading surface (0.5s, cubic-bezier(0.4,0,0.2,1)); the fallback is plain navigation. Card heads and article headers carry date + server-rendered reading time (`N мин`). Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
+Post cards reuse the link-card block with `user-select: none`; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` and shows it instantly (no transition); the fallback is plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
 
 ### Modal
-`<dialog>` morphing from the clicked card: Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim maroon backdrop, circular close button top-right.
+`<dialog>` opening instantly over the page: Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim maroon backdrop, circular close button top-right.
 
 ### Close Button
 - **Style:** 48px circle, Oxblood, no border

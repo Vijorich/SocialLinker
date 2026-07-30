@@ -93,18 +93,7 @@ body {
 
 a { color: var(--accent-link); }
 
-/* Screen-reader-only — visible content stays hidden from sighted users, still announced. */
-.sr-only {
-  position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Skip link — first focusable, sr-only until keyboard focus reveals it top-left. */
+/* Skip link — first focusable, off-screen until keyboard focus reveals it top-left. */
 .skip-link {
   position: fixed;
   top: max(.5rem, env(safe-area-inset-top)); left: max(.5rem, env(safe-area-inset-left));
@@ -268,6 +257,8 @@ a { color: var(--accent-link); }
   font-weight: 500;
   text-wrap: balance;
 }
+
+.bio-content { text-align: center; }
 
 /* Bio + post prose share styling */
 .bio-content, .post-content {
@@ -565,7 +556,7 @@ a { color: var(--accent-link); }
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
 
-/* Post modal — dialog morphs from clicked .post-card (same post-hero view-transition).
+/* Post modal — opens instantly over the page (no transition).
    Wider than the page column on desktop; standalone post page stays as no-JS/direct-link fallback. */
 .post-modal {
   border: none;
@@ -578,14 +569,10 @@ a { color: var(--accent-link); }
   border-radius: var(--radius);
   color: var(--fg);
   overflow: hidden;
-  view-transition-name: post-hero;
 }
 .post-modal[open] { display: flex; flex-direction: column; }
 .post-modal::backdrop { background: rgba(13, 7, 6, 0.6); }
 .post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: var(--scrollbar) transparent; }
-/* Click acknowledgment while the (usually cached) article resolves — subtle and
-   transform-free so it never reads as layout shift; lifted the instant the morph starts. */
-.post-card.loading { opacity: 0.7; cursor: progress; }
 .post-modal .post-close { position: absolute; top: 1rem; right: 1rem; }
 
 /* Projects */
@@ -661,64 +648,6 @@ a { color: var(--accent-link); }
   45% { transform: scale(1.12); }
   60% { transform: scale(1); }
 }
-
-/* View Transitions: cross-document (card → standalone article) and same-document
-   (card → modal). Material-3 container transform: the box morphs (bounds/radius/color),
-   title + time fly as shared elements, body content staggers in after the fetch.
-   ponytail: native API, 0 deps. Chrome/Edge/Safari 26+. Firefox/older = normal nav. */
-/* ponytail: guard silences "unrecognized at-rule" in Firefox, which lacks view transitions */
-@supports (view-transition-name: none) {
-  @view-transition { navigation: auto; }
-}
-
-.post-article { view-transition-name: post-hero; }
-
-@media (prefers-reduced-motion: no-preference) {
-  /* Emphasized entry (M3 standard decelerate). Container + the two shared text elements share
-     one timing so the morph reads as a single motion; only transform/opacity/radius run. */
-  ::view-transition-group(post-hero),
-  ::view-transition-group(post-title),
-  ::view-transition-group(post-time) {
-    animation-duration: 0.38s;
-    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
-  }
-  /* Container snapshots cross-fade fast — bg is constant oxblood, hiding the stretch as the
-     card image grows into the modal surface on open and shrinks back on close. */
-  ::view-transition-old(post-hero),
-  ::view-transition-new(post-hero) {
-    animation-duration: 0.2s;
-    animation-timing-function: ease;
-  }
-  /* Shared text cross-fades quickly while its group flies it to the new position. */
-  ::view-transition-old(post-title), ::view-transition-new(post-title),
-  ::view-transition-old(post-time),  ::view-transition-new(post-time) {
-    animation-duration: 0.18s;
-    animation-timing-function: ease;
-  }
-  /* Scrim + page continuity lag the container a touch: the morph leads, the scrim follows. */
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 0.34s;
-    animation-delay: 0.05s;
-    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
-  }
-  /* Close = mirrored reverse on the emphasized exit curve (faster, slight overshoot). */
-  :root.vt-closing::view-transition-group(post-hero),
-  :root.vt-closing::view-transition-group(post-title),
-  :root.vt-closing::view-transition-group(post-time) {
-    animation-timing-function: cubic-bezier(0.3, 0, 0.8, 0.15);
-    animation-duration: 0.3s;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) { animation: none; }
-}
-
-/* Reduced-motion / no-VT fallback: a plain 150ms fade-in (added via JS). */
-.post-modal.fade { animation: modal-fade-in 0.15s ease both; }
-@keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* Phone adaptation (< 768px). Desktop is the base; phones get denser spacing,
    stacked card head, smaller hero + close button. Tablet portrait folds in here. */
