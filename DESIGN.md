@@ -16,6 +16,7 @@ colors:
   signal-deep: "#af302b"
   signal-live: "#bb3c35"
   signal-sel: "#d65048"
+  on-live: "#ffffff"          # white on the Live fill — bone dips to 4.41 (fails AA); white clears 5.51
   spotlight-gold: "#fdd171"
   ash-rose: "#b1a09d"
   bone-white: "#eee4e0"
@@ -147,7 +148,7 @@ A warm maroon family graded as an **OKLCH lightness ramp** from near-black groun
 The signal red lives at anchor hue 27 (ember) and appears in three lightness steps with non-overlapping jobs:
 - **Signal** (`{colors.signal-red}`, L≈0.585): the resting accent — *fills, borders, rails, and the avatar ring.* Not used as text; as a non-text accent it clears 3:1 on Cinder and Oxblood. Selection uses **Signal Sel** (`{colors.signal-sel}`), a half-step tuned so Cinder text clears 4.5:1 on it.
 - **Signal Bright** (`{colors.signal-link}`, L≈0.725): the accent as **text or icon on any surface**, including the heated Ember hover. This is the single readable rendering of the red — all in-prose links, focus rings, post-nav hovers, and the close-button hover icon use it. It clears 4.5:1 as text on Cinder/Oxblood and 3:1 as an icon on Ember (the close-button tension that was previously *Open* is now resolved — no more red-on-red failure on hover).
-- **Signal Deep** (`{colors.signal-deep}`, L≈0.505) / **Signal Live** (`{colors.signal-live}`, L≈0.54): the two fill steps behind light text. New! uses Deep (Bone ≈ 5.1:1); Live uses the half-step-hotter Live fill (white ≈ 5.5:1) so "on air" reads visibly hotter than "fresh."
+- **Signal Deep** (`{colors.signal-deep}`, L≈0.505) / **Signal Live** (`{colors.signal-live}`, L≈0.54): the two fill steps behind light text. New! uses Deep (Bone ≈ 5.1:1); Live's hotter fill drops Bone to 4.41 (fails AA), so Live text is pure white (5.51) — a contrast requirement, not a stylistic choice. "On air" still reads hotter than "fresh" via the fill step itself.
 - **Ember** (`{colors.ember-red}`, L≈0.405): the heated surface — hover/focus state for every card. Cards literally heat (lighten + gain chroma) when touched.
 
 ### Secondary
@@ -227,7 +228,7 @@ Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on 
 - **Style:** pill (999px), Label type, bob animation (3s gentle float: translateY + soft scale, lifting the whole chip rather than pivoting a side)
 - **Reveal:** one-shot scale-in pop (0.35s, slight overshoot) when un-hidden — freshness arrival feels earned, not silent. Then bob takes over.
 - **Live-pin afterglow:** on confirmed Twitch live, the freshly-pinned card flashes hot (Ember Red → Oxblood over 1.4s) so the eye finds it after the reorder morph.
-- **Live:** Signal Live fill, pure white text and pulsing dot (1.2s recording pulse). White clears ≈ 5.5:1 (Bone would pass too at this lightness; white reads loudest for "on air").
+- **Live:** Signal Live fill, pure white text and pulsing dot (1.2s recording pulse). White clears 5.51; Bone dips to 4.41 on this hotter fill and fails AA — white is required here, while New!'s darker Deep fill lets Bone pass (5.12).
 - **New!:** Signal Deep fill, Bone White text (passes AA for 12px/700). Saturated Signal Red + dark text failed at ~3.9:1, so the deeper red was introduced for this fill.
 - **Motion safety:** animations off under `prefers-reduced-motion`
 

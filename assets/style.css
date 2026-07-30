@@ -22,6 +22,7 @@
   /* Selection surface — tuned so Cinder text clears 4.5:1 on it. */
   --accent-sel: #d65048;
   --gold: #fdd171;          /* Spotlight — donate block only */
+  --on-live: #ffffff;       /* white on the Live fill — bone dips to 4.41 (fails AA at 12px); white clears 5.51 */
   /* Warm ember scrollbar — tonal with the maroon ramp, not neutral gray. */
   --scrollbar: #795b56;
   --scrollbar-hover: #997770;
@@ -66,7 +67,7 @@ html { scrollbar-color: var(--scrollbar) var(--bg); background: var(--bg); }
   html::-webkit-scrollbar { width: 1rem; }
   html::-webkit-scrollbar-track { background: var(--bg); }
   html::-webkit-scrollbar-button { width: 0; height: 0; display: none; }
-  html::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 0.5rem; border: 0.2rem solid transparent; background-clip: padding-box; }
+  html::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 999px; border: 0.2rem solid transparent; background-clip: padding-box; }
   html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 }
 
@@ -103,7 +104,7 @@ a { color: var(--accent-link); }
   background: var(--accent-link);
   color: var(--bg);
   font-weight: 600;
-  border-radius: .6rem;
+  border-radius: 999px;
   text-decoration: none;
   transform: translateY(-150%);
   transition: transform .15s ease-out;
@@ -396,14 +397,14 @@ a { color: var(--accent-link); }
 }
 .badge[hidden] { display: none; }
 .badge-new { background: var(--accent-deep); color: var(--fg); }
-/* ponytail: text/dot stay #ffffff — white on the hotter Live fill clears ≈ 5.5:1; bone would pass too, white reads loudest for "on air". */
-.badge-live { background: var(--accent-live); color: #ffffff; }
+/* ponytail: text/dot are white, not bone — bone dips to 4.41 on the hotter Live fill (fails AA at 12px); white clears 5.51. New!'s Deep fill is dark enough for bone (5.12); Live's lighter fill isn't. */
+.badge-live { background: var(--accent-live); color: var(--on-live); }
 .badge-live::before {
   content: "";
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--on-live);
   animation: badge-dot 1.2s ease-in-out infinite;
 }
 @keyframes badge-pop {
@@ -430,10 +431,13 @@ a { color: var(--accent-link); }
   100% { background-color: var(--bg-card); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .badge, .badge-live::before, .avatar.live,
+  .badge, .badge-live::before,
   .link-list li.just-pinned .link-card,
   .donate-list .link-card:hover::after,
   .footer-heart { animation: none; }
+  /* Live avatar: stop the sonar ping but keep the persistent soft glow —
+     it's the page's primary "on air" signal (ambient light, not motion). */
+  .avatar.live { animation: none; box-shadow: 0 0 0.5rem rgba(209, 67, 60, 0.45); }
   /* Glow stays (it's ambient light, not motion) — just stop breathing. */
   .hero::before { animation: none; opacity: 0.12; }
   .hero:has(.avatar.live)::before { opacity: 0.20; }
@@ -457,7 +461,7 @@ a { color: var(--accent-link); }
   transform: translateX(-250%) skewX(-20deg);
   pointer-events: none;
 }
-@media (hover: hover) {
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .donate-list .link-card:hover::after { animation: gold-sweep 0.9s ease-out; }
 }
 @keyframes gold-sweep {

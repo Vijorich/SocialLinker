@@ -1,5 +1,5 @@
 <header class="hero">
-  <img class="avatar" src="{{ site.data.profile.avatar | relative_url | escape }}" alt="{{ site.data.profile.nick | escape }}" width="96" height="96" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2048%2048%27%3E%3Crect%20width=%2748%27%20height=%2748%27%20fill=%27%23482121%27/%3E%3Ccircle%20cx=%2724%27%20cy=%2718%27%20r=%278%27%20fill=%27%23af9c9c%27/%3E%3Cpath%20d=%27M10%2042a14%2014%200%200%201%2028%200z%27%20fill=%27%23af9c9c%27/%3E%3C/svg%3E'">
+  <img class="avatar" src="{{ site.data.profile.avatar | relative_url | escape }}" alt="" width="96" height="96" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2048%2048%27%3E%3Crect%20width=%2748%27%20height=%2748%27%20fill=%27%23482121%27/%3E%3Ccircle%20cx=%2724%27%20cy=%2718%27%20r=%278%27%20fill=%27%23af9c9c%27/%3E%3Cpath%20d=%27M10%2042a14%2014%200%200%201%2028%200z%27%20fill=%27%23af9c9c%27/%3E%3C/svg%3E'">
   <h1 class="nick">{{ site.data.profile.nick | escape }}</h1>
   {% if site.data.profile.tagline %}<p class="tagline">{{ site.data.profile.tagline | escape }}</p>{% endif %}
 </header>

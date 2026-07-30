@@ -21,7 +21,7 @@
 {{ content }}
 
 <script>
-if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}
+if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{let fx=0,fy=0,raf=0;const run=()=>{raf=0;const r=c.getBoundingClientRect(),dx=(fx-r.left)/r.width-.5,dy=(fy-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`};c.addEventListener('mousemove',e=>{fx=e.clientX;fy=e.clientY;if(!raf)raf=requestAnimationFrame(run)});c.addEventListener('mouseleave',()=>{if(raf)cancelAnimationFrame(raf);raf=0;c.style.transform=''})})}
 (function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
 /* Post modal — card ⇄ dialog morph + directional prev/next swap. Fetch+cache the
    article, fill the dialog, showModal. Open/close share-element morph (View
@@ -50,7 +50,7 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     cache.set(url,art);
     return art;
   }
-  function fill(article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t)dlg.setAttribute('aria-label',t.textContent);body.scrollTop=0}
+  function fill(article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t){dlg.setAttribute('aria-label',t.textContent);/* Demote h1→h2 inside the modal so the page keeps one document h1 (the hero nick); the standalone post page keeps its server-rendered h1. */const h=body.querySelector('.post-title');if(h&&h.tagName==='H1'){const d=document.createElement('h2');d.className=h.className;while(h.firstChild)d.appendChild(h.firstChild);h.replaceWith(d)}}body.scrollTop=0}
   async function open(card,push){
     if(dlg.open)return;
     const g=++gen,url=card.getAttribute('href');
