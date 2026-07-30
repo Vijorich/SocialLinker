@@ -23,55 +23,55 @@ colors:
   scrollbar: "#795b56"
   scrollbar-hover: "#997770"
 typography:
-  # Fluid clamp scale — roles breathe across the viewport instead of jumping at
-  # breakpoints; endpoints preserve chat-readable phone sizes and desktop presence.
-  # One system stack (One-Stack Rule); deeper fallbacks + optical sizing + kerning.
-  fontSans: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
-  fontMono: "ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace"
+  # Two voices: Unbounded (display: logo, headings) + Rubik (body/UI).
+  # Fluid clamp scale; system stacks as load-time floor (fail-silent like badges).
+  fontSans: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+  fontDisplay: "Unbounded, 'Arial Black', system-ui, sans-serif"
+  fontMono: "'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace"
   display:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
     fontSize: "clamp(2rem, 1.41rem + 2.48vw, 3rem)"
-    fontWeight: 500
+    fontWeight: 900
     letterSpacing: "-0.02em"
     lineHeight: 1.1
   headline:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
     fontSize: "clamp(1.4rem, 1.19rem + 0.87vw, 1.75rem)"
-    fontWeight: 600
+    fontWeight: 800
     letterSpacing: "-0.02em"
     lineHeight: 1.2
   prose-h2:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
     fontSize: "clamp(1.15rem, 1rem + 0.4vw, 1.4rem)"
-    fontWeight: 600
+    fontWeight: 700
     letterSpacing: "-0.02em"
     lineHeight: 1.2
   prose-h3:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
     fontSize: "clamp(1.05rem, 0.92rem + 0.33vw, 1.25rem)"
-    fontWeight: 600
+    fontWeight: 700
     letterSpacing: "-0.02em"
     lineHeight: 1.2
   title:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "1rem"
-    fontWeight: 500
+    fontWeight: 700
     letterSpacing: "0.1em"
   body:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "clamp(1rem, 0.76rem + 1.03vw, 1.25rem)"
-    fontWeight: 400
+    fontWeight: 600
     lineHeight: 1.5
   meta:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "1rem"
-    fontWeight: 400
+    fontWeight: 700
   tagline:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "clamp(0.95rem, 0.85rem + 0.43vw, 1.125rem)"
-    fontWeight: 400
+    fontWeight: 600
   label:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 700
     letterSpacing: "0.05em"
@@ -138,7 +138,7 @@ Confirmed anti-references: never a sterile light-mode SaaS look, never purple/bl
 - One accent (Signal Red) + one reserved spotlight (gold = donate only)
 - Lists read as one clipped pill-block; hover breaks a card out into a full pill
 - Flat surfaces; depth comes from tonal steps and motion, never resting shadows
-- System font stack only — zero webfonts, zero build, keyless everything
+- Three-voice typography: Unbounded (display) + Rubik (body/UI) + JetBrains Mono (code), with system stacks as load-time floor
 
 ## Colors
 
@@ -169,23 +169,24 @@ The signal red lives at anchor hue 27 (ember) and appears in three lightness ste
 
 ## Typography
 
-**Sans stack:** `system-ui` with `-apple-system`, `Segoe UI`, `Roboto`, `Helvetica Neue`, `Noto Sans`, `Arial` fallback — one stack for everything. **Mono stack:** `ui-monospace` with SF Mono / Cascadia / Roboto Mono / Menlo / Consolas fallback for `code` and `pre`, so code reads as code rather than costume-sans. Both stacks enable `font-optical-sizing: auto` and `font-kerning: normal`.
+Two voices, one job each: **Unbounded** carries display (logo, headings, the 404 number) — a wide, geometric face that gives the hero and section headings real presence. **Rubik** carries body, UI, captions, and meta — a clean rounded sans that stays readable at small sizes and dark-surface contrast. **JetBrains Mono** carries code and pre — a clean monospaced face so code reads as code. All three load from Google Fonts with `display=swap`; the system stacks (`--font-sans`, `--font-display`, `--font-mono`) remain as the load-time floor so a blocked or slow font request degrades to the incumbent look, not a broken page — same fail-silent discipline as the live badges.
 
-**Character:** No webfonts by design. The system stack keeps the site zero-asset and instant on any device; hierarchy is carried by size, weight, tracking, and case — not by typeface contrast.
+**Character:** Three sourced faces with clear roles; hierarchy is carried by face, then size, weight, tracking, and case — in that order. The display voice is deliberately wide and bold; the body voice is deliberately rounded and dense; the mono voice is a clean monospaced face for code and data. This contrast across the three voices is the typographic identity.
 
 ### Hierarchy
 The size ramp is **fluid** — each scalable role is a `clamp()` that breathes between a small-viewport floor (380px) and a desktop ceiling, instead of jumping at breakpoints. Endpoints preserve the chat-readable phone sizes and desktop presence.
-- **Display** (500, `clamp(2rem → 3rem)`, -0.02em, leading 1.1): the nick in the hero. The only oversized text on the page.
-- **Headline** (600, `clamp(1.4rem → 1.75rem)`, -0.02em, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
-- **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both 600 weight, -0.02em, leading 1.2 — a real sub-scale inside long-form copy (previously prose headings had no size or weight of their own).
-- **Title** (500, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
-- **Body** (400, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
-- **Meta** (400, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. The quiet information that surrounds the primary text.
-- **Tagline** (400, `clamp(0.95rem → 1.125rem)`, Ash Rose): the optional hero one-liner, one step above meta.
-- **Label** (700, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
+- **Display** (Unbounded 900, `clamp(2rem → 3rem)`, -0.02em, leading 1.1): the nick in the hero. The only oversized text on the page.
+- **Headline** (Unbounded 800, `clamp(1.4rem → 1.75rem)`, -0.02em, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
+- **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both Unbounded 700, -0.02em, leading 1.2 — a real sub-scale inside long-form copy.
+- **Title** (Rubik 700, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
+- **Body** (Rubik 600, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
+- **Meta** (Rubik 700, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. Heavier weight than body at the same size to maintain legibility at the small scale.
+- **Tagline** (Rubik 600, `clamp(0.95rem → 1.125rem)`, Ash Rose): the optional hero one-liner, one step above meta.
+- **Label** (Rubik 700, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
+- **Strong / Emphasis** (Rubik 800): inline emphasis in prose — heavier than body weight, distinct from both meta and body.
 
 ### Named Rules
-**The One-Stack Rule.** Never add a webfont. If hierarchy is needed, reach for weight, size, tracking, or case — in that order.
+**The Two-Voice Rule.** Unbounded owns display roles (nick, headings, the 404 number); Rubik owns everything you read (body, UI, meta, captions); JetBrains Mono owns code. Never mix: display-face text on body-sized elements looks clumsy; body-face on display-sized elements looks timid; monospace outside code is costume. System stacks are the load-time floor, not the intended voice.
 **The Negative-Tracking Rule.** Tight letter-spacing (-0.02em) is reserved for display, headline, and prose-heading sizes; labels stay positive. The sole exception is a hair of dark-surface compensation on the body itself (see below).
 **The Dark-Compensation Note.** Light text on dark surfaces reads looser, so body gets `letter-spacing: 0.005em` (near-imperceptible) plus the Leading-Arc air — a clarity adjustment, not a style change.
 **The Leading-Arc Rule.** Leading tightens as size grows: 1.1 display → 1.2 headline/prose-headings → 1.5 body → 1.7 long-form prose. Big type never inherits the body's air. Headings use `text-wrap: balance`; body and prose use `text-wrap: pretty` — native, zero-cost, no asset.
@@ -262,11 +263,13 @@ Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separate
 - **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the maroon ramp.
 - **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the card⇄modal morph (~0.34s) are the exceptions — the morph is continuity (the dialog shows synchronously inside the transition, so nothing waits), the others are exit-style state feedback.
 - **Do** keep badges honest: hidden by default, revealed only on confirmed data, silent on any fetch error.
-- **Do** use native platform features (View Transitions, `<dialog>`, system stack) before writing JS or adding assets.
+- **Do** use native platform features (View Transitions, `<dialog>`) before writing JS or adding assets.
 
 ### Don't:
 - **Don't** add resting box-shadows — depth is tonal steps plus motion (The Flat-At-Rest Rule).
 - **Don't** use Spotlight Gold outside the donate block (The One Spotlight Rule).
-- **Don't** introduce webfonts, purple/blue gamer gradients, corporate blue, or a light theme.
+- **Don't** add webfont faces beyond Unbounded, Rubik, and JetBrains Mono — three voices with clear roles, not a type specimen.
+- **Don't** mix the voices: Unbounded on body-sized text, Rubik on display-sized text, monospace outside code.
+- **Don't** use purple/blue gamer gradients, corporate blue, or a light theme.
 - **Don't** give hover styles to touch devices — use the `@media (hover: hover)` / `(hover: none)` split with press-scale feedback.
 - **Don't** add API keys, tokens, or build steps to make a visual effect work; if it needs a server, it's off-brand.
