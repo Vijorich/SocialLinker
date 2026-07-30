@@ -56,7 +56,7 @@ typography:
   body:
     fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "clamp(1rem, 0.76rem + 1.03vw, 1.25rem)"
-    fontWeight: 500
+    fontWeight: 400
     lineHeight: 1.5
   meta:
     fontFamily: "Rubik, system-ui, sans-serif"
@@ -175,7 +175,7 @@ The size ramp is **fluid** — each scalable role is a `clamp()` that breathes b
 - **Headline** (Unbounded 800, `clamp(1.4rem → 1.75rem)`, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
 - **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both Unbounded 700, leading 1.2 — a real sub-scale inside long-form copy.
 - **Title** (Unbounded 700, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
-- **Body** (Rubik 500, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
+- **Body** (Rubik 400, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
 - **Meta** (Rubik 600, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. One step heavier than body at the same size for small-text legibility.
 - **Tagline** (Rubik 500, `clamp(0.95rem → 1.125rem)`, Ash Rose): the optional hero one-liner, one step above meta.
 - **Label** (Rubik 600, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
