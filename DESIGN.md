@@ -49,27 +49,27 @@ typography:
     fontWeight: 700
     lineHeight: 1.2
   title:
-    fontFamily: "Rubik, system-ui, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', sans-serif"
     fontSize: "1rem"
     fontWeight: 700
     letterSpacing: "0.1em"
   body:
     fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "clamp(1rem, 0.76rem + 1.03vw, 1.25rem)"
-    fontWeight: 600
+    fontWeight: 500
     lineHeight: 1.5
   meta:
     fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "1rem"
-    fontWeight: 700
+    fontWeight: 600
   tagline:
     fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "clamp(0.95rem, 0.85rem + 0.43vw, 1.125rem)"
-    fontWeight: 600
+    fontWeight: 500
   label:
     fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "0.75rem"
-    fontWeight: 700
+    fontWeight: 600
     letterSpacing: "0.05em"
 rounded:
   sm: "0.25rem"
@@ -174,12 +174,12 @@ The size ramp is **fluid** — each scalable role is a `clamp()` that breathes b
 - **Display** (Unbounded 900, `clamp(2rem → 3rem)`, leading 1.1): the nick in the hero. The only oversized text on the page.
 - **Headline** (Unbounded 800, `clamp(1.4rem → 1.75rem)`, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
 - **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both Unbounded 700, leading 1.2 — a real sub-scale inside long-form copy.
-- **Title** (Rubik 700, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
-- **Body** (Rubik 600, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
-- **Meta** (Rubik 700, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. Heavier weight than body at the same size to maintain legibility at the small scale.
-- **Tagline** (Rubik 600, `clamp(0.95rem → 1.125rem)`, Ash Rose): the optional hero one-liner, one step above meta.
-- **Label** (Rubik 700, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
-- **Strong / Emphasis** (Rubik 800): inline emphasis in prose — heavier than body weight, distinct from both meta and body.
+- **Title** (Unbounded 700, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
+- **Body** (Rubik 500, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
+- **Meta** (Rubik 600, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. One step heavier than body at the same size for small-text legibility.
+- **Tagline** (Rubik 500, `clamp(0.95rem → 1.125rem)`, Ash Rose): the optional hero one-liner, one step above meta.
+- **Label** (Rubik 600, 0.75rem, +0.05em, uppercase): badges. Loud at tiny size.
+- **Strong / Emphasis** (Rubik 700): inline emphasis in prose — heavier than body weight, distinct from both meta and body.
 
 ### Named Rules
 **The Two-Voice Rule.** Unbounded owns display roles (nick, headings, the 404 number); Rubik owns everything you read (body, UI, meta, captions); JetBrains Mono owns code. Never mix: display-face text on body-sized elements looks clumsy; body-face on display-sized elements looks timid; monospace outside code is costume. System stacks are the load-time floor, not the intended voice.

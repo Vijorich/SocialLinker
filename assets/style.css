@@ -83,7 +83,7 @@ body {
   font-family: var(--font-sans);
   font-optical-sizing: auto;
   font-kerning: normal;
-  font-weight: 600;
+  font-weight: 500;
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-grad) 100%);
   color: var(--fg);
   line-height: var(--leading-body);
@@ -96,7 +96,7 @@ body {
 }
 
 a { color: var(--accent-link); }
-strong, b { font-weight: 800; }
+strong, b { font-weight: 700; }
 
 /* Skip link — first focusable, off-screen until keyboard focus reveals it top-left. */
 .skip-link {
@@ -106,7 +106,7 @@ strong, b { font-weight: 800; }
   padding: .5rem .9rem;
   background: var(--accent-link);
   color: var(--bg);
-  font-weight: 900;
+  font-weight: 800;
   border-radius: 999px;
   text-decoration: none;
   transform: translateY(-150%);
@@ -254,6 +254,7 @@ strong, b { font-weight: 800; }
 /* Sections */
 .section { margin-bottom: 2rem; }
 .section-title {
+  font-family: var(--font-display);
   font-size: var(--text-title);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -274,7 +275,7 @@ strong, b { font-weight: 800; }
   code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
   pre { font-family: var(--font-mono); background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
   pre code { background: none; border: none; padding: 0; }
-  blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); font-style: italic; font-weight: 600; }
+  blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); font-style: italic; font-weight: 500; }
   ul, ol { padding-left: 1.5rem; }
 }
 
@@ -299,7 +300,7 @@ strong, b { font-weight: 800; }
   border-radius: 1rem;
   color: var(--fg);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
   position: relative;
   overflow: hidden;
@@ -325,7 +326,7 @@ strong, b { font-weight: 800; }
   display: block;
   color: var(--fg-muted);
   font-size: var(--text-meta);
-  font-weight: 700;
+  font-weight: 600;
   margin-top: 0.125rem;
   white-space: nowrap;
   overflow: hidden;
@@ -388,7 +389,7 @@ strong, b { font-weight: 800; }
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   font-size: var(--text-label);
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1.4;
@@ -484,14 +485,14 @@ strong, b { font-weight: 800; }
   align-items: baseline;
   gap: 1rem;
 }
-.post-title { font-weight: 600; }
-.post-date { color: var(--fg-muted); font-size: var(--text-meta); font-weight: 700; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.post-title { font-weight: 500; }
+.post-date { color: var(--fg-muted); font-size: var(--text-meta); font-weight: 600; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .post-excerpt {
   display: block;
   color: var(--fg-muted);
   margin: 0.5rem 0 0;
   font-size: var(--text-meta);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Single post — article is a card (morph target matches .post-card visual) */
@@ -598,13 +599,13 @@ strong, b { font-weight: 800; }
 }
 
 /* Projects */
-.project-name { font-weight: 600; }
+.project-name { font-weight: 500; }
 .project-desc {
   display: block;
   color: var(--fg-muted);
   font-size: var(--text-meta);
   margin-top: 0.25rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* 404 — centered hero, gradient code, card-style CTA matching link aesthetic */
@@ -638,7 +639,7 @@ strong, b { font-weight: 800; }
   border-radius: var(--radius);
   color: var(--fg);
   text-decoration: none;
-  font-weight: 900;
+  font-weight: 800;
   transition: background 0.3s ease, scale 0.3s ease, color 0.3s ease;
 }
 @media (hover: hover) {
