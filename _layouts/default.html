@@ -25,12 +25,12 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
 (function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
 (function(){const cards=document.querySelectorAll('.post-card');if(!cards.length)return;const dlg=document.getElementById('post-modal');
 if(!dlg){const back=sessionStorage.getItem('vt-post-href');if(back){sessionStorage.removeItem('vt-post-href');const m=document.querySelector('.post-card[href="'+back+'"]');if(m)m.style.viewTransitionName='post-hero'}cards.forEach(c=>c.addEventListener('click',()=>{cards.forEach(x=>x.style.viewTransitionName='');sessionStorage.setItem('vt-post-href',c.getAttribute('href'));c.style.viewTransitionName='post-hero'}));return}
-/* Modal path: Material-3 container transform. The clicked card morphs straight into the
-   full article — bounds/radius/color on the box, title + time fly as shared elements, and the
-   body resolves inside the growing surface. Fetch-first against a warmed cache, so the morph
-   target is always the final size: no loading state, no resize jolt, one seamless motion.
-   URL synced: a successful open pushes the post URL (refresh = standalone page = no-JS
-   fallback); Back closes, Forward reopens. */
+/* Modal path: Material-3 container transform with shared elements. The clicked card morphs
+   straight into the full article: the container (post-hero) animates bounds/radius/color, while
+   title + time fly as shared elements (post-title/post-time). Fetch-first against a warmed cache,
+   so the morph target is always the final size: no loading state, no resize jolt. URL synced: a
+   successful open pushes the post URL (refresh = standalone page = no-JS fallback); Back closes,
+   Forward reopens. */
 const body=dlg.querySelector('.post-modal-body');
 const q=(el,s)=>el&&typeof el.querySelector==='function'?el.querySelector(s):null;
 const cls=(el,f,c)=>{if(el&&el.classList&&el.classList[f])el.classList[f](c)};
@@ -50,8 +50,8 @@ function fill(card,article){body.innerHTML=article.innerHTML;const t=article.que
 function cardNames(card,on){if(!card)return;card.style.viewTransitionName=on?'post-hero':'';const t=q(card,'.post-title'),d=q(card,'.post-date');if(t&&t.style)t.style.viewTransitionName=on?'post-title':'';if(d&&d.style)d.style.viewTransitionName=on?'post-time':''}
 function modalNames(on){const t=q(dlg,'.post-title'),d=q(dlg,'.post-date');if(t&&t.style)t.style.viewTransitionName=on?'post-title':'';if(d&&d.style)d.style.viewTransitionName=on?'post-time':''}
 /* The article is filled BEFORE the view transition captures, so the box animates from card
-   bounds to the article's final bounds in one continuous grow — title/time fly, body resolves
-   inside the surface. A failed fetch falls back to the standalone page. */
+   bounds to the article's final bounds in one continuous grow. A failed fetch falls back to
+   the standalone page. */
 async function open(card,push){if(dlg.open||busy)return;busy=true;const g=++gen;const url=card.getAttribute('href');activeCard=card;cls(card,'add','loading');const article=await getArticle(url);cls(card,'remove','loading');if(g!==gen){return}if(!article){busy=false;location.href=url;return}fill(card,article);body.scrollTop=0;let done;const show=()=>{cardNames(card,false);if(g!==gen)return;dlg.showModal()};if(canVT()){cardNames(card,true);const t=document.startViewTransition(()=>{modalNames(true);show()});done=t.finished.catch(()=>{})}else{show();cls(dlg,'add','fade');done=Promise.resolve()}await done;if(g!==gen){busy=false;return}if(push!==false)history.pushState({postModal:url},'',url);busy=false}
 async function swap(url,push){const g=++gen;const article=await getArticle(url);if(!article){if(g===gen)location.href=url;return}if(g!==gen)return;const card=[...cards].find(c=>c.getAttribute('href')===url);fill(card||activeCard,article);body.scrollTop=0;if(push!==false)history.pushState({postModal:url},'',url)}
 function closeMorph(){const card=activeCard;activeCard=null;const g=++gen;const cleanup=()=>{if(card&&g===gen)cardNames(card,false);modalNames(false);cls(dlg,'remove','fade');cls(document.documentElement,'remove','vt-closing');if(dlg.style){dlg.style.transform='';dlg.style.opacity='';dlg.style.transition=''}};if(canVT()&&card){modalNames(true);cls(document.documentElement,'add','vt-closing');const t=document.startViewTransition(()=>{cardNames(card,true);modalNames(false);dlg.close()});t.finished.then(cleanup,cleanup)}else{dlg.close();cleanup()}}

@@ -674,7 +674,7 @@ a { color: var(--accent-link); }
 .post-article { view-transition-name: post-hero; }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Emphasized entry (M3 standard decelerate). Box + the two shared text elements share
+  /* Emphasized entry (M3 standard decelerate). Container + the two shared text elements share
      one timing so the morph reads as a single motion; only transform/opacity/radius run. */
   ::view-transition-group(post-hero),
   ::view-transition-group(post-title),
@@ -682,8 +682,8 @@ a { color: var(--accent-link); }
     animation-duration: 0.38s;
     animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
   }
-  /* Box snapshots cross-fade fast — bg is constant oxblood, so this hides the vertical
-     stretch as the card image grows into the modal surface. */
+  /* Container snapshots cross-fade fast — bg is constant oxblood, hiding the stretch as the
+     card image grows into the modal surface on open and shrinks back on close. */
   ::view-transition-old(post-hero),
   ::view-transition-new(post-hero) {
     animation-duration: 0.2s;
