@@ -183,7 +183,6 @@ a { color: var(--accent-link); }
    hotter = bigger + brighter, same fire. Tuning knob: the rgba alpha below.
    The glow bleeds past the hero to the viewport edges (no hard cutoff at the
    header bounds); body's overflow-x:clip keeps the bleed from causing scroll. */
-.hero { position: relative; }
 .hero::before {
   content: "";
   position: absolute;
@@ -266,7 +265,8 @@ a { color: var(--accent-link); }
 .bio-content, .post-content {
   :first-child { margin-top: 0; }
   :last-child { margin-bottom: 0; }
-  a { color: var(--accent-link); text-decoration: underline; text-underline-offset: 0.15em; &:hover { color: var(--fg); text-decoration-thickness: 2px; } }
+  a { color: var(--accent-link); text-decoration: underline; text-underline-offset: 0.15em; }
+  @media (hover: hover) { a:hover { color: var(--fg); text-decoration-thickness: 2px; } }
   code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
   pre { font-family: var(--font-mono); background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
   pre code { background: none; border: none; padding: 0; }
@@ -315,10 +315,6 @@ a { color: var(--accent-link); }
 .donate-list .link-card::before {
   background: radial-gradient(circle at center, rgba(253, 209, 113, 0.28), transparent 70%);
 }
-/* Visited dimming — tracks clicked destinations by tone, never by changing the card surface.
-   Donate keeps its gold (later rule wins); hover restores full bone-white (contrast on ember). */
-.link-card:visited { color: var(--fg-muted); }
-
 /* Card body: name + optional muted description line (social.yml `description:`) */
 .link-card-body { min-width: 0; }
 .link-desc {
@@ -525,7 +521,7 @@ a { color: var(--accent-link); }
   white-space: nowrap;
   transition: color 0.3s ease;
 }
-.post-nav a:hover { color: var(--accent-link); }
+@media (hover: hover) { .post-nav a:hover { color: var(--accent-link); } }
 .post-nav-next { margin-left: auto; text-align: right; }
 
 /* Close button — fixed top-right, circular, same card language */
@@ -547,12 +543,14 @@ a { color: var(--accent-link); }
   transition: background 0.3s ease, color 0.3s ease, scale 0.3s ease;
 }
 .post-close svg { width: 1.5rem; height: 1.5rem; }
+@media (hover: hover) {
 .post-close:hover {
   background: var(--bg-card-hover);
-  /* ponytail: accent-link (lifted tint) reads on the ember hover bg; plain --accent is ~1.5:1 red-on-red.
-     Residual ~2.6:1 vs the 3:1 non-text floor — flagged in DESIGN.md for a spec decision. */
+  /* ponytail: accent-link (Signal Bright) reads on the ember hover bg; plain --accent is ~1.5:1 red-on-red.
+     Signal Bright on Ember ≈ 3.7:1 — clears the 3:1 non-text floor (resolved in DESIGN.md). */
   color: var(--accent-link);
   scale: 1.08;
+}
 }
 .post-close:focus-visible {
   outline: none;
@@ -635,10 +633,12 @@ a { color: var(--accent-link); }
   font-weight: 500;
   transition: background 0.3s ease, scale 0.3s ease, color 0.3s ease;
 }
+@media (hover: hover) {
 .not-found-home:hover {
   background: var(--bg-card-hover);
   color: var(--accent-link);
   scale: 1.03;
+}
 }
 .not-found-home:focus-visible {
   outline: none;

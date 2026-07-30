@@ -31,11 +31,12 @@ function makeWorld(cardUrls) {
       sel === '.post-modal-body' ? body : { addEventListener: (ev, fn) => { closeClick = fn; } },
     addEventListener: (ev, fn) => { dlgListeners[ev] = fn; },
   };
-  const st = { entries: [{ state: null, url: '/' }], idx: 0, pushed: [], navigated: null };
+  const st = { entries: [{ state: null, url: '/' }], idx: 0, pushed: [], replaced: [], navigated: null };
   const firePop = () => popListeners.forEach(fn => fn({ state: history.state }));
   const history = {
     get state() { return st.entries[st.idx].state; },
     pushState(s, _, url) { st.entries.splice(st.idx + 1); st.entries.push({ state: s, url }); st.idx++; st.pushed.push(url); },
+    replaceState(s, _, url) { st.entries[st.idx] = { state: s, url }; st.replaced.push(url); },
     back() { if (st.idx > 0) { st.idx--; firePop(); } },
     forward() { if (st.idx < st.entries.length - 1) { st.idx++; firePop(); } },
   };
@@ -139,7 +140,30 @@ function makeWorld(cardUrls) {
   w.fetches[1].resolve(okResp('/posts/b/')); // B resolves late — must be dropped
   await tick();
   assert.equal(w.body.innerHTML, 'body-of /posts/c/', 'T4 last click wins');
-  assert.deepEqual(w.st.pushed, ['/posts/a/', '/posts/c/'], 'T4 one push, right order');
+  assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T4 only the open pushes; swaps replace in place');
+  assert.equal(w.history.state.postModal, '/posts/c/', 'T4 current state is the last swap');
+}
+
+// T7: the fix — in-modal next/prev must not stack history. After swapping through
+// posts, a single close (button or backdrop) returns to the index, not the previous post.
+{
+  const w = makeWorld(['/posts/a/', '/posts/b/', '/posts/c/']);
+  w.clickCard('/posts/a/');
+  w.fetches[0].resolve(okResp('/posts/a/'));
+  await tick();
+  w.navClick('/posts/b/');
+  w.fetches[1].resolve(okResp('/posts/b/'));
+  await tick();
+  w.navClick('/posts/c/');
+  w.fetches[2].resolve(okResp('/posts/c/'));
+  await tick();
+  assert.equal(w.st.idx, 1, 'T7 swaps replaced, did not grow the stack');
+  assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T7 one push for the whole session');
+  assert.deepEqual(w.st.replaced, ['/posts/b/', '/posts/c/'], 'T7 swaps replaced in place');
+  w.clickClose(); // close button (backdrop shares the same close() path)
+  await tick();
+  assert.ok(!w.dlg.open, 'T7 close dismissed the modal');
+  assert.equal(w.st.idx, 0, 'T7 one back lands on the index, not a previous post');
 }
 
 // T5: popstate naming a post with no card on the page navigates to the standalone page.
@@ -164,4 +188,4 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w.st.pushed, [], 'T6 nothing pushed (failed fetch has no URL sync)');
 }
 
-console.log('modal-history: 6/6 checks passed');
+console.log('modal-history: 7/7 checks passed');

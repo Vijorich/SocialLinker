@@ -216,7 +216,7 @@ The product's core unit — every social link, project, and post is one.
 - **Shape:** gently rounded (1rem) inside lists, full pill (2rem) at list ends and on hover
 - **Default:** Oxblood background, Bone White 500-weight text, 1rem padding, 2rem brand icon left, external-link glyph right at 40% opacity
 - **Description line:** optional `description:` (social.yml) renders one muted line (Ash Rose, 1rem, 400-weight, ellipsis) under the card name — disambiguates same-brand links (YouTube vs YouTube Second)
-- **Hover:** background heats to Ember Red, scale 1.03, radius inflates to 2rem, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted; gold-tinted on the donate variant) — the Heat-On-Touch rule made literal. Hover styles are gated behind `@media (hover: hover)`; touch devices never receive them.
+- **Hover:** background heats to Ember Red, scale 1.03, radius inflates to 2rem, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted; gold-tinted on the donate variant) — the Heat-On-Touch rule made literal. Hover styles are gated behind `@media (hover: hover)`; touch devices never receive them. On fine-pointer devices only, a cursor-tracking parallax leans the card ±4px toward the pointer (composes with the hover scale, transform-driven); excluded on touch and under reduced-motion (default.html).
 - **Focus (`:focus-visible`):** mirrors hover heat + a double keyboard ring (`box-shadow: 0 0 0 2px Cinder, 0 0 0 4px Signal Link`) so the focused row is unambiguous. Donate variant heats to full gold + dark text. Focus is not hover-gated — keyboard users on any device get the ring. Mouse clicks suppress it via `:focus-visible`.
 - **Touch:** no hover — press scales to 0.97 (0.15s)
 - **Donate variant:** Hearth Brown + Spotlight Gold text at rest; full gold fill with dark text and a soft gold glow on hover
@@ -236,6 +236,8 @@ Post cards reuse the link-card block with `user-select: none`; the single-articl
 
 ### Modal
 `<dialog>` morphing into place over the page via a shared-element View Transition — the clicked card expands into the dialog on open and morphs back on close (`view-transition-name: post-morph`, ~0.34s confident-arrival): Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim maroon backdrop, circular close button top-right. Falls back to instant open/close under `prefers-reduced-motion` or where View Transitions are unavailable.
+
+**Deferred — modal loading state (backlog, implement only if it bites):** `open()` currently `await`s `getArticle()` *before* `showModal()`, so a cache-miss fetch (mobile, no reliable `pointerover` prefetch, slow data) produces ~1-3s of dead air on the clicked card with no status signal. Acceptable while fetches stay fast (they typically do — posts are tiny, cached after first hit, and desktop prefetches on hover). If slow opens are ever observed, upgrade to: `showModal()` (or start the View Transition) immediately with an ember-pulse skeleton in `.post-modal-body`, then `fill()` on resolve — keep the gen-token guard so a stale fetch can't overwrite.
 
 ### Close Button
 - **Style:** 48px circle, Oxblood, no border

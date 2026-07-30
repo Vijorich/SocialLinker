@@ -21,7 +21,7 @@
 {{ content }}
 
 <script>
-if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}else{document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('touchstart',()=>{c.style.transform=''})})}
+if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{c.addEventListener('mousemove',e=>{let r=c.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`});c.addEventListener('mouseleave',()=>{c.style.transform=''})})}
 (function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
 /* Post modal — card ⇄ dialog morph + directional prev/next swap. Fetch+cache the
    article, fill the dialog, showModal. Open/close share-element morph (View
@@ -71,7 +71,10 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     if(!article){location.href=url;return}
     const card=[...cards].find(c=>c.getAttribute('href')===url);if(card)current=card;
     fill(article);
-    if(push!==false)history.pushState({postModal:url},'',url);
+    // replaceState, not pushState: in-modal next/prev must NOT stack history entries,
+    // else close->back only pops one post and reopens the previous instead of main.
+    // One entry per modal session; close->back always lands on the index.
+    if(push!==false)history.replaceState({postModal:url},'',url);
     if(reduce()||!dir)return;
     body.animate([{opacity:0,transform:`translateX(${dir*28}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(0.16,1,0.3,1)'});
   }
