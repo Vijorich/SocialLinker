@@ -29,10 +29,9 @@
   --max-width: 40rem;
   --radius: 2rem;
 
-  /* Type — two voices: Unbounded (display: logo, headings) + Rubik (body/UI).
-     Fluid clamp scale: roles breathe smoothly across the viewport instead of
-     jumping at breakpoints; endpoints preserve chat-readable phone sizes and
-     desktop presence. Hierarchy by face, size, weight, tracking, case. */
+  /* Type — three voices: Unbounded (display: logo, headings) + Rubik (body/UI)
+     + JetBrains Mono (code). Fluid clamp scale; system stacks as load-time floor
+     (fail-silent like live badges). No negative letter-spacing. */
   --text-display: clamp(2rem, 1.41rem + 2.48vw, 3rem);        /* .nick — focal hero */
   --text-headline: clamp(1.4rem, 1.19rem + 0.87vw, 1.75rem);  /* post titles, prose h1 */
   --text-title: 1rem;        /* section labels (uppercase, tracked) */
@@ -50,9 +49,9 @@
      system stacks remain as the load-time floor so a blocked font request degrades
      to the incumbent look, not a broken one — same fail-silent discipline as the
      live badges. optical sizing + kerning on. */
-  --font-sans: Rubik, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
-  --font-display: Unbounded, "Arial Black", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  --font-sans: Rubik, system-ui, sans-serif;
+  --font-display: Unbounded, "Arial Black", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -161,7 +160,6 @@ strong, b { font-weight: 800; }
   font-size: var(--text-display);
   line-height: var(--leading-display);
   margin: 0;
-  letter-spacing: -0.02em;
   font-weight: 900;
   text-wrap: balance;
 }
@@ -503,13 +501,13 @@ strong, b { font-weight: 800; }
   padding: 2rem;
 }
 .post-header { margin-bottom: 2rem; }
-.post-header .post-title { margin: 0 0 0.5rem; font-family: var(--font-display); font-size: var(--text-headline); line-height: var(--leading-headline); letter-spacing: -0.02em; font-weight: 800; text-wrap: balance; }
+.post-header .post-title { margin: 0 0 0.5rem; font-family: var(--font-display); font-size: var(--text-headline); line-height: var(--leading-headline); font-weight: 800; text-wrap: balance; }
 .post-header .post-date { font-size: var(--text-meta); color: var(--fg-muted); }
 .post-content { line-height: var(--leading-read); max-width: 44rem; }
 .post-content h1 { font-family: var(--font-display); font-size: var(--text-headline); font-weight: 800; }
 .post-content h2 { font-family: var(--font-display); font-size: clamp(1.15rem, 1rem + 0.4vw, 1.4rem); font-weight: 700; }
 .post-content h3 { font-family: var(--font-display); font-size: clamp(1.05rem, 0.92rem + 0.33vw, 1.25rem); font-weight: 700; }
-.post-content h1, .post-content h2, .post-content h3 { margin: 2rem 0 0.75rem; letter-spacing: -0.02em; line-height: var(--leading-headline); text-wrap: balance; }
+.post-content h1, .post-content h2, .post-content h3 { margin: 2rem 0 0.75rem; line-height: var(--leading-headline); text-wrap: balance; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
 /* Post nav — prev/next at the foot of the article. Lives inside .post-article so the
    index modal copies it; modal JS swaps content instead of navigating there. */
@@ -622,7 +620,6 @@ strong, b { font-weight: 800; }
   font-family: var(--font-display);
   font-size: clamp(5rem, 22vw, 9rem);
   font-weight: 900;
-  letter-spacing: -0.04em;
   line-height: 1;
   background: var(--accent);
   background-clip: text;

@@ -25,53 +25,49 @@ colors:
 typography:
   # Two voices: Unbounded (display: logo, headings) + Rubik (body/UI).
   # Fluid clamp scale; system stacks as load-time floor (fail-silent like badges).
-  fontSans: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
-  fontDisplay: "Unbounded, 'Arial Black', system-ui, sans-serif"
-  fontMono: "'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace"
+  fontSans: "Rubik, system-ui, sans-serif"
+  fontDisplay: "Unbounded, 'Arial Black', sans-serif"
+  fontMono: "'JetBrains Mono', ui-monospace, monospace"
   display:
-    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', sans-serif"
     fontSize: "clamp(2rem, 1.41rem + 2.48vw, 3rem)"
     fontWeight: 900
-    letterSpacing: "-0.02em"
     lineHeight: 1.1
   headline:
-    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', sans-serif"
     fontSize: "clamp(1.4rem, 1.19rem + 0.87vw, 1.75rem)"
     fontWeight: 800
-    letterSpacing: "-0.02em"
     lineHeight: 1.2
   prose-h2:
-    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', sans-serif"
     fontSize: "clamp(1.15rem, 1rem + 0.4vw, 1.4rem)"
     fontWeight: 700
-    letterSpacing: "-0.02em"
     lineHeight: 1.2
   prose-h3:
-    fontFamily: "Unbounded, 'Arial Black', system-ui, sans-serif"
+    fontFamily: "Unbounded, 'Arial Black', sans-serif"
     fontSize: "clamp(1.05rem, 0.92rem + 0.33vw, 1.25rem)"
     fontWeight: 700
-    letterSpacing: "-0.02em"
     lineHeight: 1.2
   title:
-    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 700
     letterSpacing: "0.1em"
   body:
-    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "clamp(1rem, 0.76rem + 1.03vw, 1.25rem)"
     fontWeight: 600
     lineHeight: 1.5
   meta:
-    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 700
   tagline:
-    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "clamp(0.95rem, 0.85rem + 0.43vw, 1.125rem)"
     fontWeight: 600
   label:
-    fontFamily: "Rubik, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
+    fontFamily: "Rubik, system-ui, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 700
     letterSpacing: "0.05em"
@@ -175,9 +171,9 @@ Two voices, one job each: **Unbounded** carries display (logo, headings, the 404
 
 ### Hierarchy
 The size ramp is **fluid** — each scalable role is a `clamp()` that breathes between a small-viewport floor (380px) and a desktop ceiling, instead of jumping at breakpoints. Endpoints preserve the chat-readable phone sizes and desktop presence.
-- **Display** (Unbounded 900, `clamp(2rem → 3rem)`, -0.02em, leading 1.1): the nick in the hero. The only oversized text on the page.
-- **Headline** (Unbounded 800, `clamp(1.4rem → 1.75rem)`, -0.02em, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
-- **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both Unbounded 700, -0.02em, leading 1.2 — a real sub-scale inside long-form copy.
+- **Display** (Unbounded 900, `clamp(2rem → 3rem)`, leading 1.1): the nick in the hero. The only oversized text on the page.
+- **Headline** (Unbounded 800, `clamp(1.4rem → 1.75rem)`, leading 1.2): article titles on post pages and in the modal; also the prose `h1`.
+- **Prose headings:** `h2` (`clamp(1.15rem → 1.4rem)`) and `h3` (`clamp(1.05rem → 1.25rem)`), both Unbounded 700, leading 1.2 — a real sub-scale inside long-form copy.
 - **Title** (Rubik 700, 1rem, +0.1em, uppercase, Ash Rose): section labels. Small, tracked-out, quiet. Donate's title is the one exception — Spotlight Gold, lifting the spotlight to the section level (One Spotlight Rule).
 - **Body** (Rubik 600, `clamp(1rem → 1.25rem)`, leading 1.5): everything else. Generous size — this page is read on phones from stream chats. Long-form prose (`.post-content`) opens to leading 1.7.
 - **Meta** (Rubik 700, 1rem, Ash Rose): the muted secondary layer — dates, excerpts, link/project descriptions, post nav, footer. Heavier weight than body at the same size to maintain legibility at the small scale.
@@ -187,7 +183,6 @@ The size ramp is **fluid** — each scalable role is a `clamp()` that breathes b
 
 ### Named Rules
 **The Two-Voice Rule.** Unbounded owns display roles (nick, headings, the 404 number); Rubik owns everything you read (body, UI, meta, captions); JetBrains Mono owns code. Never mix: display-face text on body-sized elements looks clumsy; body-face on display-sized elements looks timid; monospace outside code is costume. System stacks are the load-time floor, not the intended voice.
-**The Negative-Tracking Rule.** Tight letter-spacing (-0.02em) is reserved for display, headline, and prose-heading sizes; labels stay positive. The sole exception is a hair of dark-surface compensation on the body itself (see below).
 **The Dark-Compensation Note.** Light text on dark surfaces reads looser, so body gets `letter-spacing: 0.005em` (near-imperceptible) plus the Leading-Arc air — a clarity adjustment, not a style change.
 **The Leading-Arc Rule.** Leading tightens as size grows: 1.1 display → 1.2 headline/prose-headings → 1.5 body → 1.7 long-form prose. Big type never inherits the body's air. Headings use `text-wrap: balance`; body and prose use `text-wrap: pretty` — native, zero-cost, no asset.
 
