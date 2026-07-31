@@ -14,7 +14,8 @@ function makeWorld(cardUrls) {
   const cardClicks = new Map();
   let closeClick = null;
   const dlgListeners = {};
-  const body = { innerHTML: '', scrollTop: 0, animate: () => ({}), querySelector: () => null };
+  const scrollCalls = [];
+  const body = { innerHTML: '', scrollTop: 0, scroll: (x, y) => scrollCalls.push([x, y]), animate: () => ({}), querySelector: () => null };
   const cards = cardUrls.map(url => ({
     style: {},
     getAttribute: n => (n === 'href' ? url : null),
@@ -44,7 +45,7 @@ function makeWorld(cardUrls) {
   Object.defineProperty(location, 'href', { get: () => st.navigated, set: v => { st.navigated = v; } });
   const fetches = [];
   const world = {
-    cards, dlg, body, st, history, location, fetches, cardClicks, dlgListeners,
+    cards, dlg, body, st, history, location, fetches, cardClicks, dlgListeners, scrollCalls,
     clickCard: url => cardClicks.get(url)({ preventDefault() {} }),
     clickClose: () => closeClick(),
     navClick: url => dlgListeners.click({
@@ -64,7 +65,7 @@ function makeWorld(cardUrls) {
     querySelectorAll: sel => (sel === '.post-card' ? cards : []),
     getElementById: id => (id === 'post-modal' ? dlg : null),
     documentElement: { style: {} },
-    body: { style: {} },
+    body: { style: { setProperty() {} } },
   };
   const fetchStub = url => new Promise(res => fetches.push({ url, resolve: res }));
   const DOMParserStub = class {
@@ -192,4 +193,24 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w.st.pushed, [], 'T6 nothing pushed (failed fetch has no URL sync)');
 }
 
-console.log('modal-history: 7/7 checks passed');
+// T8: scroll lock uses the CSS-var top (clamped-negative-safe) and fill() force-resets
+// the modal body's scroll position before showing new content.
+{
+  const w = makeWorld(['/posts/a/']);
+  w.clickCard('/posts/a/');
+  w.fetches[0].resolve(okResp('/posts/a/'));
+  await tick();
+  assert.deepEqual(w.scrollCalls.slice(-1)[0] ?? null, [0, 0], 'T8 fill() scrolls modal body to top');
+}
+
+// T9: lockScroll writes --lock-y and the calc() top; unlock restores. Documented via a
+// source check (the stub DOM has no layout, so we assert the mechanism directly).
+{
+  const fs = await import('node:fs');
+  const src = fs.readFileSync(new URL('../_layouts/default.html', import.meta.url), 'utf8');
+  assert.ok(src.includes(`'--lock-y'`), 'T9 lockScroll sets the --lock-y CSS var');
+  assert.ok(src.includes('calc(-1 * var(--lock-y))'), 'T9 body top consumes the var via calc');
+  assert.ok(!src.includes("style.top=`-"), 'T9 no raw negative top assignment remains');
+}
+
+console.log('modal-history: 9/9 checks passed');

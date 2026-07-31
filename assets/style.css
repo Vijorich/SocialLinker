@@ -147,11 +147,16 @@ strong, b { font-weight: 700; }
   text-align: center;
   margin-bottom: 2rem;
   position: relative;
-  padding-top: 1rem;
+  /* Geometry vars the ember glow consumes: --hero-pad + half --avatar-size is the
+     avatar's exact center. Media queries below change only these two values and the
+     glow follows by construction — no per-breakpoint magic offset. */
+  --hero-pad: 1rem;
+  --avatar-size: 6rem;
+  padding-top: var(--hero-pad);
 }
 .avatar {
-  width: 6rem;
-  height: 6rem;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
   border-radius: 50%;
   display: block;
   margin: 0 auto 1rem;
@@ -192,10 +197,12 @@ strong, b { font-weight: 700; }
 .hero::before {
   content: "";
   position: absolute;
-  top: -10rem;
+  /* Disc center == avatar center: hero pad + half avatar, minus half the disc.
+     translate shifts with `top` so keyframe scale stays centered on the avatar. */
+  top: calc(var(--hero-pad) + var(--avatar-size) / 2);
   left: 50%;
   width: 30rem; height: 30rem;
-  margin-left: -15rem;
+  translate: -50% -50%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(209, 67, 60, 0.85) 0%, rgba(209, 67, 60, 0) 65%);
   filter: blur(48px);
@@ -690,8 +697,8 @@ strong, b { font-weight: 700; }
 @media (max-width: 768px) {
   /* Type is fluid now (clamp scale above) — only layout/spacing adapt here. */
   .container { padding: max(1.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 2rem max(1rem, env(safe-area-inset-left)); }
-  .hero { margin-bottom: 1.5rem; padding-top: 0.5rem; }
-  .avatar { width: 5rem; height: 5rem; margin-bottom: 0.75rem; }
+  .hero { margin-bottom: 1.5rem; --hero-pad: 0.5rem; --avatar-size: 5rem; }
+  .avatar { margin-bottom: 0.75rem; }
   .section { margin-bottom: 1.5rem; }
   .link-card { padding: 0.875rem; gap: 0.75rem; }
   .link-card svg { width: 1.75rem; height: 1.75rem; }
@@ -720,8 +727,8 @@ strong, b { font-weight: 700; }
 @media (orientation: landscape) and (max-height: 30rem) {
   :root { --text-display: 1.75rem; --text-tagline: 0.95rem; }
   .container { padding-top: 1rem; padding-bottom: 1.5rem; }
-  .hero { margin-bottom: 1rem; padding-top: 0; }
-  .avatar { width: 3.5rem; height: 3.5rem; margin-bottom: 0.35rem; }
+  .hero { margin-bottom: 1rem; --hero-pad: 0; --avatar-size: 3.5rem; }
+  .avatar { margin-bottom: 0.35rem; }
   .section { margin-bottom: 1rem; }
   .post-single { padding-top: 4rem; }
   .post-modal { max-height: 96dvh; }
