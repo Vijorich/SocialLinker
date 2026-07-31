@@ -79,8 +79,8 @@ function makeWorld(cardUrls) {
     }
   };
   const sessionStub = { getItem: () => null, setItem() {}, removeItem() {} };
-  new Function('window', 'document', 'history', 'location', 'fetch', 'sessionStorage', 'DOMParser', 'scrollY', 'scrollTo', code)
-    (windowStub, documentStub, history, location, fetchStub, sessionStub, DOMParserStub, 0, () => {});
+  new Function('window', 'document', 'history', 'location', 'fetch', 'sessionStorage', 'DOMParser', 'scrollY', 'scrollTo', 'requestAnimationFrame', code)
+    (windowStub, documentStub, history, location, fetchStub, sessionStub, DOMParserStub, 0, () => {}, cb=>cb());
   return world;
 }
 
@@ -193,14 +193,15 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w.st.pushed, [], 'T6 nothing pushed (failed fetch has no URL sync)');
 }
 
-// T8: scroll lock uses the CSS-var top (clamped-negative-safe) and fill() force-resets
-// the modal body's scroll position before showing new content.
+// T8: fill() force-resets the modal body's scroll position to top before showing
+// new content — a prior post's scroll offset never bleeds into the next open.
 {
   const w = makeWorld(['/posts/a/']);
+  w.body.scrollTop = 400; // previous post scrolled to the end
   w.clickCard('/posts/a/');
   w.fetches[0].resolve(okResp('/posts/a/'));
   await tick();
-  assert.deepEqual(w.scrollCalls.slice(-1)[0] ?? null, [0, 0], 'T8 fill() scrolls modal body to top');
+  assert.equal(w.body.scrollTop, 0, 'T8 fill() resets modal body scroll to top');
 }
 
 // T9: the scroll lock is overflow:hidden on html — no position:fixed body, no saved

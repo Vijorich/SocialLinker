@@ -59,7 +59,11 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     cache.set(url,art);
     return art;
   }
-  function fill(article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t){dlg.setAttribute('aria-label',t.textContent);/* Demote h1→h2 inside the modal so the page keeps one document h1 (the hero nick); the standalone post page keeps its server-rendered h1. */const h=body.querySelector('.post-title');if(h&&h.tagName==='H1'){const d=document.createElement('h2');d.className=h.className;while(h.firstChild)d.appendChild(h.firstChild);h.replaceWith(d)}}body.scroll(0,0);body.scrollTop=0}
+  /* Instant jump to top — not body.scroll(0,0), which is smooth under CSS
+     scroll-behavior and would animate the old post's scroll away instead of
+     resetting it. rAF re-asserts once post-fill layout / morph settles. */
+  const top=()=>{body.scrollTop=0;requestAnimationFrame(()=>{body.scrollTop=0})};
+  function fill(article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t){dlg.setAttribute('aria-label',t.textContent);/* Demote h1→h2 inside the modal so the page keeps one document h1 (the hero nick); the standalone post page keeps its server-rendered h1. */const h=body.querySelector('.post-title');if(h&&h.tagName==='H1'){const d=document.createElement('h2');d.className=h.className;while(h.firstChild)d.appendChild(h.firstChild);h.replaceWith(d)}}top()}
   async function open(card,push){
     if(dlg.open)return;
     const g=++gen,url=card.getAttribute('href');
@@ -67,11 +71,13 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     if(g!==gen)return;
     if(!article){location.href=url;return}
     current=card;
-    const show=()=>{fill(article);document.documentElement.style.overflow='hidden';dlg.showModal();if(push!==false)history.pushState({postModal:url},'',url)};
+    const show=()=>{fill(article);document.documentElement.style.overflow='hidden';dlg.showModal();top();if(push!==false)history.pushState({postModal:url},'',url)};
     if(!canVT()){show();return}
     card.style.viewTransitionName='post-morph';
     const vt=document.startViewTransition(()=>{show();dlg.style.viewTransitionName='post-morph';card.style.viewTransitionName=''});
-    vt.finished.catch(()=>{}).finally(()=>{card.style.viewTransitionName='';dlg.style.viewTransitionName=''});
+    /* The morph animates the DIALOG — it must not inherit the old scroll offset
+       mid-transition. Assert once more when it finishes. */
+    vt.finished.catch(()=>{}).finally(()=>{top();card.style.viewTransitionName='';dlg.style.viewTransitionName=''});
   }
   async function swap(url,push,dir){
     const g=++gen;
