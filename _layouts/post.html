@@ -14,8 +14,8 @@ layout: default
     {% comment %} Nav lives inside .post-article so the index modal copies it for free;
          modal JS intercepts these links and swaps content instead of navigating. {% endcomment %}
     <nav class="post-nav">
-      {% if page.previous %}<a class="post-nav-prev" href="{{ page.previous.url | relative_url }}" title="{{ site.data.locale.post_newer | escape }}">← {{ page.previous.title | escape }}</a>{% endif %}
-      {% if page.next %}<a class="post-nav-next" href="{{ page.next.url | relative_url }}" title="{{ site.data.locale.post_older | escape }}">{{ page.next.title | escape }} →</a>{% endif %}
+      {% if page.previous %}<a class="post-nav-prev" href="{{ page.previous.url | relative_url }}" aria-label="{{ site.data.locale.post_newer | escape }}: {{ page.previous.title | escape }}">← {{ page.previous.title | escape }}</a>{% endif %}
+      {% if page.next %}<a class="post-nav-next" href="{{ page.next.url | relative_url }}" aria-label="{{ site.data.locale.post_older | escape }}: {{ page.next.title | escape }}">{{ page.next.title | escape }} →</a>{% endif %}
     </nav>
   </article>
 </div>

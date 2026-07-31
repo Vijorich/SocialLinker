@@ -96,6 +96,8 @@ body {
 }
 
 a { color: var(--accent-link); }
+/* Screen-reader-only text (e.g. "(новая вкладка)" inside outbound cards). */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 strong, b { font-weight: 700; }
 
 /* Skip link — first focusable, off-screen until keyboard focus reveals it top-left. */
@@ -513,8 +515,10 @@ strong, b { font-weight: 700; }
 /* Post nav — prev/next at the foot of the article. Lives inside .post-article so the
    index modal copies it; modal JS swaps content instead of navigating there. */
 .post-nav {
-  display: flex;
-  justify-content: space-between;
+  /* 2-column grid: each side owns its lane — a long title truncates itself,
+     never the sibling (previously space-between + min-width:0 let one side starve the other). */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
   margin-top: 2.5rem;
   padding-top: 1.25rem;
@@ -531,7 +535,8 @@ strong, b { font-weight: 700; }
   transition: color 0.3s ease;
 }
 @media (hover: hover) { .post-nav a:hover { color: var(--accent-link); } }
-.post-nav-next { margin-left: auto; text-align: right; }
+.post-nav-prev { grid-column: 1; }
+.post-nav-next { grid-column: 2; text-align: right; }
 
 /* Close button — fixed top-right, circular, same card language */
 .post-close {
@@ -665,7 +670,8 @@ strong, b { font-weight: 700; }
   color: var(--fg-muted);
   font-size: var(--text-meta);
 
-  a { color: inherit; text-decoration: none; }
+  /* Signal Bright like every other actionable accent — inherit (Ash Rose) read as plain text. */
+  a { color: var(--accent-link); text-decoration: none; }
 }
 /* Inline-SVG heart (replaces emoji) — signal red, sized to the cap height.
    One-shot double-thump on load (lub-dub), delayed so it plays after settle. */
@@ -694,7 +700,9 @@ strong, b { font-weight: 700; }
   .post-article { padding: 1.25rem; }
   .post-modal { max-height: 92dvh; }
   .post-modal-body { padding: 1.25rem; }
-  .post-close { top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); width: 2.75rem; height: 2.75rem; }
+  /* 44px touch-target floor (WCAG 2.5.8) — was 2.75rem (44px) nominal but padding shrink
+     crowded the visual region; keep the hit area at 3rem everywhere. */
+  .post-close { top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); }
   .post-close svg { width: 1.35rem; height: 1.35rem; }
   .site-footer { padding: 1.5rem max(1rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
 }
