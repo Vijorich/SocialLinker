@@ -203,14 +203,15 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w.scrollCalls.slice(-1)[0] ?? null, [0, 0], 'T8 fill() scrolls modal body to top');
 }
 
-// T9: lockScroll writes --lock-y and the calc() top; unlock restores. Documented via a
-// source check (the stub DOM has no layout, so we assert the mechanism directly).
+// T9: the scroll lock is overflow:hidden on html — no position:fixed body, no saved
+// offset, no scrollTo restore. Close must never move the page (source check: the stub
+// DOM has no layout, so we assert the mechanism directly).
 {
   const fs = await import('node:fs');
   const src = fs.readFileSync(new URL('../_layouts/default.html', import.meta.url), 'utf8');
-  assert.ok(src.includes(`'--lock-y'`), 'T9 lockScroll sets the --lock-y CSS var');
-  assert.ok(src.includes('calc(-1 * var(--lock-y))'), 'T9 body top consumes the var via calc');
-  assert.ok(!src.includes("style.top=`-"), 'T9 no raw negative top assignment remains');
+  assert.ok(src.includes("documentElement.style.overflow='hidden'"), 'T9 lock sets html overflow');
+  assert.ok(!src.includes("body.style.position='fixed'"), 'T9 body never position:fixed');
+  assert.ok(!src.includes('scrollTo('), 'T9 no scroll restore on close');
 }
 
 console.log('modal-history: 9/9 checks passed');
