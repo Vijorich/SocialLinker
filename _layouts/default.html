@@ -43,7 +43,15 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
   if(!dlg)return;
   const body=dlg.querySelector('.post-modal-body');
   const cache=new Map();
-  let gen=0, current=null;
+  let gen=0, current=null, lockY=0;
+  /* Scroll lock: showModal() makes the rest of the page inert to clicks but NOT to
+     scrolling — body keeps moving behind the modal (worst on iOS Safari, where
+     overflow:hidden on html alone doesn't stop it). position:fixed body freezes the
+     page exactly where it is; close (any path — button, backdrop, Esc, popstate)
+     fires the native 'close' event, the single chokepoint that unlocks and restores. */
+  const lockScroll=()=>{lockY=scrollY;document.documentElement.style.overflow='hidden';document.body.style.position='fixed';document.body.style.top=`-${lockY}px`;document.body.style.width='100%'};
+  const unlockScroll=()=>{document.documentElement.style.overflow='';document.body.style.position='';document.body.style.top='';document.body.style.width='';document.documentElement.style.scrollBehavior='auto';window.scrollTo(0,lockY);document.documentElement.style.scrollBehavior='';};
+  dlg.addEventListener('close',unlockScroll);
   const reduce=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canVT=()=>!reduce()&&'function'===typeof document.startViewTransition;
   async function getArticle(url){
@@ -61,7 +69,7 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     if(g!==gen)return;
     if(!article){location.href=url;return}
     current=card;
-    const show=()=>{fill(article);dlg.showModal();if(push!==false)history.pushState({postModal:url},'',url)};
+    const show=()=>{fill(article);lockScroll();dlg.showModal();if(push!==false)history.pushState({postModal:url},'',url)};
     if(!canVT()){show();return}
     card.style.viewTransitionName='post-morph';
     const vt=document.startViewTransition(()=>{show();dlg.style.viewTransitionName='post-morph';card.style.viewTransitionName=''});
@@ -73,6 +81,7 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     if(g!==gen)return;
     if(!article){location.href=url;return}
     const card=[...cards].find(c=>c.getAttribute('href')===url);if(card)current=card;
+    if(!dlg.open){lockScroll();dlg.showModal()}
     fill(article);
     // replaceState, not pushState: in-modal next/prev must NOT stack history entries,
     // else close->back only pops one post and reopens the previous instead of main.

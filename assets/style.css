@@ -571,9 +571,14 @@ strong, b { font-weight: 700; }
 .post-modal {
   border: none;
   padding: 0;
-  margin: auto;
+  /* ponytail: UA dialog `margin:auto` centers against the layout scrollport, which
+     drifts on mobile zoom/scroll. Pin to the *visual* viewport instead, and gate on
+     dynamic vh so the modal never exceeds what the user can see. */
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
   width: min(56rem, calc(100vw - 2rem));
-  max-height: 85vh;
   max-height: 85dvh;
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -687,7 +692,7 @@ strong, b { font-weight: 700; }
   .post-card-head { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
   .post-single { padding: 4.5rem max(1rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
   .post-article { padding: 1.25rem; }
-  .post-modal { max-height: 92vh; max-height: 92dvh; }
+  .post-modal { max-height: 92dvh; }
   .post-modal-body { padding: 1.25rem; }
   .post-close { top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); width: 2.75rem; height: 2.75rem; }
   .post-close svg { width: 1.35rem; height: 1.35rem; }
@@ -711,6 +716,6 @@ strong, b { font-weight: 700; }
   .avatar { width: 3.5rem; height: 3.5rem; margin-bottom: 0.35rem; }
   .section { margin-bottom: 1rem; }
   .post-single { padding-top: 4rem; }
-  .post-modal { max-height: 96vh; max-height: 96dvh; }
+  .post-modal { max-height: 96dvh; }
   .post-modal-body { padding: 1.25rem; }
 }

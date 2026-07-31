@@ -14,7 +14,7 @@ function makeWorld(cardUrls) {
   const cardClicks = new Map();
   let closeClick = null;
   const dlgListeners = {};
-  const body = { innerHTML: '', scrollTop: 0, animate: () => ({}) };
+  const body = { innerHTML: '', scrollTop: 0, animate: () => ({}), querySelector: () => null };
   const cards = cardUrls.map(url => ({
     style: {},
     getAttribute: n => (n === 'href' ? url : null),
@@ -23,8 +23,8 @@ function makeWorld(cardUrls) {
   const dlg = {
     style: {},
     open: false,
-    showModal() { this.open = true; },
-    close() { this.open = false; },
+  showModal() { this.open = true; },
+  close() { this.open = false; dlgListeners.close && dlgListeners.close(); },
     setAttribute() {},
     contains: () => true,
     querySelector: sel =>
@@ -56,11 +56,15 @@ function makeWorld(cardUrls) {
   const windowStub = {
     matchMedia: () => ({ matches: false }),
     addEventListener: (ev, fn) => { if (ev === 'popstate') popListeners.push(fn); },
+    scrollTo() {},
+    get scrollY() { return 0; },
   };
   const documentStub = {
     querySelector: () => null,
     querySelectorAll: sel => (sel === '.post-card' ? cards : []),
     getElementById: id => (id === 'post-modal' ? dlg : null),
+    documentElement: { style: {} },
+    body: { style: {} },
   };
   const fetchStub = url => new Promise(res => fetches.push({ url, resolve: res }));
   const DOMParserStub = class {
@@ -74,8 +78,8 @@ function makeWorld(cardUrls) {
     }
   };
   const sessionStub = { getItem: () => null, setItem() {}, removeItem() {} };
-  new Function('window', 'document', 'history', 'location', 'fetch', 'sessionStorage', 'DOMParser', code)
-    (windowStub, documentStub, history, location, fetchStub, sessionStub, DOMParserStub);
+  new Function('window', 'document', 'history', 'location', 'fetch', 'sessionStorage', 'DOMParser', 'scrollY', 'scrollTo', code)
+    (windowStub, documentStub, history, location, fetchStub, sessionStub, DOMParserStub, 0, () => {});
   return world;
 }
 
