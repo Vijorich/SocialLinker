@@ -6,6 +6,7 @@ _site/
 vendor/
 .codegraph/
 .impeccable/
+.scripts/
 
 # ponytail: secrets + OS/IDE noise. Trust boundary: blocks accidental commit of credentials.
 .env
