@@ -13,12 +13,12 @@
     const t = ctx.currentTime, g = ctx.createGain(), o = ctx.createOscillator(), o2 = ctx.createOscillator();
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
     o.frequency.value = f;
     o2.frequency.value = f * 2;
-    const g2 = ctx.createGain(); g2.gain.value = 0.3;
+    const g2 = ctx.createGain(); g2.gain.value = 0.22;
     o.connect(g); o2.connect(g2).connect(g); g.connect(ctx.destination);
-    o.start(t); o2.start(t); o.stop(t + 0.8); o2.stop(t + 0.8);
+    o.start(t); o2.start(t); o.stop(t + 0.95); o2.stop(t + 0.95);
   };
   document.addEventListener('mouseover', e => {
     const card = e.target.closest('.link-card, .post-card');
@@ -32,6 +32,10 @@
   // which output gain each voice takes. Voices start at a mistuned/common pitch
   // and glide onto the chord — that arrival is what reads as "resolve".
   // Timing is in beats of `beat` seconds so all four events share a grid.
+  // Warmth: mistune curve is symmetric-ish and gentle — P5 below, M3 below,
+  // M2 above, M2 above — arrival lands in the chord instead of mysteriously
+  // above/below. Fixed semitone keys, extended for >4-voice chords.
+  const GLIDE_SEMIS = [-7, -4, 2, 2, 2, -4];
   const chord = (root, semis, { beat = 0.14, glide = 0.06, vols = [0.09, 0.07, 0.06, 0.05], dur = null } = {}) => {
     const c = ac(), t = c.currentTime;
     dur ??= beat * (semis.length + 1.5);
@@ -43,9 +47,9 @@
       g.gain.setValueAtTime(0.0001, tOn);
       g.gain.exponentialRampToValueAtTime(vols[k % vols.length], tOn + 0.02);
       g.gain.exponentialRampToValueAtTime(0.0001, tOn + dur);
-      // Start a minor third below on even voices, a fifth above on odd voices —
-      // exponential glide onto the target so the chord "lands" as it forms.
-      o.frequency.setValueAtTime(f * Math.pow(2, (k % 2 ? 7 : -3) / 12), tOn);
+      // Start on a gentle mistuned pitch, glide onto the target so the chord
+      // "arrives" as it forms (the landing is what reads "warm resolve").
+      o.frequency.setValueAtTime(f * Math.pow(2, GLIDE_SEMIS[k % GLIDE_SEMIS.length] / 12), tOn);
       o.frequency.exponentialRampToValueAtTime(f, tOn + glide);
       o2.frequency.value = f * 2;
       const g2 = c.createGain(); g2.gain.value = 0.25;
@@ -54,16 +58,38 @@
     });
   };
 
-  // Click vocab, one line each:
-  //   joy      A major with add9, rising arpeggio            — greeting a jump out
-  //   donate   C6 lifted to maj7, slower and fuller          — grateful, golden
+  // Click vocab, one line each (joy/thank/page root follows the card's
+  // own pentatonic index, so repeated opens of one card match its hover):
+  //   joy      [0 4 7 14] add9 arpeggio, on the beat          — greeting a jump out
+  //   thank    [0 4 7 11 14] 6→maj7 lift, slower and fuller  — grateful, golden
+  //   page     [0 7 14 21] fifth-stacked, on the upbeat      — turning a page
   //   farewell two notes sagging a major third down          — page falling asleep
-  const joy = () => chord(440, [0, 4, 7, 14]);
-  const thank = () => chord(261.63, [0, 4, 7, 11, 14], { beat: 0.16, dur: 1.2, vols: [0.08, 0.07, 0.07, 0.06, 0.05] });
+  const tonic = card => {
+    if (!order.has(card)) order.set(card, i++);
+    return freq(order.get(card));
+  };
+  const joy = r => chord(r, [0, 4, 7, 14]);
+  const thank = r => chord(r, [0, 4, 7, 11, 14], { beat: 0.16, dur: 1.2, vols: [0.08, 0.07, 0.07, 0.06, 0.05] });
+  // Page-open differs from joy in two dimensions: interval set ([0,7,14,21] —
+  // open fifths + add2, no 3rd) AND rhythm (voices enter on the upbeat,
+  // beat*1.5 cadence, slightly slower). Reads "inviting, push the cover".
+  const page = r => chord(r, [0, 7, 14, 21], { beat: 0.21, glide: 0.09, dur: 1.0, vols: [0.08, 0.07, 0.06, 0.05] });
+  const clickSound = card => {
+    const r = tonic(card);
+    if (card.closest('.donate-list')) return thank(r);
+    if (card.classList.contains('post-card')) return page(r);
+    joy(r);
+  };
   document.addEventListener('click', e => {
     const card = e.target.closest('.link-card, .post-card');
-    if (!card) return;
-    (card.closest('.donate-list') ? thank : joy)(); // post-cards fall back to joy; open-note overrides on the modal path below
+    if (card) clickSound(card);
+  });
+  // Middle-click opens in a new tab but never fires 'click'; auxclick catches it.
+  // ponytail: ignore right-click explicitly — button 2 has its own affordance.
+  document.addEventListener('auxclick', e => {
+    if (e.button !== 1) return;
+    const card = e.target.closest('.link-card, .post-card');
+    if (card) clickSound(card);
   });
 
   // Post modal: inviting add9 swell on open, fading RE→DO two-note sigh on close.
