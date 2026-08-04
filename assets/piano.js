@@ -1,7 +1,7 @@
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  let ctx = null, i = 0, lastTs = 0;
-  const order = new WeakMap(), lastHit = new WeakMap();
+  let ctx = null, i = 0;
+  const order = new WeakMap();
   const SEMI = [0, 3, 5, 7, 10];
   const freq = j => 220 * Math.pow(2, (SEMI[j % SEMI.length] + 12 * Math.floor(j / SEMI.length)) / 12);
   const note = f => {
@@ -20,10 +20,7 @@
     if (!card || card.contains(e.relatedTarget)) return;
     ctx ??= new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === 'suspended') ctx.resume();
-    const now = performance.now();
-    if (now - lastTs < 55 || now - (lastHit.get(card) || 0) < 1200) return; // sweep = run of notes; same card stays quiet 1.2 s
-    lastTs = now; lastHit.set(card, now);
     if (!order.has(card)) order.set(card, i++);
     note(freq(order.get(card)));
-  });
+  }); // ponytail: no throttle — every card entry sounds, the list is an instrument. Overlaps are cheap sine oscs.
 })();
