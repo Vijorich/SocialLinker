@@ -35,16 +35,19 @@
   document.querySelectorAll('.link-card, .post-card').forEach(c => order.set(c, i++));
   const note = f => {
     const t = ctx.currentTime, g = ctx.createGain(), o = ctx.createOscillator(), o2 = ctx.createOscillator();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.09, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+    // ponytail: all setTargetAtTime — exponentialRamp has kinks at segment ends,
+    // and even "instant" 10 ms ramps crackle on phones' coarse render quanta.
+    // TC = smooth exponential move, no discontinuity by construction.
+    g.gain.setValueAtTime(0, t);
+    g.gain.setTargetAtTime(0.09, t, 0.02);
+    g.gain.setTargetAtTime(0, t + 0.06, 0.28);
     o.frequency.value = f;
     // Fifth (not octave) partial at low level: sine+octave at the top of a chord
     // sum is exactly what phone speakers render as buzzing crackle.
     o2.frequency.value = f * 1.5;
     const g2 = ctx.createGain(); g2.gain.value = 0.1;
     o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
-    o.start(t); o2.start(t); o.stop(t + 0.95); o2.stop(t + 0.95);
+    o.start(t); o2.start(t); o.stop(t + 1.2); o2.stop(t + 1.2);
   };
   document.addEventListener('mouseover', e => {
     const card = e.target.closest('.link-card, .post-card');
@@ -69,19 +72,18 @@
       const f = root * Math.pow(2, s / 12);
       const g = c.createGain(), o = c.createOscillator(), o2 = c.createOscillator();
       const tOn = t + k * beat;
-      // ponytail: single anchor at tOn. A second anchor at t (== tOn for k=0)
-      // schedules two same-time events, which some engines zipper into a click.
-      g.gain.setValueAtTime(0.0001, tOn);
-      g.gain.exponentialRampToValueAtTime(vols[k % vols.length], tOn + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, tOn + dur);
+      // TC everywhere (see note()) — ramp kinks and fast glides are the crackle.
+      g.gain.setValueAtTime(0, tOn);
+      g.gain.setTargetAtTime(vols[k % vols.length], tOn, 0.02);
+      g.gain.setTargetAtTime(0, tOn + dur * 0.25, dur * 0.25);
       // Start on a gentle mistuned pitch, glide onto the target so the chord
       // "arrives" as it forms (the landing is what reads "warm resolve").
       o.frequency.setValueAtTime(f * Math.pow(2, GLIDE_SEMIS[k % GLIDE_SEMIS.length] / 12), tOn);
-      o.frequency.exponentialRampToValueAtTime(f, tOn + glide);
+      o.frequency.setTargetAtTime(f, tOn, Math.max(0.03, glide));
       o2.frequency.value = f * 1.5;
       const g2 = c.createGain(); g2.gain.value = 0.12;
       o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
-      o.start(tOn); o2.start(tOn); o.stop(tOn + dur + 0.1); o2.stop(tOn + dur + 0.1);
+      o.start(tOn); o2.start(tOn);       o.stop(tOn + dur * 1.75 + 0.3); o2.stop(tOn + dur * 1.75 + 0.3);
     });
   };
 
@@ -144,12 +146,12 @@
     skipLink.addEventListener('focus', () => play(() => {
       const c = ac(), t = c.currentTime;
       const g = c.createGain(), o = c.createOscillator();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.09, t + 0.005);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      g.gain.setValueAtTime(0, t);
+      g.gain.setTargetAtTime(0.08, t, 0.008);
+      g.gain.setTargetAtTime(0, t + 0.05, 0.06);
       o.frequency.value = 330; // perfect fifth above the pentatonic root
       o.connect(g); g.connect(bus());
-      o.start(t); o.stop(t + 0.2);
+      o.start(t); o.stop(t + 0.4);
     }));
   }
 
@@ -163,12 +165,12 @@
       setTimeout(() => {
         if (!running()) return;
         const a = ac(), t = a.currentTime, g = a.createGain(), o = a.createOscillator();
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.05, t + 0.005);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+        g.gain.setValueAtTime(0, t);
+        g.gain.setTargetAtTime(0.045, t, 0.008);
+        g.gain.setTargetAtTime(0, t + 0.04, 0.09);
         o.frequency.value = f * 2;
         o.connect(g); g.connect(bus());
-        o.start(t); o.stop(t + 0.3);
+        o.start(t); o.stop(t + 0.5);
       }, 30);
     });
   });
@@ -224,15 +226,15 @@
     const g = c.createGain();
     const breath = 2 * stepS;
     card.style.setProperty('--attune-period', breath + 's');
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.linearRampToValueAtTime(gain * 0.9, t0 + 1.4);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.setTargetAtTime(gain * 0.9, t0, 0.5);
     // LFO ±~11% around the base = the old peak/valley alternation, but continuous
     // and phase-locked with the CSS shimmer. Ramps in with the attack so a
     // pre-gesture (suspended-context) hold can't dip the gain below zero.
     const lfo = c.createOscillator(), lfoGain = c.createGain();
     lfo.frequency.value = 1 / breath;
     lfoGain.gain.setValueAtTime(0, t0);
-    lfoGain.gain.linearRampToValueAtTime(gain * 0.1, t0 + 1.4);
+    lfoGain.gain.setTargetAtTime(gain * 0.1, t0, 0.5);
     lfo.connect(lfoGain).connect(g.gain);
     const filt = c.createBiquadFilter();
     filt.type = 'lowpass'; filt.frequency.value = 1600; filt.Q.value = 0.3;
@@ -274,12 +276,11 @@
     return { stop() {
       clearTimeout(walk.t);
       const te = c.currentTime;
-      lfoGain.gain.setValueAtTime(0, te); // freeze the LFO so the release tail is smooth
+      lfoGain.gain.setTargetAtTime(0, te, 0.05); // freeze the LFO so the release tail is smooth
       g.gain.cancelScheduledValues(te);
-      g.gain.setValueAtTime(g.gain.value, te);
-      g.gain.exponentialRampToValueAtTime(0.0001, te + 1.6);
-      voices.forEach(o => o.stop(te + 1.8));
-      lfo.stop(te + 1.8);
+      g.gain.setTargetAtTime(0, te, 0.5);
+      voices.forEach(o => o.stop(te + 2));
+      lfo.stop(te + 2);
     } };
   };
 
@@ -325,8 +326,8 @@
       if (drone || !running()) return;
       const c = ac(), t = c.currentTime;
       const g = c.createGain(), lfoGain = c.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.05, t + 1.2);
+      g.gain.setValueAtTime(0, t);
+      g.gain.setTargetAtTime(0.05, t, 0.45);
       const lfo = c.createOscillator();
       lfo.frequency.value = 1 / 7.5;
       lfoGain.gain.value = 0.018;
@@ -345,10 +346,9 @@
       lfo.start(t);
       drone = { gain: g, stop() {
         const te = c.currentTime;
-        lfoGain.gain.setValueAtTime(0, te); // freeze the LFO so the release tail is monotonic
+        lfoGain.gain.setTargetAtTime(0, te, 0.05); // freeze the LFO so the release tail is monotonic
         g.gain.cancelScheduledValues(te);
-        g.gain.setValueAtTime(g.gain.value, te);
-        g.gain.exponentialRampToValueAtTime(0.0001, te + 1.8);
+        g.gain.setTargetAtTime(0, te, 0.55);
         osc.forEach(o => o.stop(te + 2)); lfo.stop(te + 2);
       } };
     };
