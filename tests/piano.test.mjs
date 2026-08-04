@@ -68,6 +68,7 @@ function makeWorld({ cards = [], dlg = null, suspended = false } = {}) {
 }
 const makeCard = (cls, label = '') => ({
   label,
+  style: { props: {}, setProperty(k, v) { this.props[k] = v; } },
   classList: {
     _s: new Set(cls),
     contains(c) { return this._s.has(c); },
@@ -105,8 +106,9 @@ const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
   card.addEventListener = (ev, fn) => { (handlers[ev] ??= []).push(fn); };
   const w = makeWorld({ cards: [card] });
   handlers.mouseenter.forEach(fn => fn());       // queue the 3.5 s attune timer
-  w.flushOne();                                   // hold starts: first 3 oscs are voices
-  const [v0, v1, v2] = w.ctx.oscs;
+  w.flushOne();                                   // hold starts: lfo + 3 voices
+  const lfo = w.ctx.oscs[0];
+  const [v0, v1, v2] = w.ctx.oscs.slice(1, 4);
   const root = 220; // card is DOM position 0
   assert.ok(Number.isFinite(v0.frequency.value) && Number.isFinite(v1.frequency.value) && Number.isFinite(v2.frequency.value),
     'T2 all walker voices have finite frequency (was NaN)');
@@ -118,26 +120,29 @@ const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
   assert.ok(Number.isFinite(r) && r > 0, 'T2 step keeps the root finite');
   assert.ok(closeTo(v1.frequency.value / r, Math.pow(2, 4 / 12)), 'T2 step keeps the chord shape (M3)');
   assert.ok(closeTo(v2.frequency.value / r, Math.pow(2, 7 / 12)), 'T2 step keeps the chord shape (P5)');
+  // Breath: gain LFO at 1/(2×stepS) and the CSS shimmer period stamped on the card.
+  assert.ok(closeTo(lfo.frequency.value, 1 / 6.4), 'T2 breath LFO runs on 2×stepS');
+  assert.equal(card.style.props['--attune-period'], '6.4s', 'T2 glow period stamped from the same clock');
 }
 
 // T3: one modal opening = exactly one sound. Card click plays page(), the observer
 // swallows its swell; a popstate-style open (no click) still gets the swell; close
-// gets the farewell.
+// gets the farewell. page/swell = [0,7,14] = 3 voices × 2 oscs = 6 oscs each.
 {
   const handlers = {};
   const post = makeCard(['post-card', 'link-card']);
   const dlg = { open: false };
   const w = makeWorld({ cards: [post], dlg });
   const count = () => w.ctx.oscs.length;
-  w.click(post);                                  // page() chord: 4 voices × 2 oscs
+  w.click(post);                                  // page() chord: 3 voices × 2 oscs
   const afterClick = count();
-  assert.equal(afterClick, 8, 'T3 post-card click sounds its page() chord');
+  assert.equal(afterClick, 6, 'T3 post-card click sounds its page() chord');
   dlg.open = true; w.moCb()();                    // modal opens → flag consumed
   assert.equal(count(), afterClick, 'T3 click-open does NOT double with the observer swell');
   dlg.open = false; w.moCb()();                   // farewell: 2 voices × 2 oscs
   assert.equal(count(), afterClick + 4, 'T3 close sounds the farewell');
   dlg.open = true; w.moCb()();                    // popstate reopen: swell plays
-  assert.equal(count(), afterClick + 12, 'T3 a no-click open still gets its swell');
+  assert.equal(count(), afterClick + 10, 'T3 a no-click open still gets its swell');
 }
 
 // T4: tab-hide stops an active attune (timer queue drains, .attuned class drops)
@@ -162,4 +167,20 @@ const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
   assert.equal(w.ctx.oscs.length, before + 4, 'T4 visible badge-reveal sounds the wake-tick');
 }
 
-console.log('piano: 4/4 check groups passed');
+// T5: importance ladder — click melody length grows one voice per rung,
+// donate > links > projects > posts. Each voice = 2 oscs (fundamental + octave).
+{
+  const don = makeCard(['link-card', 'donate']);
+  don.closest = sel => (sel === '.donate-list' ? {} : (sel.includes('.link-card') ? don : null));
+  const link = makeCard(['link-card']);
+  const proj = makeCard(['link-card', 'project-card']);
+  const post = makeCard(['link-card', 'post-card']);
+  const w = makeWorld({ cards: [don, link, proj, post] });
+  const voices = card => { const n = w.ctx.oscs.length; w.click(card); return (w.ctx.oscs.length - n) / 2; };
+  assert.equal(voices(post), 3, 'T5 posts are the shortest rung (3 voices)');
+  assert.equal(voices(proj), 4, 'T5 projects add one voice (4)');
+  assert.equal(voices(link), 5, 'T5 links add one voice (5)');
+  assert.equal(voices(don), 6, 'T5 donate is the longest, most playful rung (6)');
+}
+
+console.log('piano: 5/5 check groups passed');

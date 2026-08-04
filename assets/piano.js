@@ -69,26 +69,25 @@
     });
   };
 
-  // Click vocab, one line each (joy/thank/page root follows the card's
-  // own pentatonic index, so repeated opens of one card match its hover):
-  //   joy      [0 4 7 14] add9 arpeggio, on the beat          — greeting a jump out
-  //   thank    [0 4 7 11 14] 6→maj7 lift, slower and fuller  — grateful, golden
-  //   page     [0 7 14 21] fifth-stacked, on the upbeat      — turning a page
-  //   farewell two notes sagging a major third down          — page falling asleep
+  // Click vocab = the importance ladder: the more important the component, the
+  // longer and more playful the melody — exactly one voice per rung:
+  //   donate (1) thank [0 4 7 11 14 21] maj7 rise + octave sparkle — golden, fullest
+  //   links  (2) joy   [0 4 7 11 14]    maj7 lift
+  //   projct (3) craft [0 4 7 14]       add9 arpeggio
+  //   posts  (4) page  [0 7 14]         open fifths — shortest, least important
   const tonic = card => {
     if (!order.has(card)) order.set(card, i++);
     return freq(order.get(card));
   };
-  const joy = r => chord(r, [0, 4, 7, 14]);
-  const thank = r => chord(r, [0, 4, 7, 11, 14], { beat: 0.16, dur: 1.2, vols: [0.08, 0.07, 0.07, 0.06, 0.05] });
-  // Page-open differs from joy in two dimensions: interval set ([0,7,14,21] —
-  // open fifths + add2, no 3rd) AND rhythm (voices enter on the upbeat,
-  // beat*1.5 cadence, slightly slower). Reads "inviting, push the cover".
-  const page = r => chord(r, [0, 7, 14, 21], { beat: 0.21, glide: 0.09, dur: 1.0, vols: [0.08, 0.07, 0.06, 0.05] });
+  const page = r => chord(r, [0, 7, 14], { beat: 0.12, glide: 0.05, dur: 0.45, vols: [0.08, 0.07, 0.06] });
+  const craft = r => chord(r, [0, 4, 7, 14], { beat: 0.13, dur: 0.55, vols: [0.09, 0.07, 0.06, 0.05] });
+  const joy = r => chord(r, [0, 4, 7, 11, 14], { beat: 0.14, dur: 0.65, vols: [0.085, 0.07, 0.065, 0.06, 0.05] });
+  const thank = r => chord(r, [0, 4, 7, 11, 14, 21], { beat: 0.15, glide: 0.08, dur: 0.75, vols: [0.08, 0.07, 0.07, 0.06, 0.05, 0.045] });
   const clickSound = card => {
     const r = tonic(card);
     if (card.closest('.donate-list')) return thank(r);
     if (card.classList.contains('post-card')) return page(r);
+    if (card.classList.contains('project-card')) return craft(r);
     joy(r);
   };
   // Set when a post-card click plays its page() chord, consumed by the modal-open
@@ -181,7 +180,8 @@
       }
       // A post-card click already spoke its page() chord — don't double the open.
       if (openedByClick) { openedByClick = false; return; }
-      chord(440, [0, 4, 7, 14], { beat: 0.17, dur: 1.1 });
+      // Popstate/programmatic reopen: the same short page chord (post importance rung).
+      chord(440, [0, 7, 14], { beat: 0.12, glide: 0.05, dur: 0.45, vols: [0.08, 0.07, 0.06] });
     }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 
@@ -193,14 +193,26 @@
   // a visitor hears lands on the same breath they see.
   const SHIMMER_DELAY = 3.5;
 
-  // One walker step: pick a ladder rung k ± bounded delta from prev, set the AC's
-  // voice frequencies to a 3-note chord voiced around that rung, and breathe the
-  // master gain up. Steps are scheduled on the same beat the CSS shimmer animates.
+  // One walker step: pick a ladder rung k ± bounded delta from prev and retune the
+  // three sustained voices onto it. Breath is NOT per-step: a real LFO swells the
+  // master gain on a period of 2×stepS, and attune.css runs its shimmer on the very
+  // same period (JS stamps --attune-period on the card at hold start) with a −¼
+  // period delay — glow peak lands exactly on the loudness peak. One clock, two skins.
   const holdFor = (card, { ladderScale = 1, gain = 0.05, stepS = 3.2, chordSemis = [0, 4, 7] } = {}) => () => {
     const c = ac(), t0 = c.currentTime;
     const g = c.createGain();
+    const breath = 2 * stepS;
+    card.style.setProperty('--attune-period', breath + 's');
     g.gain.setValueAtTime(0.0001, t0);
-    g.gain.linearRampToValueAtTime(gain, t0 + 1.4);
+    g.gain.linearRampToValueAtTime(gain * 0.9, t0 + 1.4);
+    // LFO ±~11% around the base = the old peak/valley alternation, but continuous
+    // and phase-locked with the CSS shimmer. Ramps in with the attack so a
+    // pre-gesture (suspended-context) hold can't dip the gain below zero.
+    const lfo = c.createOscillator(), lfoGain = c.createGain();
+    lfo.frequency.value = 1 / breath;
+    lfoGain.gain.setValueAtTime(0, t0);
+    lfoGain.gain.linearRampToValueAtTime(gain * 0.1, t0 + 1.4);
+    lfo.connect(lfoGain).connect(g.gain);
     const filt = c.createBiquadFilter();
     filt.type = 'lowpass'; filt.frequency.value = 1600; filt.Q.value = 0.3;
     // Three sustained voices whose frequencies the walker retunes each step.
@@ -222,35 +234,31 @@
     // Set initial pitches directly (no glide), then start the voices.
     voices.forEach((o, k) => o.frequency.setValueAtTime(chordFreq(stepRung(rung), k), t0));
     voices.forEach(o => o.start(t0));
+    lfo.start(t0);
     const walk = () => {
       const deltas = [-2, -1, -1, +1, +1, +2];        // biased ±1, occasionally ±2 for leaps
-      rung = Math.max(0, rung + deltas[Math.floor(Math.random() * deltas.length)]);
-      const t = c.currentTime + stepS;                // next step lands after stepS
+      // Pivot around the card's own rung — unclamped, a long hold drifts up
+      // octaves forever; ±4 keeps the drone in the card's register.
+      rung = Math.min(pos + 4, Math.max(0, rung + deltas[Math.floor(Math.random() * deltas.length)]));
       const root = stepRung(rung);
       voices.forEach((o, k) => {
         const f = chordFreq(root, k);
         // Glide to the new pitch across the first 60% of the step — reading as
         // movement, not a jump. The remaining 40% sits stable so the chord formants.
-        const tArrive = t - stepS * 0.4;
-        o.frequency.setTargetAtTime(f, tArrive - stepS * 0.6, stepS * 0.2);
+        o.frequency.setTargetAtTime(f, c.currentTime, stepS * 0.2);
       });
-      // Gain breathes in step with the CSS animation (7s period). Alternate steps
-      // louder/softer so a single breath contains two little phrases.
-      const stepN = Math.round((c.currentTime - t0) / stepS) + 1;
-      const peak = gain * (stepN % 2 === 0 ? 1.0 : 0.78);
-      g.gain.cancelScheduledValues(t);
-      g.gain.setValueAtTime(g.gain.value, t - 0.001);
-      g.gain.linearRampToValueAtTime(peak, t);
       walk.t = setTimeout(walk, stepS * 1000);
     };
     walk.t = setTimeout(walk, stepS * 1000);
     return { stop() {
       clearTimeout(walk.t);
       const te = c.currentTime;
+      lfoGain.gain.setValueAtTime(0, te); // freeze the LFO so the release tail is smooth
       g.gain.cancelScheduledValues(te);
       g.gain.setValueAtTime(g.gain.value, te);
       g.gain.exponentialRampToValueAtTime(0.0001, te + 1.6);
       voices.forEach(o => o.stop(te + 1.8));
+      lfo.stop(te + 1.8);
     } };
   };
 
