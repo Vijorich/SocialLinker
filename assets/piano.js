@@ -16,6 +16,9 @@
   const unlock = () => { ac().resume().catch(() => {}); };
   document.addEventListener('pointerdown', unlock, { once: true });
   document.addEventListener('keydown', unlock, { once: true });
+  // ponytail: autoplay policy needs a gesture, but browsers with media-engagement
+  // history (or relaxed sound permission) allow resume at load — costs one line.
+  unlock();
   // ponytail: one master compressor for the whole page — a ceiling for overlapping
   // notes so the sum can't clip. Upgrade path if it audibly pumps: per-voice gains.
   let out = null;
@@ -39,11 +42,13 @@
   const note = f => {
     const t = ctx.currentTime, g = ctx.createGain(), o = ctx.createOscillator(), o2 = ctx.createOscillator();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.09, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
     o.frequency.value = f;
-    o2.frequency.value = f * 2;
-    const g2 = ctx.createGain(); g2.gain.value = 0.22;
+    // Fifth (not octave) partial at low level: sine+octave at the top of a chord
+    // sum is exactly what phone speakers render as buzzing crackle.
+    o2.frequency.value = f * 1.5;
+    const g2 = ctx.createGain(); g2.gain.value = 0.1;
     o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
     o.start(t); o2.start(t); o.stop(t + 0.95); o2.stop(t + 0.95);
   };
@@ -63,14 +68,15 @@
   // M2 above, M2 above — arrival lands in the chord instead of mysteriously
   // above/below. Fixed semitone keys, extended for >4-voice chords.
   const GLIDE_SEMIS = [-7, -4, 2, 2, 2, -4];
-  const chord = (root, semis, { beat = 0.14, glide = 0.06, vols = [0.09, 0.07, 0.06, 0.05], dur = null } = {}) => {
+  const chord = (root, semis, { beat = 0.14, glide = 0.06, vols = [0.07, 0.055, 0.05, 0.04], dur = null } = {}) => {
     const c = ac(), t = c.currentTime;
     dur ??= beat * (semis.length + 1.5);
     semis.forEach((s, k) => {
       const f = root * Math.pow(2, s / 12);
       const g = c.createGain(), o = c.createOscillator(), o2 = c.createOscillator();
       const tOn = t + k * beat;
-      g.gain.setValueAtTime(0.0001, t);
+      // ponytail: single anchor at tOn. A second anchor at t (== tOn for k=0)
+      // schedules two same-time events, which some engines zipper into a click.
       g.gain.setValueAtTime(0.0001, tOn);
       g.gain.exponentialRampToValueAtTime(vols[k % vols.length], tOn + 0.02);
       g.gain.exponentialRampToValueAtTime(0.0001, tOn + dur);
@@ -78,8 +84,8 @@
       // "arrives" as it forms (the landing is what reads "warm resolve").
       o.frequency.setValueAtTime(f * Math.pow(2, GLIDE_SEMIS[k % GLIDE_SEMIS.length] / 12), tOn);
       o.frequency.exponentialRampToValueAtTime(f, tOn + glide);
-      o2.frequency.value = f * 2;
-      const g2 = c.createGain(); g2.gain.value = 0.25;
+      o2.frequency.value = f * 1.5;
+      const g2 = c.createGain(); g2.gain.value = 0.12;
       o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
       o.start(tOn); o2.start(tOn); o.stop(tOn + dur + 0.1); o2.stop(tOn + dur + 0.1);
     });
@@ -95,10 +101,12 @@
     if (!order.has(card)) order.set(card, i++);
     return freq(order.get(card));
   };
-  const page = r => chord(r, [0, 7, 14], { beat: 0.12, glide: 0.05, dur: 0.45, vols: [0.08, 0.07, 0.06] });
-  const craft = r => chord(r, [0, 4, 7, 14], { beat: 0.13, dur: 0.55, vols: [0.09, 0.07, 0.06, 0.05] });
-  const joy = r => chord(r, [0, 4, 7, 11, 14], { beat: 0.14, dur: 0.65, vols: [0.085, 0.07, 0.065, 0.06, 0.05] });
-  const thank = r => chord(r, [0, 4, 7, 11, 14, 21], { beat: 0.15, glide: 0.08, dur: 0.75, vols: [0.08, 0.07, 0.07, 0.06, 0.05, 0.045] });
+  // ponytail: sum-of-voices headroom — voices overlap in decay, so 6 voices at
+  // ~0.05 each still crests past 0.25 before the limiter. Levels stay low.
+  const page = r => chord(r, [0, 7, 14], { beat: 0.12, glide: 0.05, dur: 0.45, vols: [0.06, 0.05, 0.04] });
+  const craft = r => chord(r, [0, 4, 7, 14], { beat: 0.13, dur: 0.55, vols: [0.07, 0.055, 0.05, 0.04] });
+  const joy = r => chord(r, [0, 4, 7, 11, 14], { beat: 0.14, dur: 0.65, vols: [0.065, 0.055, 0.05, 0.045, 0.035] });
+  const thank = r => chord(r, [0, 4, 7, 11, 14, 21], { beat: 0.15, glide: 0.08, dur: 0.75, vols: [0.06, 0.055, 0.055, 0.045, 0.04, 0.035] });
   const clickSound = card => {
     const r = tonic(card);
     if (card.closest('.donate-list')) return thank(r);
