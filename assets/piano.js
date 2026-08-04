@@ -1,18 +1,34 @@
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let ctx = null, i = 0;
-  const ac = () => {
-    ctx ??= new (window.AudioContext || window.webkitAudioContext)();
-    // Rejects when no gesture has happened yet (badge-reveal as first sound) — silence is the intended fallback.
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-    return ctx;
+  const ac = () => ctx ??= new (window.AudioContext || window.webkitAudioContext)();
+  const running = () => !!ctx && ctx.state === 'running';
+  // ponytail: nothing may be scheduled until the context runs. Scheduling into a
+  // suspended ctx stacks every note on the frozen clock, so the first gesture
+  // fires them all at once — that burst is the startup lag+crackle. Gesture
+  // sounds go through play() so the very first tap still sings; ambient sounds
+  // (hover, drones, badge-reveal) skip silently, which was always the intent.
+  const play = fn => {
+    const c = ac();
+    if (c.state === 'running') fn(c);
+    else c.resume().then(() => fn(c)).catch(() => {});
   };
+  const unlock = () => { ac().resume().catch(() => {}); };
+  document.addEventListener('pointerdown', unlock, { once: true });
+  document.addEventListener('keydown', unlock, { once: true });
   // ponytail: one master compressor for the whole page — a ceiling for overlapping
   // notes so the sum can't clip. Upgrade path if it audibly pumps: per-voice gains.
   let out = null;
   const bus = () => {
     const c = ac();
-    if (!out) { const g = c.createGain(), comp = c.createDynamicsCompressor(); g.connect(comp).connect(c.destination); out = g; }
+    if (!out) {
+      const g = c.createGain(), comp = c.createDynamicsCompressor();
+      // ponytail: defaults (-24 dB threshold, ratio 12) squeeze every quiet note
+      // and makeup gain pushes the mix hot — phone speakers read it as overload.
+      // Let only real overlaps hit the limiter. Upgrade path: per-voice gains.
+      comp.threshold.value = -10; comp.knee.value = 12; comp.ratio.value = 8;
+      g.connect(comp).connect(c.destination); out = g;
+    }
     return out;
   };
   const order = new WeakMap();
@@ -34,7 +50,7 @@
   document.addEventListener('mouseover', e => {
     const card = e.target.closest('.link-card, .post-card');
     if (!card || card.contains(e.relatedTarget)) return;
-    ac();
+    if (!running()) return; // pre-gesture hover stays silent, never queued
     if (!order.has(card)) order.set(card, i++);
     note(freq(order.get(card)));
   }); // ponytail: no throttle — every card entry sounds, the list is an instrument. Overlaps are cheap sine oscs.
@@ -100,13 +116,13 @@
     const card = e.target.closest('.link-card, .post-card');
     if (!card) return;
     if (card.classList.contains('post-card')) openedByClick = true;
-    clickSound(card);
+    play(() => clickSound(card));
   });
   // Middle-click opens in a new tab but never fires 'click'; auxclick catches it.
   document.addEventListener('auxclick', e => {
     if (e.button !== 1) return;
     const card = e.target.closest('.link-card, .post-card');
-    if (card) clickSound(card);
+    if (card) play(() => clickSound(card));
   });
   // Right-click on a card: a questioning flirtatious glance, not a silence.
   // Two short notes a perfect fourth apart ([0, 5]) that hang unresolved.
@@ -116,14 +132,14 @@
     const card = e.target.closest('.link-card, .post-card');
     if (!card) return;
     const r = tonic(card);
-    chord(r, [0, 5], { beat: 0.18, glide: 0.12, vols: [0.07, 0.05], dur: 0.55 });
+    play(() => chord(r, [0, 5], { beat: 0.18, glide: 0.12, vols: [0.07, 0.05], dur: 0.55 }));
   });
 
   // Skip-link: the accessibility path deserves its own instrument.
   // One clean fundamental, no harmonic — a soft *tok* that says "door's here".
   const skipLink = document.querySelector('.skip-link');
   if (skipLink) {
-    skipLink.addEventListener('focus', () => {
+    skipLink.addEventListener('focus', () => play(() => {
       const c = ac(), t = c.currentTime;
       const g = c.createGain(), o = c.createOscillator();
       g.gain.setValueAtTime(0.0001, t);
@@ -132,7 +148,7 @@
       o.frequency.value = 330; // perfect fifth above the pentatonic root
       o.connect(g); g.connect(bus());
       o.start(t); o.stop(t + 0.2);
-    });
+    }));
   }
 
   // GitHub link card = Vijor's workbench. Same pentatonic note as every other
@@ -143,6 +159,7 @@
     c.addEventListener('mouseenter', () => {
       const f = tonic(c);
       setTimeout(() => {
+        if (!running()) return;
         const a = ac(), t = a.currentTime, g = a.createGain(), o = a.createOscillator();
         g.gain.setValueAtTime(0.0001, t);
         g.gain.exponentialRampToValueAtTime(0.05, t + 0.005);
@@ -159,7 +176,7 @@
   // badges.js dispatches 'badge-reveal' with the badge type after pinning.
   // Guarded on document.hidden: a reveal that lands in a background tab stays silent.
   window.addEventListener('badge-reveal', e => {
-    if (document.hidden) return;
+    if (document.hidden || !running()) return;
     const isLive = e.detail === 'twitch';
     chord(660, isLive ? [0, 4] : [0, 6], { beat: 0.12, glide: 0.05, vols: [0.05, 0.04], dur: 0.35 });
   });
@@ -176,10 +193,12 @@
       wasOpen = dlg.open;
       if (!dlg.open) {
         openedByClick = false; // clear any stale flag from a click that never opened
+        if (!running()) return;
         return farewell();
       }
       // A post-card click already spoke its page() chord — don't double the open.
       if (openedByClick) { openedByClick = false; return; }
+      if (!running()) return;
       // Popstate/programmatic reopen: the same short page chord (post importance rung).
       chord(440, [0, 7, 14], { beat: 0.12, glide: 0.05, dur: 0.45, vols: [0.08, 0.07, 0.06] });
     }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
@@ -268,7 +287,7 @@
     card.addEventListener('mouseenter', () => {
       clearTimeout(tRef);
       tRef = setTimeout(() => {
-        if (document.hidden) return; // queued while the tab was hidden — skip
+        if (document.hidden || !running()) return; // background tab or pre-gesture — skip
         live = startHold();
         if (live) { card.classList.add('attuned'); holds.add(live); }
       }, SHIMMER_DELAY * 1000);
@@ -301,7 +320,7 @@
   if (avatar) {
     let drone = null; // { gain, stop() } while alive
     const start = () => {
-      if (drone) return;
+      if (drone || !running()) return;
       const c = ac(), t = c.currentTime;
       const g = c.createGain(), lfoGain = c.createGain();
       g.gain.setValueAtTime(0.0001, t);
