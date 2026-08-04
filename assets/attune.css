@@ -1,9 +1,11 @@
-// Focus instrument: attune-shimmer note and CSS glow.
-// Soft enough to sit under the piano plinks; donate keeps its gold, the rest
-// take the calmer ember shimmer at ~70% of hover's ::before intensity.
-// The attuned note lands 3.5s in — the CSS transitionDelay matches so the
-// light and the sound arrive together. Tremolo period mirrors the gain LFO
-// in piano.js:doAttune (~0.14Hz ⇔ 7s) so what you hear is what you see.
+/* Focus instrument: attune-shimmer note and CSS glow.
+   Soft enough to sit under the piano plinks; donate keeps its gold, the rest
+   take the calmer ember shimmer at ~70% of hover's ::before intensity.
+   The attuned note lands 3.5s in — the CSS transitionDelay matches so the
+   light and the sound arrive together. Tremolo period mirrors the gain LFO
+   in piano.js holdFor (~0.14Hz ⇔ 7s) so what you hear is what you see.
+   ponytail: was //-comments, which CSS parses as a garbage selector and ate
+   the whole first rule — .link-card::after{} never reached the page. */
 .link-card::after, .post-card::after {
   content: "";
   position: absolute;
@@ -23,6 +25,10 @@
     rgba(253, 191, 89, 0.14) 45%,
     transparent 78%);
   transition-delay: 3.5s;
+  /* style.css leaves transform:translateX(-250%) skewX(-20deg) on this ::after
+     for its gold-sweep. Without a reset the attune glow rides that off screen. */
+  transform: none;
+  width: auto; height: auto;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .link-card.attuned::after, .post-card.attuned::after {

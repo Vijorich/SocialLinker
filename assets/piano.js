@@ -116,14 +116,14 @@
       osc.forEach(o => o.stop(te + 1.8)); lfo.stop(te + 1.8);
     } };
   };
-  const wireHold = (card, makeHold) => {
+  const wireHold = (card, startHold) => {
     let tRef = null; // setTimeout id while still waiting to attune
     let live = null; // running hold while attuned
     card.addEventListener('mouseenter', () => {
       clearTimeout(tRef);
       tRef = setTimeout(() => {
-        live = makeHold()();
-        live && card.classList.add('attuned');
+        live = startHold(); // ponytail: was makeHold()() — double-call made every attune throw before classList.add
+        if (live) card.classList.add('attuned');
       }, SHIMMER_DELAY * 1000);
     });
     card.addEventListener('mouseleave', () => {
@@ -133,10 +133,12 @@
       h?.stop();
     });
   };
+  // ponytail: holdFor(semis, opts) — stray Element as arg1 made semis.map throw
+  // inside the 3.5s timeout, killing attune silently. Pass semis only.
   document.querySelectorAll('.link-list:not(.donate-list) .link-card, .link-list:not(.donate-list) .post-card').forEach(c =>
-    wireHold(c, () => holdFor(c, [0, 4, 7, 14], { gain: 0.045, trem: 0.14 })));
+    wireHold(c, holdFor([0, 4, 7, 14], { gain: 0.045, trem: 0.14 })));
   document.querySelectorAll('.donate-list .link-card').forEach(c =>
-    wireHold(c, () => holdFor(c, [0, 4, 7, 11, 14], { root: 523.25, gain: 0.06, trem: 0.22, detune: 0.55 })));
+    wireHold(c, holdFor([0, 4, 7, 11, 14], { root: 523.25, gain: 0.06, trem: 0.22, detune: 0.55 })));
 
   // Avatar warmth → ember drone: three detuned sines (110/165/220 Hz), gain
   // "breathes" with an LFO matching the CSS ember-breath 7.5s period. Starts on
