@@ -34,7 +34,11 @@
     document.startViewTransition(move).finished.finally(() =>
       lis.forEach(n => n.style.viewTransitionName = ''));
   };
-  const reveal = el => { el.hidden = false; pin(el); };
+  const reveal = el => {
+    el.hidden = false; pin(el);
+    // piano.js listens for this to play the wake-tick — no direct coupling.
+    window.dispatchEvent(new CustomEvent('badge-reveal', { detail: el.dataset.badgeType }));
+  };
 
   document.querySelectorAll('.badge[data-badge-type]').forEach(el => {
     const d = el.dataset;

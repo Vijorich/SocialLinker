@@ -85,11 +85,64 @@
     if (card) clickSound(card);
   });
   // Middle-click opens in a new tab but never fires 'click'; auxclick catches it.
-  // ponytail: ignore right-click explicitly — button 2 has its own affordance.
   document.addEventListener('auxclick', e => {
     if (e.button !== 1) return;
     const card = e.target.closest('.link-card, .post-card');
     if (card) clickSound(card);
+  });
+  // Right-click on a card: a questioning flirtatious glance, not a silence.
+  // Two short notes — a fourth up, then a tritone up off it — that hang unresolve.
+  // contextmenu fires on the press (even when the menu opens), so this plays
+  // regardless of whether the user actually picks "open in new tab".
+  document.addEventListener('contextmenu', e => {
+    const card = e.target.closest('.link-card, .post-card');
+    if (!card) return;
+    const r = tonic(card);
+    chord(r, [0, 5], { beat: 0.18, glide: 0.12, vols: [0.07, 0.05], dur: 0.55 });
+  });
+
+  // Skip-link: the accessibility path deserves its own instrument.
+  // One clean fundamental, no harmonic — a soft *tok* that says "door's here".
+  const skipLink = document.querySelector('.skip-link');
+  if (skipLink) {
+    skipLink.addEventListener('focus', () => {
+      const c = ac(), t = c.currentTime;
+      const g = c.createGain(), o = c.createOscillator();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.09, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      o.frequency.value = 330; // perfect fifth above the pentatonic root
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t + 0.2);
+    });
+  }
+
+  // GitHub link card = Vijor's workbench. Same pentatonic note as every other
+  // card, plus a faint octave tap 30 ms late — workshop-y, dry, curious.
+  document.querySelectorAll('a.link-card').forEach(c => {
+    const href = c.href || '';
+    if (!href.includes('github.com/Vijorich')) return;
+    c.addEventListener('mouseenter', () => {
+      const f = tonic(c);
+      setTimeout(() => {
+        const t = ctx.currentTime, g = ctx.createGain(), o = ctx.createOscillator();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.05, t + 0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+        o.frequency.value = f * 2;
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + 0.3);
+      }, 30);
+    });
+  });
+
+  // Badge wake-tick: two short Lydian notes when a Live/New chip appears.
+  // The page moved on its own; the only moment the UI plays without a gesture.
+  // badges.js dispatches 'badge-reveal' with the badge type after pinning.
+  window.addEventListener('badge-reveal', e => {
+    const t = ac().currentTime;
+    const isLive = e.detail === 'twitch';
+    chord(660, isLive ? [0, 4] : [0, 6], { beat: 0.12, glide: 0.05, vols: [0.05, 0.04], dur: 0.35 });
   });
 
   // Post modal: inviting add9 swell on open, fading RE→DO two-note sigh on close.
@@ -106,65 +159,90 @@
     }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 
-  // Focus instruments: hovering a card holds a soft shimmer-chord bed after ~3.5 s.
-  // Two flavors, one shape: normal = warm C add9 fourth-octave, donate = the same
-  // voicing an octave up with phase-shifted gain tremolo (gold, not ember).
-  // Visual shimmer lives in CSS (.attuned::after) — same 3.5 s delay, same tremolo
-  // period, so the warmth a visitor hears lands on the same breath they see.
+  // Focus instruments: hovering a card holds an evolving pentatonic walker after ~3.5 s.
+  // The walker picks steps from the shared pentatonic ladder, biased ±1 pivoting on
+  // the card's position, so two adjacent cards drone in neighbouring registers and
+  // the "melody" is genuinely a melody — pitch (and volume) move together.
+  // Visual shimmer lives in CSS (.attuned::after) — same 3.5 s delay, so the warmth
+  // a visitor hears lands on the same breath they see. */
   const SHIMMER_DELAY = 3.5;
-  const holdFor = (semis, { root = 261.63, gain = 0.045, trem = 0.14, glide = 1.4, detune = 0.4 } = {}) => () => {
-    const c = ac(), t = c.currentTime;
+
+  // One walker step: pick a ladder rung k ± bounded delta from prev, set the AC's
+  // voice frequencies to a 3-note chord voiced around that rung, and breathe the
+  // master gain up. Steps are scheduled on the same beat the CSS shimmer animates.
+  const holdFor = (card, { ladderScale = 1, gain = 0.05, stepS = 3.2, chordSemis = [0, 4, 7] } = {}) => () => {
+    const c = ac(), t0 = c.currentTime;
     const g = c.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(gain, t + glide);
-    const lfo = c.createOscillator(), lg = c.createGain();
-    lfo.frequency.value = trem; lg.gain.value = gain * 0.35;
-    lfo.connect(lg).connect(g.gain);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(gain, t0 + 1.4);
     const filt = c.createBiquadFilter();
-    filt.type = 'lowpass'; filt.frequency.value = 1400; filt.Q.value = 0.3;
-    const osc = semis.map((s, k) => {
-      const f = root * Math.pow(2, s / 12);
+    filt.type = 'lowpass'; filt.frequency.value = 1600; filt.Q.value = 0.3;
+    // Three sustained voices whose frequencies the walker retunes each step.
+    const voices = chordSemis.map(s => {
       const o = c.createOscillator(), og = c.createGain();
-      o.frequency.value = f + k * detune;
-      og.gain.value = [0.55, 0.3, 0.22, 0.18, 0.12][k % 5];
+      og.gain.value = [0.6, 0.28, 0.18][chordSemis.indexOf(s) % 3];
       o.connect(og).connect(g);
-      o.start(t);
       return o;
     });
     g.connect(filt).connect(c.destination);
-    lfo.start(t);
+    const pos = order.get(card) ?? 0;
+    let rung = pos;                                  // start where the hover-note ended
+    const base = 220 * ladderScale;                  // donate variant passes ladderScale=2
+    const stepRung = k => base * Math.pow(2, (SEMI[k % SEMI.length] + 12 * Math.floor(k / SEMI.length)) / 12);
+    // Set initial pitches directly (no glide), then start the voices.
+    voices.forEach((o, k) => o.frequency.setValueAtTime(stepRung(rung + chordSemis[k] / 12), t0));
+    voices.forEach(o => o.start(t0));
+    const walk = () => {
+      const deltas = [-2, -1, -1, +1, +1, +2];        // biased ±1, occasionally ±2 for leaps
+      rung = Math.max(0, rung + deltas[Math.floor(Math.random() * deltas.length)]);
+      const t = c.currentTime + stepS;                // next step lands after stepS
+      voices.forEach((o, k) => {
+        const f = stepRung(rung + chordSemis[k] / 12);
+        // Glide to the new pitch across the first 60% of the step — reading as
+        // movement, not a jump. The remaining 40% sits stable so the chord formants.
+        const tArrive = t - stepS * 0.4;
+        o.frequency.setTargetAtTime(f, tArrive - stepS * 0.6, stepS * 0.2);
+      });
+      // Gain breathes in step with the CSS animation (7s period). Alternate steps
+      // louder/softer so a single breath contains two little phrases.
+      const stepN = Math.round((c.currentTime - t0) / stepS) + 1;
+      const peak = gain * (stepN % 2 === 0 ? 1.0 : 0.78);
+      g.gain.cancelScheduledValues(t);
+      g.gain.setValueAtTime(g.gain.value, t - 0.001);
+      g.gain.linearRampToValueAtTime(peak, t);
+      walk.t = setTimeout(walk, stepS * 1000);
+    };
+    walk.t = setTimeout(walk, stepS * 1000);
     return { stop() {
+      clearTimeout(walk.t);
       const te = c.currentTime;
-      lg.gain.setValueAtTime(0, te);
       g.gain.cancelScheduledValues(te);
       g.gain.setValueAtTime(g.gain.value, te);
       g.gain.exponentialRampToValueAtTime(0.0001, te + 1.6);
-      osc.forEach(o => o.stop(te + 1.8)); lfo.stop(te + 1.8);
+      voices.forEach(o => o.stop(te + 1.8));
     } };
   };
+
   const wireHold = (card, startHold) => {
-    let tRef = null; // setTimeout id while still waiting to attune
-    let live = null; // running hold while attuned
+    let tRef = null, live = null;
     card.addEventListener('mouseenter', () => {
       clearTimeout(tRef);
       tRef = setTimeout(() => {
-        live = startHold(); // ponytail: was makeHold()() — double-call made every attune throw before classList.add
+        live = startHold();
         if (live) card.classList.add('attuned');
       }, SHIMMER_DELAY * 1000);
     });
     card.addEventListener('mouseleave', () => {
-      clearTimeout(tRef); // left before attuning → nothing to release
+      clearTimeout(tRef);
       card.classList.remove('attuned');
       const h = live; live = null;
       h?.stop();
     });
   };
-  // ponytail: holdFor(semis, opts) — stray Element as arg1 made semis.map throw
-  // inside the 3.5s timeout, killing attune silently. Pass semis only.
   document.querySelectorAll('.link-list:not(.donate-list) .link-card, .link-list:not(.donate-list) .post-card').forEach(c =>
-    wireHold(c, holdFor([0, 4, 7, 14], { gain: 0.045, trem: 0.14 })));
+    wireHold(c, holdFor(c, { gain: 0.045, stepS: 3.2 })));
   document.querySelectorAll('.donate-list .link-card').forEach(c =>
-    wireHold(c, holdFor([0, 4, 7, 11, 14], { root: 523.25, gain: 0.06, trem: 0.22, detune: 0.55 })));
+    wireHold(c, holdFor(c, { ladderScale: 2, gain: 0.06, stepS: 3.0 })));
 
   // Avatar warmth → ember drone: three detuned sines (110/165/220 Hz), gain
   // "breathes" with an LFO matching the CSS ember-breath 7.5s period. Starts on
