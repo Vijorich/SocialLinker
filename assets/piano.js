@@ -19,19 +19,13 @@
   // ponytail: autoplay policy needs a gesture, but browsers with media-engagement
   // history (or relaxed sound permission) allow resume at load — costs one line.
   unlock();
-  // ponytail: one master compressor for the whole page — a ceiling for overlapping
-  // notes so the sum can't clip. Upgrade path if it audibly pumps: per-voice gains.
+  // ponytail: no compressor — DynamicsCompressor's fast release pumps on short
+  // sine notes, and phones render that pumping as crackle on every sound. Voice
+  // levels are tuned well under clipping, so a plain Gain junction is enough.
   let out = null;
   const bus = () => {
     const c = ac();
-    if (!out) {
-      const g = c.createGain(), comp = c.createDynamicsCompressor();
-      // ponytail: defaults (-24 dB threshold, ratio 12) squeeze every quiet note
-      // and makeup gain pushes the mix hot — phone speakers read it as overload.
-      // Let only real overlaps hit the limiter. Upgrade path: per-voice gains.
-      comp.threshold.value = -10; comp.knee.value = 12; comp.ratio.value = 8;
-      g.connect(comp).connect(c.destination); out = g;
-    }
+    if (!out) { out = c.createGain(); out.connect(c.destination); }
     return out;
   };
   const order = new WeakMap();
