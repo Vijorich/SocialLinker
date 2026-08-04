@@ -3,12 +3,23 @@
   let ctx = null, i = 0;
   const ac = () => {
     ctx ??= new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
+    // Rejects when no gesture has happened yet (badge-reveal as first sound) — silence is the intended fallback.
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     return ctx;
+  };
+  // ponytail: one master compressor for the whole page — a ceiling for overlapping
+  // notes so the sum can't clip. Upgrade path if it audibly pumps: per-voice gains.
+  let out = null;
+  const bus = () => {
+    const c = ac();
+    if (!out) { const g = c.createGain(), comp = c.createDynamicsCompressor(); g.connect(comp).connect(c.destination); out = g; }
+    return out;
   };
   const order = new WeakMap();
   const SEMI = [0, 3, 5, 7, 10];
   const freq = j => 220 * Math.pow(2, (SEMI[j % SEMI.length] + 12 * Math.floor(j / SEMI.length)) / 12);
+  // Pitch ladder follows DOM order, top→bottom: prefill once at load, handlers only read.
+  document.querySelectorAll('.link-card, .post-card').forEach(c => order.set(c, i++));
   const note = f => {
     const t = ctx.currentTime, g = ctx.createGain(), o = ctx.createOscillator(), o2 = ctx.createOscillator();
     g.gain.setValueAtTime(0.0001, t);
@@ -17,7 +28,7 @@
     o.frequency.value = f;
     o2.frequency.value = f * 2;
     const g2 = ctx.createGain(); g2.gain.value = 0.22;
-    o.connect(g); o2.connect(g2).connect(g); g.connect(ctx.destination);
+    o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
     o.start(t); o2.start(t); o.stop(t + 0.95); o2.stop(t + 0.95);
   };
   document.addEventListener('mouseover', e => {
@@ -53,7 +64,7 @@
       o.frequency.exponentialRampToValueAtTime(f, tOn + glide);
       o2.frequency.value = f * 2;
       const g2 = c.createGain(); g2.gain.value = 0.25;
-      o.connect(g); o2.connect(g2).connect(g); g.connect(c.destination);
+      o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
       o.start(tOn); o2.start(tOn); o.stop(tOn + dur + 0.1); o2.stop(tOn + dur + 0.1);
     });
   };
@@ -80,9 +91,17 @@
     if (card.classList.contains('post-card')) return page(r);
     joy(r);
   };
+  // Set when a post-card click plays its page() chord, consumed by the modal-open
+  // observer below so one opening sounds exactly once (the observer still voices
+  // popstate/programmatic opens). Never reset on other clicks: the open may still
+  // be mid-fetch, and any card click here leaves the page or stays on it — stale
+  // flags are cleared on the next close/observe anyway.
+  let openedByClick = false;
   document.addEventListener('click', e => {
     const card = e.target.closest('.link-card, .post-card');
-    if (card) clickSound(card);
+    if (!card) return;
+    if (card.classList.contains('post-card')) openedByClick = true;
+    clickSound(card);
   });
   // Middle-click opens in a new tab but never fires 'click'; auxclick catches it.
   document.addEventListener('auxclick', e => {
@@ -91,7 +110,7 @@
     if (card) clickSound(card);
   });
   // Right-click on a card: a questioning flirtatious glance, not a silence.
-  // Two short notes — a fourth up, then a tritone up off it — that hang unresolve.
+  // Two short notes a perfect fourth apart ([0, 5]) that hang unresolved.
   // contextmenu fires on the press (even when the menu opens), so this plays
   // regardless of whether the user actually picks "open in new tab".
   document.addEventListener('contextmenu', e => {
@@ -112,7 +131,7 @@
       g.gain.exponentialRampToValueAtTime(0.09, t + 0.005);
       g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
       o.frequency.value = 330; // perfect fifth above the pentatonic root
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(bus());
       o.start(t); o.stop(t + 0.2);
     });
   }
@@ -125,12 +144,12 @@
     c.addEventListener('mouseenter', () => {
       const f = tonic(c);
       setTimeout(() => {
-        const t = ctx.currentTime, g = ctx.createGain(), o = ctx.createOscillator();
+        const a = ac(), t = a.currentTime, g = a.createGain(), o = a.createOscillator();
         g.gain.setValueAtTime(0.0001, t);
         g.gain.exponentialRampToValueAtTime(0.05, t + 0.005);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
         o.frequency.value = f * 2;
-        o.connect(g); g.connect(ctx.destination);
+        o.connect(g); g.connect(bus());
         o.start(t); o.stop(t + 0.3);
       }, 30);
     });
@@ -139,8 +158,9 @@
   // Badge wake-tick: two short Lydian notes when a Live/New chip appears.
   // The page moved on its own; the only moment the UI plays without a gesture.
   // badges.js dispatches 'badge-reveal' with the badge type after pinning.
+  // Guarded on document.hidden: a reveal that lands in a background tab stays silent.
   window.addEventListener('badge-reveal', e => {
-    const t = ac().currentTime;
+    if (document.hidden) return;
     const isLive = e.detail === 'twitch';
     chord(660, isLive ? [0, 4] : [0, 6], { beat: 0.12, glide: 0.05, vols: [0.05, 0.04], dur: 0.35 });
   });
@@ -155,7 +175,13 @@
     new MutationObserver(() => {
       if (dlg.open === wasOpen) return;
       wasOpen = dlg.open;
-      (dlg.open ? () => chord(440, [0, 4, 7, 14], { beat: 0.17, dur: 1.1 }) : farewell)();
+      if (!dlg.open) {
+        openedByClick = false; // clear any stale flag from a click that never opened
+        return farewell();
+      }
+      // A post-card click already spoke its page() chord — don't double the open.
+      if (openedByClick) { openedByClick = false; return; }
+      chord(440, [0, 4, 7, 14], { beat: 0.17, dur: 1.1 });
     }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 
@@ -164,7 +190,7 @@
   // the card's position, so two adjacent cards drone in neighbouring registers and
   // the "melody" is genuinely a melody — pitch (and volume) move together.
   // Visual shimmer lives in CSS (.attuned::after) — same 3.5 s delay, so the warmth
-  // a visitor hears lands on the same breath they see. */
+  // a visitor hears lands on the same breath they see.
   const SHIMMER_DELAY = 3.5;
 
   // One walker step: pick a ladder rung k ± bounded delta from prev, set the AC's
@@ -184,20 +210,25 @@
       o.connect(og).connect(g);
       return o;
     });
-    g.connect(filt).connect(c.destination);
+    g.connect(filt).connect(bus());
     const pos = order.get(card) ?? 0;
     let rung = pos;                                  // start where the hover-note ended
     const base = 220 * ladderScale;                  // donate variant passes ladderScale=2
     const stepRung = k => base * Math.pow(2, (SEMI[k % SEMI.length] + 12 * Math.floor(k / SEMI.length)) / 12);
+    // Chord offsets are SEMITONES above the rung's root — multiply the rung frequency.
+    // Never feed them into stepRung: ladder space counts steps, not semitones, and a
+    // fractional index reads undefined → NaN (the voices go silent).
+    const chordFreq = (root, k) => root * Math.pow(2, chordSemis[k] / 12);
     // Set initial pitches directly (no glide), then start the voices.
-    voices.forEach((o, k) => o.frequency.setValueAtTime(stepRung(rung + chordSemis[k] / 12), t0));
+    voices.forEach((o, k) => o.frequency.setValueAtTime(chordFreq(stepRung(rung), k), t0));
     voices.forEach(o => o.start(t0));
     const walk = () => {
       const deltas = [-2, -1, -1, +1, +1, +2];        // biased ±1, occasionally ±2 for leaps
       rung = Math.max(0, rung + deltas[Math.floor(Math.random() * deltas.length)]);
       const t = c.currentTime + stepS;                // next step lands after stepS
+      const root = stepRung(rung);
       voices.forEach((o, k) => {
-        const f = stepRung(rung + chordSemis[k] / 12);
+        const f = chordFreq(root, k);
         // Glide to the new pitch across the first 60% of the step — reading as
         // movement, not a jump. The remaining 40% sits stable so the chord formants.
         const tArrive = t - stepS * 0.4;
@@ -223,26 +254,37 @@
     } };
   };
 
+  const holds = new Set();
   const wireHold = (card, startHold) => {
     let tRef = null, live = null;
     card.addEventListener('mouseenter', () => {
       clearTimeout(tRef);
       tRef = setTimeout(() => {
+        if (document.hidden) return; // queued while the tab was hidden — skip
         live = startHold();
-        if (live) card.classList.add('attuned');
+        if (live) { card.classList.add('attuned'); holds.add(live); }
       }, SHIMMER_DELAY * 1000);
     });
     card.addEventListener('mouseleave', () => {
       clearTimeout(tRef);
       card.classList.remove('attuned');
       const h = live; live = null;
-      h?.stop();
+      if (h) { holds.delete(h); h.stop(); }
     });
   };
   document.querySelectorAll('.link-list:not(.donate-list) .link-card, .link-list:not(.donate-list) .post-card').forEach(c =>
     wireHold(c, holdFor(c, { gain: 0.045, stepS: 3.2 })));
   document.querySelectorAll('.donate-list .link-card').forEach(c =>
     wireHold(c, holdFor(c, { ladderScale: 2, gain: 0.06, stepS: 3.0 })));
+
+  // Tab-hide releases every active hold: hover can't move in a hidden tab, but a
+  // walker started beforehand would keep oscillating (and burning battery) otherwise.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) return;
+    holds.forEach(h => h.stop());
+    holds.clear();
+    document.querySelectorAll('.attuned').forEach(c => c.classList.remove('attuned'));
+  });
 
   // Avatar warmth → ember drone: three detuned sines (110/165/220 Hz), gain
   // "breathes" with an LFO matching the CSS ember-breath 7.5s period. Starts on
@@ -270,7 +312,7 @@
       });
       const filt = c.createBiquadFilter(); // low-pass tames the sines into a glow, not a whine
       filt.type = 'lowpass'; filt.frequency.value = 900; filt.Q.value = 0.4;
-      g.disconnect(); g.connect(filt).connect(c.destination);
+      g.disconnect(); g.connect(filt).connect(bus());
       lfo.start(t);
       drone = { gain: g, stop() {
         const te = c.currentTime;
