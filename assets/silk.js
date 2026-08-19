@@ -1,8 +1,8 @@
 // Vanilla port of the React Bits <Silk /> component (reactbits.dev).
-// The thin React/three shell is dropped; the shader is unchanged and runs on
-// the same vendored `ogl` ESM used by scanner.js (Renderer, Program, Mesh,
-// Triangle). A fullscreen triangle (uv spans 0..1 over the viewport) replaces
-// three's viewport-scaled plane, so vUv maps 1:1 to the original Silk plane.
+// The thin React/three shell is dropped; the shader runs on the same vendored
+// `ogl` ESM used by scanner.js (Renderer, Program, Mesh, Triangle). The pattern
+// coordinate is normalized by the canvas HEIGHT (not the viewport), so wave
+// size stays constant across window widths instead of scaling with them.
 import { Renderer, Program, Mesh, Triangle } from './ogl.js';
 
 const hexToRgb = (hex) => {
@@ -13,19 +13,16 @@ const hexToRgb = (hex) => {
 
 const vertex = `#version 300 es
 in vec2 position;
-in vec2 uv;
-out vec2 vUv;
 void main() {
-  vUv = uv;
   gl_Position = vec4(position, 0.0, 1.0);
 }
 `;
 
 const fragment = `#version 300 es
 precision highp float;
-in vec2 vUv;
 out vec4 fragColor;
 
+uniform vec2  iResolution;
 uniform float uTime;
 uniform vec3  uColor;
 uniform float uSpeed;
@@ -49,10 +46,13 @@ vec2 rotateUvs(vec2 uv, float angle) {
 }
 
 void main() {
-  float rnd        = noise(gl_FragCoord.xy);
-  vec2  uv         = rotateUvs(vUv * uScale, uRotation);
-  vec2  tex        = uv * uScale;
-  float tOffset    = uSpeed * uTime;
+  float rnd = noise(gl_FragCoord.xy);
+  // Fixed pixel scale: normalize by the canvas HEIGHT so the wave size stays
+  // constant across window widths — a narrow phone no longer squeezes the
+  // pattern into thin waves; width only changes how many waves are visible.
+  vec2  uv      = rotateUvs((gl_FragCoord.xy / iResolution.y) * uScale, uRotation);
+  vec2  tex     = uv * uScale;
+  float tOffset = uSpeed * uTime;
 
   tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
 
@@ -100,6 +100,7 @@ export function createSilk(container, options = {}) {
     vertex,
     fragment,
     uniforms: {
+      iResolution: { value: new Float32Array([1, 1]) },
       uTime: { value: 0 },
       uSpeed: { value: 5 },
       uScale: { value: 1 },
@@ -136,6 +137,9 @@ export function createSilk(container, options = {}) {
     // on very long pages is invisible.
     renderer.dpr = Math.min(Math.min(window.devicePixelRatio || 1, 2), 4096 / h);
     renderer.setSize(w, h);
+    const res = program.uniforms.iResolution.value;
+    res[0] = gl.drawingBufferWidth;
+    res[1] = gl.drawingBufferHeight;
     renderer.render({ scene: mesh });
   };
 
