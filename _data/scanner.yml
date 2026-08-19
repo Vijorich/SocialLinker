@@ -29,6 +29,3 @@ opacity: 1.0
 mouseInteraction: true
 mouseRadius: 0.4
 mouseStrength: 0.5
-# Extra (port-only): parallax factor — the fixed layer drifts up at this fraction
-# of scrollY, so the field reads as a distant plane behind the content.
-parallax: 0.06

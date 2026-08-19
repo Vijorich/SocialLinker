@@ -120,9 +120,8 @@ const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
   assert.ok(Number.isFinite(r) && r > 0, 'T2 step keeps the root finite');
   assert.ok(closeTo(v1.frequency.value / r, Math.pow(2, 4 / 12)), 'T2 step keeps the chord shape (M3)');
   assert.ok(closeTo(v2.frequency.value / r, Math.pow(2, 7 / 12)), 'T2 step keeps the chord shape (P5)');
-  // Breath: gain LFO at 1/(2×stepS) and the CSS shimmer period stamped on the card.
+  // Breath: gain LFO at 1/(2×stepS).
   assert.ok(closeTo(lfo.frequency.value, 1 / 6.4), 'T2 breath LFO runs on 2×stepS');
-  assert.equal(card.style.props['--attune-period'], '6.4s', 'T2 glow period stamped from the same clock');
 }
 
 // T3: one modal opening = exactly one sound. Card click plays page(), the observer

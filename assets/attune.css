@@ -1,48 +1,18 @@
-/* Focus instrument: attune-shimmer note and CSS glow.
-   Soft enough to sit under the piano plinks; donate keeps its gold, the rest
-   take the calmer ember shimmer at ~70% of hover's ::before intensity.
-   The attuned note lands 3.5s in (wireHold in piano.js), the same tick the
-   glow appears — light and sound start on one clock from that moment.
-   Glow⇄ambient sync: piano.js holdFor breathes the gain on an LFO of period
-   2×stepS and stamps it on the card as --attune-period; the shimmer runs on
-   that exact period with a −¼-period delay, so the brightness peak lands on
-   the loudness peak (LFO sine peaks a quarter period in, CSS peaks at 50%).
-   Keyframe opacity 0.62⇄0.95 mirrors the gain's 0.8⇄1.0 envelope: what you
-   hear is what you see.
-   ponytail: was //-comments, which CSS parses as a garbage selector and ate
-   the whole first rule — .link-card::after{} never reached the page. */
-.link-card::after, .post-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(ellipse at 50% 30%,
-    rgba(246, 126, 108, 0.20) 0%,
-    rgba(209, 67, 60, 0.10) 45%,
-    transparent 75%);
-  /* Fade the glow out when .attuned drops (audio releases over ~1.6 s). While
-     attuned the shimmer animation owns opacity and this transition stands down. */
-  transition: opacity 1.2s ease;
+/* Hold glow — an OUTER ember bloom, not the old inside ::after tint. piano.js
+   adds .attuned after the ~3.5s hold (the same tick the walker melody starts),
+   so light and sound land on one moment. Box-shadow paints outside the card,
+   unaffected by the card's overflow:hidden — the previous radial ::after sat
+   inside the pill and its LFO-locked shimmer froze. Normal cards bloom in the
+   accent; donate cards already glow gold on hover and step a touch brighter
+   here, since their hover glow is immediate. */
+.link-card.attuned,
+.post-card.attuned {
+  box-shadow:
+    0 0 1.4rem rgba(246, 126, 108, 0.5),
+    0 0 3rem rgba(209, 67, 60, 0.32);
 }
-.donate-list .link-card::after {
-  background: radial-gradient(ellipse at 50% 30%,
-    rgba(253, 209, 113, 0.30) 0%,
-    rgba(253, 191, 89, 0.14) 45%,
-    transparent 78%);
-  /* style.css leaves transform:translateX(-250%) skewX(-20deg) on this ::after
-     for its gold-sweep. Without a reset the attune glow rides that off screen. */
-  transform: none;
-  width: auto; height: auto;
-}
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .link-card.attuned::after, .post-card.attuned::after {
-    animation: attune-shimmer var(--attune-period, 6.4s) ease-in-out
-      calc(var(--attune-period, 6.4s) / -4) infinite;
-  }
-}
-@keyframes attune-shimmer {
-  0%, 100% { opacity: 0.62; filter: brightness(0.94) saturate(0.96); }
-  50%      { opacity: 0.95; filter: brightness(1.12) saturate(1.06); }
+.donate-list .link-card.attuned {
+  box-shadow:
+    0 0 2rem rgba(253, 209, 113, 0.6),
+    0 0 3.6rem rgba(253, 191, 89, 0.42);
 }

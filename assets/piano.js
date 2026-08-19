@@ -212,24 +212,21 @@
   // The walker picks steps from the shared pentatonic ladder, biased ±1 pivoting on
   // the card's position, so two adjacent cards drone in neighbouring registers and
   // the "melody" is genuinely a melody — pitch (and volume) move together.
-  // Visual shimmer lives in CSS (.attuned::after) — same 3.5 s delay, so the warmth
+  // The outer glow lives in CSS (.attuned) — same 3.5 s delay, so the warmth
   // a visitor hears lands on the same breath they see.
   const SHIMMER_DELAY = 3.5;
 
   // One walker step: pick a ladder rung k ± bounded delta from prev and retune the
   // three sustained voices onto it. Breath is NOT per-step: a real LFO swells the
-  // master gain on a period of 2×stepS, and attune.css runs its shimmer on the very
-  // same period (JS stamps --attune-period on the card at hold start) with a −¼
-  // period delay — glow peak lands exactly on the loudness peak. One clock, two skins.
+  // master gain on a period of 2×stepS, a slow inhale/exhale under the walker.
   const holdFor = (card, { ladderScale = 1, gain = 0.05, stepS = 3.2, chordSemis = [0, 4, 7] } = {}) => () => {
     const c = ac(), t0 = c.currentTime;
     const g = c.createGain();
     const breath = 2 * stepS;
-    card.style.setProperty('--attune-period', breath + 's');
     g.gain.setValueAtTime(0, t0);
     g.gain.setTargetAtTime(gain * 0.9, t0, 0.5);
     // LFO ±~11% around the base = the old peak/valley alternation, but continuous
-    // and phase-locked with the CSS shimmer. Ramps in with the attack so a
+    // and phase-locked breathing. Ramps in with the attack so a
     // pre-gesture (suspended-context) hold can't dip the gain below zero.
     const lfo = c.createOscillator(), lfoGain = c.createGain();
     lfo.frequency.value = 1 / breath;

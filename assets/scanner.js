@@ -167,7 +167,6 @@ const DEFAULTS = {
   mouseRadius: 0.5,
   mouseStrength: 0.5,
   directionAngle: null,
-  parallax: 0,
 };
 
 export function createScanner(container, options = {}) {
@@ -308,14 +307,10 @@ export function createScanner(container, options = {}) {
   let isVisible = true;
   let isPageVisible = !document.hidden;
   const t0 = performance.now();
-  const parallax = opts.parallax || 0;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const render = (t) => {
     program.uniforms.iTime.value = (t - t0) * 0.001;
-    if (parallax && !reduced) {
-      container.style.transform = `translate3d(0, ${-window.scrollY * parallax}px, 0)`;
-    }
     if (!mouseEnabledRef.current) targetMouseActive = 0;
     currentMouse[0] += 0.05 * (targetMouse[0] - currentMouse[0]);
     currentMouse[1] += 0.05 * (targetMouse[1] - currentMouse[1]);
@@ -376,7 +371,6 @@ export function createScanner(container, options = {}) {
     document.removeEventListener('visibilitychange', onVisibility);
     window.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseleave', onMouseLeave);
-    container.style.transform = '';
     try {
       container.removeChild(canvas);
     } catch {}

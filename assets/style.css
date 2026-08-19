@@ -28,6 +28,8 @@
   --scrollbar-hover: #997770;
   --max-width: 40rem;
   --radius: 2rem;
+  /* Film grain — grayscale fractal noise tiled over the translucent card surface. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
 
   /* Type — three voices: Unbounded (display: logo, headings) + Rubik (body/UI)
      + JetBrains Mono (code). Fluid clamp scale; system stacks as load-time floor
@@ -405,12 +407,13 @@ strong, b { font-weight: 700; }
   gap: 1rem;
   padding: 1rem;
   touch-action: pan-y;
-  background: var(--bg-card);
+  background-color: rgba(48, 21, 18, 0.85);
+  background-image: var(--grain);
   border-radius: 1rem;
   color: var(--fg);
   text-decoration: none;
   font-weight: 600;
-  transition: background 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
   position: relative;
   overflow: hidden;
 }
@@ -454,9 +457,9 @@ strong, b { font-weight: 700; }
 .link-list li:first-child .link-card { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
 .link-list li:last-child .link-card { border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 @media (hover: hover) {
-.link-card:hover { background: var(--bg-card-hover); color: var(--fg); scale: 1.055; }
+.link-card:hover { background-color: var(--bg-card-hover); color: var(--fg); scale: 1.055; }
 .link-list li .link-card:hover { border-radius: var(--radius); }
-  .donate-list .link-card:hover { background: var(--gold); color: var(--bg); box-shadow: 0 0 1.2rem rgba(253, 209, 113, 0.3); }
+  .donate-list .link-card:hover { background-color: var(--gold); color: var(--bg); box-shadow: 0 0 1.2rem rgba(253, 209, 113, 0.3); }
 /* Heat-On-Touch lifts muted secondary lines too — Ash on the heated Ember surface
    would dip below 4.5:1, so descriptions/excerpts/dates brighten with the card.
    Donate variant goes Cinder on gold (dark text on the spotlight fill). */
@@ -470,13 +473,13 @@ strong, b { font-weight: 700; }
 /* Keyboard focus: not gated by hover capability — mirrors the hover heat + adds a
    double-ring (gap in --bg, ring in --accent-link) that reads on any surface. */
 .link-card:focus-visible {
-  background: var(--bg-card-hover);
+  background-color: var(--bg-card-hover);
   border-radius: var(--radius);
   outline: none;
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
 .link-card:focus-visible::before { opacity: 1; }
-.donate-list .link-card:focus-visible { background: var(--gold); color: var(--bg); }
+.donate-list .link-card:focus-visible { background-color: var(--gold); color: var(--bg); }
 .link-card:focus-visible .link-desc,
 .link-card:focus-visible .post-excerpt,
 .link-card:focus-visible .post-date { color: var(--fg); }
@@ -541,7 +544,7 @@ strong, b { font-weight: 700; }
 }
 @keyframes pin-afterglow {
   0%   { background-color: var(--bg-card-hover); }
-  100% { background-color: var(--bg-card); }
+  100% { background-color: rgba(48, 21, 18, 0.85); }
 }
 @media (prefers-reduced-motion: reduce) {
   .badge, .badge-live::before,
@@ -559,7 +562,7 @@ strong, b { font-weight: 700; }
 /* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
    above Oxblood so the warm peak reads at rest; touch has no hover to reveal it. */
 .donate-list .link-card {
-  background: var(--bg-donate);
+  background-color: rgba(76, 47, 25, 0.88);
   color: var(--gold);
 }
 /* Gold light-sweep: a diagonal sheen crosses the gold fill on hover — light catching
