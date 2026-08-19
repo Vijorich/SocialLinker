@@ -438,7 +438,7 @@ strong, b { font-weight: 700; }
   pointer-events: none;
 }
 .donate-list .link-card::before {
-  background: radial-gradient(circle at center, rgba(253, 209, 113, 0.38), transparent 70%);
+  background: transparent;
 }
 /* Card body: name + optional muted description line (social.yml `description:`) */
 .link-card-body { min-width: 0; }
@@ -557,7 +557,6 @@ strong, b { font-weight: 700; }
 @media (prefers-reduced-motion: reduce) {
   .badge, .badge-live::before,
   .link-list li.just-pinned .link-card,
-  .donate-list .link-card:hover::after,
   .footer-heart { animation: none; }
   /* Live avatar: stop the sonar ping but keep the persistent soft glow —
      it's the page's primary "on air" signal (ambient light, not motion). */
@@ -573,24 +572,28 @@ strong, b { font-weight: 700; }
   background-color: rgba(76, 47, 25, 0.88);
   color: var(--gold);
 }
-/* Gold light-sweep: a diagonal sheen crosses the gold fill on hover — light catching
-   metal, elevating the One Spotlight. transform-driven (no layout props), hover-gated,
-   overflow:hidden on the card clips it to the pill. */
+/* Glare hover (React Bits GlareHover adaptation, colors untouched): a soft white
+   glare at -30° sweeps across the gold fill on pointer-enter and eases back on leave.
+   background-position-driven (no layout props), hover-gated, overflow:hidden on the
+   card clips it to the pill. */
 .donate-list .link-card::after {
   content: "";
   position: absolute;
-  top: 0; left: 0;
-  width: 60%; height: 100%;
-  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-  transform: translateX(-250%) skewX(-20deg);
+  inset: 0;
+  background: linear-gradient(
+    -30deg,
+    hsla(0, 0%, 100%, 0) 60%,
+    rgba(255, 255, 255, 0.3) 70%,
+    hsla(0, 0%, 100%, 0) 100%
+  );
+  background-size: 300% 300%;
+  background-repeat: no-repeat;
+  background-position: -100% -100%;
+  transition: background-position 800ms ease;
   pointer-events: none;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .donate-list .link-card:hover::after { animation: gold-sweep 0.9s ease-out; }
-}
-@keyframes gold-sweep {
-  0%   { transform: translateX(-250%) skewX(-20deg); }
-  100% { transform: translateX(400%) skewX(-20deg); }
+  .donate-list .link-card:hover::after { background-position: 100% 100%; }
 }
 /* Donate title takes the spotlight: gold over the usual Ash Rose (One Spotlight Rule).
    ponytail: :has() targets the section owning the donate list; unsupported = title stays Ash Rose. */
