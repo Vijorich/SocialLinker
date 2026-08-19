@@ -1,0 +1,29 @@
+# Scanner background layer (React Bits <Scanner />, vanilla port).
+# Set enabled: false to hide it entirely. Props map 1:1 to the component table.
+enabled: true
+color1: "#7b2a25"   # ember red — field base
+color2: "#d1433c"   # signal red — interference bands
+color3: "#fdd171"   # spotlight gold — brightest peaks
+speed: 0.35
+sweepSpeed: 0.18
+sweepWidth: 1.8
+sweepFalloff: 5
+scale: 1.5
+frequency: 2
+ripple: 0.22
+bandDensity: 11
+lineSharpness: 5.5
+glow: 0.22
+scanDirection: diagonal
+colorSpread: 0.6
+brightness: 0.9
+contrast: 1.15
+softness: 1.4
+vignette: 0.6
+scanline: true
+grain: true
+grainIntensity: 0.05
+opacity: 0.45
+mouseInteraction: true
+mouseRadius: 0.5
+mouseStrength: 0.4

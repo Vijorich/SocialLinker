@@ -776,6 +776,7 @@ strong, b { font-weight: 700; }
   padding: 2rem max(1rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
   color: var(--fg-muted);
   font-size: var(--text-meta);
+  position: relative; /* stack above the fixed scanner background layer */
 
   /* Signal Bright like every other actionable accent — inherit (Ash Rose) read as plain text. */
   a { color: var(--accent-link); text-decoration: none; }
