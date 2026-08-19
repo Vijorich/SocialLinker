@@ -1,29 +1,34 @@
 # Scanner background layer (React Bits <Scanner />, vanilla port).
 # Set enabled: false to hide it entirely. Props map 1:1 to the component table.
 enabled: true
-color1: "#7b2a25"   # ember red — field base
-color2: "#d1433c"   # signal red — interference bands
-color3: "#fdd171"   # spotlight gold — brightest peaks
-speed: 0.35
-sweepSpeed: 0.18
-sweepWidth: 1.8
-sweepFalloff: 5
-scale: 1.5
+color1: "#27ffcc"   # cyan — field base
+color2: "#48ccfa"   # light blue — interference bands
+color3: "#0009ff"   # deep blue — brightest peaks
+speed: 0.2
+sweepSpeed: 0.25
+sweepWidth: 3.4
+sweepFalloff: 6
+scale: 2.0
 frequency: 2
 ripple: 0.22
 bandDensity: 11
 lineSharpness: 5.5
-glow: 0.22
-scanDirection: diagonal
-colorSpread: 0.6
-brightness: 0.9
+glow: 0.5
+# Bottom-up travel; directionAngle tilts the bands a few degrees right-to-left.
+scanDirection: vertical
+directionAngle: 6
+colorSpread: 0.7
+brightness: 1.5
 contrast: 1.15
-softness: 1.4
-vignette: 0.6
+softness: 4
+vignette: 0.45
 scanline: true
 grain: true
-grainIntensity: 0.05
-opacity: 0.45
+grainIntensity: 0.2
+opacity: 1.0
 mouseInteraction: true
-mouseRadius: 0.5
-mouseStrength: 0.4
+mouseRadius: 0.4
+mouseStrength: 0.5
+# Extra (port-only): parallax factor — the fixed layer drifts up at this fraction
+# of scrollY, so the field reads as a distant plane behind the content.
+parallax: 0.06

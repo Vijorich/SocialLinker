@@ -9,7 +9,13 @@ const hexToRgb = (hex) => {
   return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
 };
 
-const directionToFloat = (dir) => (dir === 'horizontal' ? 1.0 : dir === 'diagonal' ? 2.0 : 0.0);
+// Scan direction as degrees from the vertical (bottom-up) axis. `scanDirection`
+// maps to the three presets; a numeric `directionAngle` overrides with any tilt.
+// Positive leans the bands right-to-left (top of the band toward the left).
+const directionDegrees = (opts) => {
+  if (typeof opts.directionAngle === 'number') return opts.directionAngle;
+  return { vertical: 0, horizontal: 90, diagonal: 45 }[opts.scanDirection] || 0;
+};
 
 const vertex = `#version 300 es
 in vec2 position;
@@ -41,7 +47,7 @@ uniform float uOpacity;
 uniform float uScanline;
 uniform float uGrain;
 uniform float uGrainIntensity;
-uniform float uDirection;
+uniform float uDirectionAngle;
 uniform vec2 uMouse;
 uniform float uMouseEnabled;
 uniform float uMouseRadius;
@@ -89,10 +95,8 @@ void main() {
     mouseBoost = exp(-dot(md, md) / (r * r)) * uMouseStrength * uMouseActive;
   }
 
-  float axis;
-  if (uDirection < 0.5) axis = p.y;
-  else if (uDirection < 1.5) axis = p.x;
-  else axis = (p.x + p.y) * 0.70710678;
+  vec2 dir = vec2(sin(uDirectionAngle), cos(uDirectionAngle));
+  float axis = dot(p, dir);
 
   float sig = signalField(p * uFrequency, t);
   float coord = axis + sig * uRipple;
@@ -162,6 +166,8 @@ const DEFAULTS = {
   mouseInteraction: true,
   mouseRadius: 0.5,
   mouseStrength: 0.5,
+  directionAngle: null,
+  parallax: 0,
 };
 
 export function createScanner(container, options = {}) {
@@ -212,7 +218,7 @@ export function createScanner(container, options = {}) {
       uScanline: { value: 1.0 },
       uGrain: { value: 1.0 },
       uGrainIntensity: { value: 0.05 },
-      uDirection: { value: 0.0 },
+      uDirectionAngle: { value: 0.0 },
       uMouse: { value: new Float32Array([0.5, 0.5]) },
       uMouseEnabled: { value: 1.0 },
       uMouseRadius: { value: 0.5 },
@@ -279,7 +285,7 @@ export function createScanner(container, options = {}) {
     u.uScanline.value = opts.scanline ? 1.0 : 0.0;
     u.uGrain.value = opts.grain ? 1.0 : 0.0;
     u.uGrainIntensity.value = opts.grainIntensity;
-    u.uDirection.value = directionToFloat(opts.scanDirection);
+    u.uDirectionAngle.value = (directionDegrees(opts) * Math.PI) / 180;
     u.uMouseEnabled.value = opts.mouseInteraction ? 1.0 : 0.0;
     u.uMouseRadius.value = opts.mouseRadius;
     u.uMouseStrength.value = opts.mouseStrength;
@@ -302,9 +308,14 @@ export function createScanner(container, options = {}) {
   let isVisible = true;
   let isPageVisible = !document.hidden;
   const t0 = performance.now();
+  const parallax = opts.parallax || 0;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const render = (t) => {
     program.uniforms.iTime.value = (t - t0) * 0.001;
+    if (parallax && !reduced) {
+      container.style.transform = `translate3d(0, ${-window.scrollY * parallax}px, 0)`;
+    }
     if (!mouseEnabledRef.current) targetMouseActive = 0;
     currentMouse[0] += 0.05 * (targetMouse[0] - currentMouse[0]);
     currentMouse[1] += 0.05 * (targetMouse[1] - currentMouse[1]);
@@ -349,7 +360,6 @@ export function createScanner(container, options = {}) {
 
   applyOpts();
 
-  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) {
     render(performance.now());
   } else {
@@ -366,6 +376,7 @@ export function createScanner(container, options = {}) {
     document.removeEventListener('visibilitychange', onVisibility);
     window.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseleave', onMouseLeave);
+    container.style.transform = '';
     try {
       container.removeChild(canvas);
     } catch {}
