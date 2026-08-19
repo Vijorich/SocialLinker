@@ -1,0 +1,9 @@
+# Animated grain overlay (React Bits <Noise />, vanilla port) — full-screen,
+# sits above the scanner field but below the content. Set enabled: false to
+# hide it. Larger patternSize = finer grain.
+enabled: true
+patternSize: 1024
+patternScaleX: 1
+patternScaleY: 1
+patternRefreshInterval: 2
+patternAlpha: 15

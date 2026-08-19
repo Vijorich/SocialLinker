@@ -22,6 +22,11 @@
   <dialog id="post-modal" class="post-modal">
     <button class="post-close" type="button" aria-label="{{ site.data.locale.close }}">{% include icon.html name='close' %}</button>
     <div class="post-modal-body"></div>
+    {% if site.data.gradual_blur.enabled %}
+    {% for ov in site.data.gradual_blur.overlays %}
+    <div data-gradual-blur data-config='{{ ov | jsonify }}' aria-hidden="true"></div>
+    {% endfor %}
+    {% endif %}
   </dialog>
   {% else %}
   <p class="post-excerpt">{{ site.data.locale.posts_empty }}</p>

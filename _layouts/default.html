@@ -19,12 +19,17 @@
   <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/attune.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/scanner.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/gradual-blur.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/noise.css' | relative_url }}">
   <script src="{{ '/assets/badges.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/piano.js' | relative_url }}" defer></script>
   <script type="module" src="{{ '/assets/scanner.js' | relative_url }}"></script>
+  <script type="module" src="{{ '/assets/gradual-blur.js' | relative_url }}"></script>
+  <script type="module" src="{{ '/assets/noise.js' | relative_url }}"></script>
 </head>
 <body>
 {% if site.data.scanner.enabled %}<div class="scanner-bg" data-scanner data-config='{{ site.data.scanner | jsonify }}' aria-hidden="true"></div>{% endif %}
+{% if site.data.noise.enabled %}<canvas class="noise-overlay" data-noise data-config='{{ site.data.noise | jsonify }}' aria-hidden="true"></canvas>{% endif %}
 <a class="skip-link" href="#links">{{ site.data.locale.skip_to_links }}</a>
 {{ content }}
 

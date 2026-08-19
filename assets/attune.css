@@ -7,6 +7,7 @@
    here, since their hover glow is immediate. */
 .link-card.attuned,
 .post-card.attuned {
+  z-index: 2;
   box-shadow:
     0 0 1.4rem rgba(246, 126, 108, 0.5),
     0 0 3rem rgba(209, 67, 60, 0.32);
