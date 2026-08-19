@@ -1,5 +1,7 @@
 .silk-bg {
-  position: fixed;
+  /* Full-page layer: stretches to the document height (body is position:relative)
+     and scrolls with the page instead of sticking to the viewport. */
+  position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;

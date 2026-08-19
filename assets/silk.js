@@ -130,6 +130,11 @@ export function createSilk(container, options = {}) {
     const rect = container.getBoundingClientRect();
     const w = Math.max(1, Math.floor(rect.width));
     const h = Math.max(1, Math.floor(rect.height));
+    // The layer now spans the whole document height. Cap the buffer so a tall
+    // page can't blow past the GPU's max texture size (typically 8192) and
+    // black out the background; the pattern is soft, so the dropped resolution
+    // on very long pages is invisible.
+    renderer.dpr = Math.min(Math.min(window.devicePixelRatio || 1, 2), 4096 / h);
     renderer.setSize(w, h);
     renderer.render({ scene: mesh });
   };
