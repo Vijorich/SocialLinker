@@ -11,7 +11,7 @@ overlays:
     curve: bezier
     exponential: true
     opacity: 1
-    zIndex: 2
+    zIndex: 5
     animated: false
   - position: top
     height: 4rem
@@ -20,5 +20,5 @@ overlays:
     curve: bezier
     exponential: true
     opacity: 1
-    zIndex: 2
+    zIndex: 5
     animated: false

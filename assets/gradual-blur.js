@@ -86,6 +86,22 @@ export function createGradualBlur(container, options = {}) {
     }
 
     inner.innerHTML = '';
+    // Always-visible fade underlay: content melts into the modal background at
+    // the edge even where backdrop-filter silently fails to sample the scroll
+    // layer; the blur layers paint on top of it where supported.
+    const fade = document.createElement('div');
+    fade.style.position = 'absolute';
+    fade.style.inset = '0';
+    const edge = 'rgba(48, 21, 18, 0.55)';
+    const fades = {
+      top: `linear-gradient(to bottom, ${edge} 0%, transparent 100%)`,
+      bottom: `linear-gradient(to top, ${edge} 0%, transparent 100%)`,
+      left: `linear-gradient(to right, ${edge} 0%, transparent 100%)`,
+      right: `linear-gradient(to left, ${edge} 0%, transparent 100%)`,
+    };
+    fade.style.background = fades[opts.position] || fades.bottom;
+    inner.appendChild(fade);
+
     const increment = 100 / opts.divCount;
     const strength = isHovered && opts.hoverIntensity ? opts.strength * opts.hoverIntensity : opts.strength;
     const curve = CURVE_FUNCTIONS[opts.curve] || CURVE_FUNCTIONS.linear;

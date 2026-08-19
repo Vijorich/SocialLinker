@@ -700,7 +700,7 @@ strong, b { font-weight: 700; }
 .post-modal[open] { display: flex; flex-direction: column; }
 .post-modal::backdrop { background: rgba(13, 7, 6, 0.6); }
 .post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: var(--scrollbar) transparent; }
-.post-modal .post-close { position: absolute; top: 1rem; right: 1rem; z-index: 3; }
+.post-modal .post-close { position: absolute; top: 1rem; right: 1rem; z-index: 6; }
 
 /* Post modal — card ⇄ dialog shared-element morph (View Transitions). The clicked
    card expands into the dialog on open and morphs back on close; the dialog is

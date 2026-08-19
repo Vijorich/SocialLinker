@@ -1,0 +1,9 @@
+# Silk background layer (React Bits <Silk />, vanilla port).
+# Set enabled: false to hide it entirely. Props map 1:1 to the component table.
+enabled: true
+speed: 4
+scale: 1
+color: "#10504d"
+noiseIntensity: 1.5
+# Rotation in radians (0 = none).
+rotation: 0
