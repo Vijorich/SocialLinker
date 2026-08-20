@@ -3,7 +3,7 @@
 enabled: true
 speed: 2
 scale: 1
-color: "#08636d"
+color: "#075a59"
 noiseIntensity: 1.5
 # Rotation in radians (0 = none).
 rotation: 0

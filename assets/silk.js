@@ -1,8 +1,8 @@
 // Vanilla port of the React Bits <Silk /> component (reactbits.dev).
-// The thin React/three shell is dropped; the shader runs on the same vendored
-// `ogl` ESM used by scanner.js (Renderer, Program, Mesh, Triangle). The pattern
-// coordinate is normalized by the canvas HEIGHT (not the viewport), so wave
-// size stays constant across window widths instead of scaling with them.
+// The thin React/three shell is dropped; the shader runs on the vendored
+// `ogl` ESM (Renderer, Program, Mesh, Triangle). The pattern coordinate is
+// normalized by the canvas HEIGHT (not the viewport), so wave size stays
+// constant across window widths instead of scaling with them.
 import { Renderer, Program, Mesh, Triangle } from './ogl.js';
 
 const hexToRgb = (hex) => {

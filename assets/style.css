@@ -1,31 +1,32 @@
 :root {
   color-scheme: dark;
-  /* Ember Stage — OKLCH lightness ramp. Every role has a defined lightness so
-     contrast is structural, not accidental. Anchor hue 27 (ember red); neutrals
-     drift warm at h30 low-chroma. One signal hue in three steps: Deep (light-text
-     fill), Live (hotter badge fill), Bright (text/icon on any surface incl. Ember). */
-  --bg: #0d0706;            /* Cinder  — page ground */
-  --bg-grad: #140c0b;       /* Cinder² — vertical-gradient bottom */
+  /* Ember-on-Teal — OKLCH lightness ramp. Every role has a defined lightness so
+     contrast is structural, not accidental. Ground hue ~179 (deep teal, the silk
+     bg); neutrals stay warm at h30 low-chroma. One signal hue in three steps:
+     Deep (light-text fill), Live (hotter badge fill), Bright (text/icon on any
+     surface incl. the silk ground). */
+  --bg: #0a1718;            /* Deep Teal — page ground (dark teal-black) */
+  --bg-grad: #0d1c1e;       /* Deep Teal² — vertical-gradient bottom */
   --bg-card: #301512;       /* Oxblood — card surface */
   --bg-card-hover: #7b2a25; /* Ember   — heated surface (hover/focus) */
   --bg-donate: #4c2f19;     /* Hearth  — donate surface, warm toward gold */
   --fg: #eee4e0;            /* Bone    — primary text */
-  --fg-muted: #b1a09d;      /* Ash     — muted text (clears 4.5:1 on every surface) */
-  --accent: #d1433c;        /* Signal  — resting accent: fills, borders, rings, rails */
+  --fg-muted: #d6c9c5;      /* Ash     — muted text (clears 4.5:1 on every surface) */
+  --accent: #d80e05;        /* Signal  — resting accent: fills, borders, rings, rails (avatar red) */
   /* Signal lifted to a readable tint: accent as TEXT/ICON anywhere, including on
-     the heated Ember surface (clears 3:1 icons; 4.5:1 text on Cinder & Oxblood). */
-  --accent-link: #f67e6c;
-  /* Deep signal red: high-contrast fill behind light text (New! badge; bone ≈ 5.1:1). */
-  --accent-deep: #af302b;
-  /* Hotter signal red for the Live badge fill; white text clears ≈ 5.5:1. */
-  --accent-live: #bb3c35;
-  /* Selection surface — tuned so Cinder text clears 4.5:1 on it. */
-  --accent-sel: #d65048;
+     the heated Ember surface (clears 3:1 icons; 4.5:1 text on Deep Teal & Oxblood). */
+  --accent-link: #ffb4a6;
+  /* Deep signal red: high-contrast fill behind light text (New! badge; bone ≈ 5.2:1). */
+  --accent-deep: #b3271e;
+  /* Hotter signal red for the Live badge fill; white text clears ≈ 5.7:1. */
+  --accent-live: #b9392f;
+  /* Selection surface — tuned so Deep Teal text clears 4.5:1 on it. */
+  --accent-sel: #ea5046;
   --gold: #fdd171;          /* Spotlight — donate block only */
-  --on-live: #ffffff;       /* white on the Live fill — bone dips to 4.41 (fails AA at 12px); white clears 5.51 */
-  /* Warm ember scrollbar — tonal with the maroon ramp, not neutral gray. */
-  --scrollbar: #795b56;
-  --scrollbar-hover: #997770;
+  --on-live: #ffffff;       /* white on the Live fill — bone dips below AA at 12px; white clears 5.7 */
+  /* Teal-tinted scrollbar — tonal with the Deep Teal ground, not warm gray. */
+  --scrollbar: #448b8e;
+  --scrollbar-hover: #5fb5b8;
   --max-width: 40rem;
   --radius: 2rem;
 
@@ -186,9 +187,9 @@ strong, b { font-weight: 700; }
    both are live-activity state responses, so allowed under the Flat-At-Rest rule. */
 .avatar.live { animation: avatar-live 1.6s ease-out infinite; }
 @keyframes avatar-live {
-  0%   { box-shadow: 0 0 0 0 rgba(209, 67, 60, 0.55), 0 0 0.5rem rgba(209, 67, 60, 0.45); }
-  70%  { box-shadow: 0 0 0 0.6rem rgba(209, 67, 60, 0), 0 0 0.5rem rgba(209, 67, 60, 0.45); }
-  100% { box-shadow: 0 0 0 0 rgba(209, 67, 60, 0), 0 0 0.5rem rgba(209, 67, 60, 0.45); }
+  0%   { box-shadow: 0 0 0 0 rgba(216, 14, 5, 0.55), 0 0 0.5rem rgba(216, 14, 5, 0.45); }
+  70%  { box-shadow: 0 0 0 0.6rem rgba(216, 14, 5, 0), 0 0 0.5rem rgba(216, 14, 5, 0.45); }
+  100% { box-shadow: 0 0 0 0 rgba(216, 14, 5, 0), 0 0 0.5rem rgba(216, 14, 5, 0.45); }
 }
 
 /* ── Ember Stage ────────────────────────────────────────────────────────
@@ -215,7 +216,7 @@ strong, b { font-weight: 700; }
   aspect-ratio: 1;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(209, 67, 60, 0.85) 0%, rgba(209, 67, 60, 0) 65%);
+  background: radial-gradient(circle, rgba(216, 14, 5, 0.85) 0%, rgba(216, 14, 5, 0) 65%);
   filter: blur(48px);
   pointer-events: none;
   z-index: 0;
@@ -228,7 +229,7 @@ strong, b { font-weight: 700; }
 /* Rest: coal warming/cooling. Bolder: brighter coal floor (0.14 → 0.22 peak),
    bigger inhale (×1.12), longer cycle (7.5s). The room reads *alive* before any
    interaction instead of faintly warm. Opacity ceiling checked: Bone (#eee4e0,
-   5.9:1 on Cinder) blended over Signal-link-tinted center at 22% peak stays ≥3:1
+   6.4:1 on Deep Teal) blended over Signal-link-tinted center at 22% peak stays ≥3:1
    for the nick (large-text floor); tagline sits in the faded 65% zone where the
    effective alpha is ~0.08, far above its own 4.5:1 floor. */
 @keyframes ember-breath {
@@ -350,7 +351,7 @@ strong, b { font-weight: 700; }
     transform: scale(1.06);
     /* box-shadow is ring color at low alpha; the avatar's existing border
        still owns the strong ring. */
-    box-shadow: 0 0 12px rgba(246, 126, 108, 0.4), 0 0 22px rgba(209, 67, 60, 0.2);
+    box-shadow: 0 0 12px rgba(255, 180, 166, 0.4), 0 0 22px rgba(216, 14, 5, 0.2);
   }
   /* While live + hovered, hover wins over live's border so the warmth still
      answers directly even when the room's already hot. */
@@ -416,7 +417,7 @@ strong, b { font-weight: 700; }
   gap: 1rem;
   padding: 1rem;
   touch-action: pan-y;
-  background-color: rgba(48, 21, 18, 0.85);
+  background-color: #301512;
   border-radius: 1rem;
   color: var(--fg);
   text-decoration: none;
@@ -432,7 +433,7 @@ strong, b { font-weight: 700; }
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(246, 126, 108, 0.28), transparent 70%);
+  background: radial-gradient(circle at center, rgba(255, 180, 166, 0.28), transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -470,7 +471,7 @@ strong, b { font-weight: 700; }
   .donate-list .link-card:hover { background-color: var(--gold); color: var(--bg); box-shadow: 0 0 1.2rem rgba(253, 209, 113, 0.3); }
 /* Heat-On-Touch lifts muted secondary lines too — Ash on the heated Ember surface
    would dip below 4.5:1, so descriptions/excerpts/dates brighten with the card.
-   Donate variant goes Cinder on gold (dark text on the spotlight fill). */
+   Donate variant goes Deep Teal on gold (dark text on the spotlight fill). */
 .link-card:hover .link-desc,
 .link-card:hover .post-excerpt,
 .link-card:hover .post-date { color: var(--fg); }
@@ -552,7 +553,7 @@ strong, b { font-weight: 700; }
 }
 @keyframes pin-afterglow {
   0%   { background-color: var(--bg-card-hover); }
-  100% { background-color: rgba(48, 21, 18, 0.85); }
+  100% { background-color: #301512; }
 }
 @media (prefers-reduced-motion: reduce) {
   .badge, .badge-live::before,
@@ -560,7 +561,7 @@ strong, b { font-weight: 700; }
   .footer-heart { animation: none; }
   /* Live avatar: stop the sonar ping but keep the persistent soft glow —
      it's the page's primary "on air" signal (ambient light, not motion). */
-  .avatar.live { animation: none; box-shadow: 0 0 0.5rem rgba(209, 67, 60, 0.45); }
+  .avatar.live { animation: none; box-shadow: 0 0 0.5rem rgba(216, 14, 5, 0.45); }
   /* Glow stays (it's ambient light, not motion) — just stop breathing. */
   .hero::before { animation: none; opacity: 0.12; }
   .hero:has(.avatar.live)::before { opacity: 0.20; }
@@ -569,7 +570,7 @@ strong, b { font-weight: 700; }
 /* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
    above Oxblood so the warm peak reads at rest; touch has no hover to reveal it. */
 .donate-list .link-card {
-  background-color: rgba(76, 47, 25, 0.88);
+  background-color: #4c2f19;
   color: var(--gold);
 }
 /* Glare hover (React Bits GlareHover adaptation, colors untouched): a soft warm
@@ -717,7 +718,7 @@ strong, b { font-weight: 700; }
   overflow: hidden;
 }
 .post-modal[open] { display: flex; flex-direction: column; }
-.post-modal::backdrop { background: rgba(13, 7, 6, 0.6); }
+.post-modal::backdrop { background: rgba(10, 23, 24, 0.6); }
 .post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: var(--scrollbar) transparent; }
 .post-modal .post-close { position: absolute; top: 1rem; right: 1rem; }
 
@@ -795,7 +796,7 @@ strong, b { font-weight: 700; }
   padding: 2rem max(1rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
   color: var(--fg-muted);
   font-size: var(--text-meta);
-  position: relative; /* stack above the fixed scanner background layer */
+  position: relative; /* stack above the fixed background layer */
 
   /* Signal Bright like every other actionable accent — inherit (Ash Rose) read as plain text. */
   a { color: var(--accent-link); text-decoration: none; }
