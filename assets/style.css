@@ -126,6 +126,8 @@ strong, b { font-weight: 700; }
    keyboard ring — the skip link's own activation was the affordance, and the next Tab
    lands on the first card inside. Only the socials section is focusable (tabindex="-1"). */
 .section:focus { outline: none; }
+/* Same for the skip-link landing region on standalone post pages. */
+.post-single:focus { outline: none; }
 
 /* Focus — visible keyboard ring on every control. Ring counts as a state response
    (allowed glow); link cards also heat so the focused row is unambiguous. */
@@ -417,7 +419,7 @@ strong, b { font-weight: 700; }
   gap: 1rem;
   padding: 1rem;
   touch-action: pan-y;
-  background-color: #301512;
+  background-color: var(--bg-card);
   border-radius: 1rem;
   color: var(--fg);
   text-decoration: none;
@@ -496,8 +498,8 @@ strong, b { font-weight: 700; }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
 /* ponytail: tap feedback for touch devices */
 @media (hover: none) {
-.link-card:active { scale: 0.94; transition: scale 0.15s; }
-.post-close:active { scale: 0.92; transition: scale 0.15s; }
+.link-card:active { scale: 0.96; transition: scale 0.15s; }
+.post-close:active { scale: 0.96; transition: scale 0.15s; }
 }
 
 /* Badges — "Live"/"New!" chips on link cards. Rendered hidden, shown by badges.js.
@@ -553,7 +555,7 @@ strong, b { font-weight: 700; }
 }
 @keyframes pin-afterglow {
   0%   { background-color: var(--bg-card-hover); }
-  100% { background-color: #301512; }
+  100% { background-color: var(--bg-card); }
 }
 @media (prefers-reduced-motion: reduce) {
   .badge, .badge-live::before,
@@ -570,7 +572,7 @@ strong, b { font-weight: 700; }
 /* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
    above Oxblood so the warm peak reads at rest; touch has no hover to reveal it. */
 .donate-list .link-card {
-  background-color: #4c2f19;
+  background-color: var(--bg-donate);
   color: var(--gold);
 }
 /* Glare hover (React Bits GlareHover adaptation, colors untouched): a soft warm
@@ -696,6 +698,45 @@ strong, b { font-weight: 700; }
 .post-close:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
+}
+
+/* Sound toggle — fixed bottom-right companion of .post-close, same card language.
+   Hidden until piano.js reveals it (no-JS pages have no audio to mute); aria-pressed
+   swaps the two inline icons and piano.js owns the aria-label. */
+.sound-toggle {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: var(--bg-card);
+  border: none;
+  border-radius: 50%;
+  color: var(--fg);
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, scale 0.3s ease;
+}
+.sound-toggle span { display: inline-flex; }
+.sound-toggle[aria-pressed="true"] .sound-on,
+.sound-toggle[aria-pressed="false"] .sound-off { display: none; }
+.sound-toggle svg { width: 1.25rem; height: 1.25rem; }
+@media (hover: hover) {
+.sound-toggle:hover {
+  background: var(--bg-card-hover);
+  color: var(--accent-link);
+  scale: 1.08;
+}
+}
+.sound-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
+}
+@media (hover: none) {
+.sound-toggle:active { scale: 0.96; transition: scale 0.15s; }
 }
 
 /* Post modal — opens instantly over the page (no transition).

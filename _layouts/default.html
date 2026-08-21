@@ -11,7 +11,10 @@
   <meta property="og:title" content="{{ t }}">
   <meta property="og:description" content="{{ site.description | escape }}">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
   <meta property="og:image" content="{{ '/assets/og-cover.png' | absolute_url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="{{ '/assets/og-cover.png' | absolute_url }}">
   <link rel="icon" href="{{ site.data.profile.avatar | relative_url }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,12 +28,20 @@
 </head>
 <body>
 {% if site.data.silk.enabled %}<div class="silk-bg" data-silk data-config='{{ site.data.silk | jsonify }}' aria-hidden="true"></div>{% endif %}
-<a class="skip-link" href="#links">{{ site.data.locale.skip_to_links }}</a>
+{% unless page.url == '/404.html' %}
+<a class="skip-link" href="{% if page.layout == 'post' %}#post-content{% else %}#links{% endif %}">{% if page.layout == 'post' %}{{ site.data.locale.skip_to_content }}{% else %}{{ site.data.locale.skip_to_links }}{% endif %}</a>
+{% endunless %}
+<!-- Sound toggle: hidden until piano.js reveals it (no-JS = no audio = nothing to mute). -->
+<button class="sound-toggle" type="button" hidden aria-pressed="false"
+        data-label-mute="{{ site.data.locale.sound_mute }}" data-label-unmute="{{ site.data.locale.sound_unmute }}">
+  <span class="sound-on">{% include icon.html name='sound' %}</span>
+  <span class="sound-off">{% include icon.html name='mute' %}</span>
+</button>
 {{ content }}
 
 <script>
 if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{let fx=0,fy=0,raf=0;const run=()=>{raf=0;const r=c.getBoundingClientRect(),dx=(fx-r.left)/r.width-.5,dy=(fy-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`};c.addEventListener('mousemove',e=>{fx=e.clientX;fy=e.clientY;if(!raf)raf=requestAnimationFrame(run)});c.addEventListener('mouseleave',()=>{if(raf)cancelAnimationFrame(raf);raf=0;c.style.transform=''})})}
-(function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const goBack=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',goBack);document.addEventListener('click',e=>{if(e.target.closest('.post-article')||e.target.closest('.post-close')||e.defaultPrevented)return;goBack()})})();
+(function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const leave=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',leave)})();
 /* Post modal — card ⇄ dialog morph + directional prev/next swap. Fetch+cache the
    article, fill the dialog, showModal. Open/close share-element morph (View
    Transitions): the clicked card expands into the dialog and morphs back on close;
@@ -61,7 +72,9 @@ if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduc
     if(cache.has(url))return cache.get(url);
     let art=null;
     try{const r=await fetch(url);if(r.ok)art=new DOMParser().parseFromString(await r.text(),'text/html').querySelector('.post-article')}catch{}
-    cache.set(url,art);
+    /* Cache successes only: a failed fetch must retry on the next click, not
+       hard-navigate forever off one transient network blip. */
+    if(art)cache.set(url,art);
     return art;
   }
   /* Instant jump to top — not body.scroll(0,0), which is smooth under CSS

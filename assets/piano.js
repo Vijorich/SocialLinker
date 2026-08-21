@@ -1,6 +1,11 @@
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let ctx = null, i = 0;
+  // Master mute — the fixed .sound-toggle button (default.html). Persisted in
+  // localStorage ('sl-audio'), default ON. Gated at every entry point so a muted
+  // page never schedules a voice, not even into an already-running context.
+  let muted = false;
+  try { muted = localStorage.getItem('sl-audio') === 'off'; } catch {}
   const ac = () => ctx ??= new (window.AudioContext || window.webkitAudioContext)();
   const running = () => !!ctx && ctx.state === 'running';
   // ponytail: nothing may be scheduled until the context runs. Scheduling into a
@@ -9,6 +14,7 @@
   // sounds go through play() so the very first tap still sings; ambient sounds
   // (hover, drones, badge-reveal) skip silently, which was always the intent.
   const play = fn => {
+    if (muted) return;
     const c = ac();
     if (c.state === 'running') fn(c);
     else c.resume().then(() => fn(c)).catch(() => {});
@@ -52,7 +58,7 @@
   document.addEventListener('mouseover', e => {
     const card = e.target.closest('.link-card, .post-card');
     if (!card || card.contains(e.relatedTarget)) return;
-    if (!running()) return; // pre-gesture hover stays silent, never queued
+    if (muted || !running()) return; // pre-gesture hover stays silent, never queued
     if (!order.has(card)) order.set(card, i++);
     note(freq(order.get(card)));
   }); // ponytail: no throttle — every card entry sounds, the list is an instrument. Overlaps are cheap sine oscs.
@@ -163,7 +169,7 @@
     c.addEventListener('mouseenter', () => {
       const f = tonic(c);
       setTimeout(() => {
-        if (!running()) return;
+        if (muted || !running()) return;
         const a = ac(), t = a.currentTime, g = a.createGain(), o = a.createOscillator();
         g.gain.setValueAtTime(0, t);
         g.gain.setTargetAtTime(0.045, t, 0.008);
@@ -175,12 +181,13 @@
     });
   });
 
-  // Badge wake-tick: two short Lydian notes when a Live/New chip appears.
+  // Badge wake-tick: two short notes when a Live/New chip appears — E5 up a major
+  // third for Live, up a tritone for New! (see AGENTS.md).
   // The page moved on its own; the only moment the UI plays without a gesture.
   // badges.js dispatches 'badge-reveal' with the badge type after pinning.
   // Guarded on document.hidden: a reveal that lands in a background tab stays silent.
   window.addEventListener('badge-reveal', e => {
-    if (document.hidden || !running()) return;
+    if (muted || document.hidden || !running()) return;
     const isLive = e.detail === 'twitch';
     chord(660, isLive ? [0, 4] : [0, 6], { beat: 0.12, glide: 0.05, vols: [0.05, 0.04], dur: 0.35 });
   });
@@ -197,12 +204,12 @@
       wasOpen = dlg.open;
       if (!dlg.open) {
         openedByClick = false; // clear any stale flag from a click that never opened
-        if (!running()) return;
+        if (muted || !running()) return;
         return farewell();
       }
       // A post-card click already spoke its page() chord — don't double the open.
       if (openedByClick) { openedByClick = false; return; }
-      if (!running()) return;
+      if (muted || !running()) return;
       // Popstate/programmatic reopen: the same short page chord (post importance rung).
       chord(440, [0, 7, 14], { beat: 0.12, glide: 0.05, dur: 0.45, vols: [0.08, 0.07, 0.06] });
     }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
@@ -282,12 +289,13 @@
   };
 
   const holds = new Set();
+  let stopAvatarDrone = () => {}; // reassigned when the avatar drone exists; mute uses it
   const wireHold = (card, startHold) => {
     let tRef = null, live = null;
     card.addEventListener('mouseenter', () => {
       clearTimeout(tRef);
       tRef = setTimeout(() => {
-        if (document.hidden || !running()) return; // background tab or pre-gesture — skip
+        if (document.hidden || muted || !running()) return; // hidden tab, muted, or pre-gesture — skip
         live = startHold();
         if (live) { card.classList.add('attuned'); holds.add(live); }
       }, SHIMMER_DELAY * 1000);
@@ -320,7 +328,7 @@
   if (avatar) {
     let drone = null; // { gain, stop() } while alive
     const start = () => {
-      if (drone || !running()) return;
+      if (drone || muted || !running()) return;
       const c = ac(), t = c.currentTime;
       const g = c.createGain(), lfoGain = c.createGain();
       g.gain.setValueAtTime(0, t);
@@ -350,8 +358,33 @@
       } };
     };
     const stop = () => { drone?.stop(); drone = null; };
+    stopAvatarDrone = stop;
     avatar.addEventListener('mouseenter', start);
     avatar.addEventListener('mouseleave', stop);
     document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+  }
+
+  // Sound toggle: revealed here because only this module knows audio exists.
+  // Muting mid-flight releases every sounding voice (holds, attune glows, drone),
+  // mirroring the tab-hide path; unmuting just re-arms the entry points.
+  const sBtn = document.querySelector('.sound-toggle');
+  if (sBtn) {
+    const paint = () => {
+      sBtn.hidden = false;
+      sBtn.setAttribute('aria-pressed', String(muted));
+      sBtn.setAttribute('aria-label', muted ? sBtn.dataset.labelUnmute : sBtn.dataset.labelMute);
+    };
+    paint();
+    sBtn.addEventListener('click', () => {
+      muted = !muted;
+      try { localStorage.setItem('sl-audio', muted ? 'off' : 'on'); } catch {}
+      if (muted) {
+        holds.forEach(h => h.stop());
+        holds.clear();
+        document.querySelectorAll('.attuned').forEach(c => c.classList.remove('attuned'));
+        stopAvatarDrone();
+      }
+      paint();
+    });
   }
 })();

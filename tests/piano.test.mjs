@@ -6,7 +6,7 @@ import assert from 'node:assert';
 
 const src = readFileSync(new URL('../assets/piano.js', import.meta.url), 'utf8');
 
-function makeWorld({ cards = [], dlg = null, suspended = false } = {}) {
+function makeWorld({ cards = [], dlg = null, suspended = false, soundBtn = null, storage = null } = {}) {
   const param = v => ({
     value: v,
     setValueAtTime(x) { this.value = x; },
@@ -49,15 +49,15 @@ function makeWorld({ cards = [], dlg = null, suspended = false } = {}) {
       if (sel.includes('.link-card') || sel.includes('.post-card')) return cards; // wireHold selectors
       return [];
     },
-    querySelector: () => null, // skip-link / avatar blocks stay out of these tests
+    querySelector: sel => (sel === '.sound-toggle' ? soundBtn : null),
     getElementById: id => (id === 'post-modal' ? dlg : null),
   };
   const windowStub = {
     AudioContext: function () { return ctx; },
     addEventListener: (ev, fn) => { (winListeners[ev] ??= []).push(fn); },
   };
-  new Function('window', 'document', 'matchMedia', 'setTimeout', 'clearTimeout', 'MutationObserver', src)
-    (windowStub, documentStub, () => ({ matches: false }), setTimeoutStub, clearTimeoutStub, MOStub);
+  new Function('window', 'document', 'matchMedia', 'setTimeout', 'clearTimeout', 'MutationObserver', 'localStorage', src)
+    (windowStub, documentStub, () => ({ matches: false }), setTimeoutStub, clearTimeoutStub, MOStub, storage);
   const fireDoc = (ev, e) => (docListeners[ev] || []).forEach(fn => fn(e));
   return {
     ctx, cards, timers, flushOne, moCb: () => moCb, fireDoc, documentStub,
@@ -87,15 +87,23 @@ const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
 
 // T1: pitch ladder follows DOM order top→bottom — even when the FIRST hovered card
 // is in the middle of the list, its note is its DOM-position pitch, not the base A3.
-// Also: a suspended context (resume rejecting, no gesture yet) must not throw.
+// A suspended context (no gesture yet) must stay fully silent AND not throw:
+// since af4a508 pre-gesture hovers never schedule into the frozen clock.
 {
   const cards = [makeCard(['link-card']), makeCard(['link-card']), makeCard(['link-card']), makeCard(['link-card'])];
-  const w = makeWorld({ cards, suspended: true });
+  const w = makeWorld({ cards });
   w.hover(cards[3]); // DOM position 3 → 220 * 2^(7/12), NOT 220
   const f3 = 220 * Math.pow(2, 7 / 12);
   assert.ok(closeTo(w.ctx.oscs[0].frequency.value, f3), 'T1 hover pitch follows DOM position');
   w.hover(cards[0]);
   assert.ok(closeTo(w.ctx.oscs[2].frequency.value, 220), 'T1 first DOM card stays the base A3');
+}
+{
+  const cards = [makeCard(['link-card']), makeCard(['link-card'])];
+  const w = makeWorld({ cards, suspended: true });
+  w.hover(cards[1]); // must not throw on the rejecting resume path
+  w.hover(cards[0]);
+  assert.equal(w.ctx.oscs.length, 0, 'T1 pre-gesture hover schedules nothing');
 }
 
 // T2: attune walker voices are a real 3-note chord — root × 2^(semi/12). The old
@@ -182,4 +190,42 @@ const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
   assert.equal(voices(don), 6, 'T5 donate is the longest, most playful rung (6)');
 }
 
-console.log('piano: 5/5 check groups passed');
+// T6: master mute — the .sound-toggle button gates every entry point, persists
+// its state to localStorage ('sl-audio'), and releases sounding voices when
+// engaged mid-flight. Default is ON (aria-pressed="false").
+{
+  const card = makeCard(['link-card']);
+  const btn = {
+    hidden: true,
+    dataset: { labelMute: 'Выключить звук', labelUnmute: 'Включить звук' },
+    attrs: {},
+    listeners: {},
+    setAttribute(k, v) { this.attrs[k] = v; },
+    addEventListener(ev, fn) { this.listeners[ev] = fn; },
+  };
+  const store = {
+    map: new Map(),
+    getItem(k) { return this.map.has(k) ? this.map.get(k) : null; },
+    setItem(k, v) { this.map.set(k, String(v)); },
+  };
+  const w = makeWorld({ cards: [card], soundBtn: btn, storage: store });
+  assert.equal(btn.hidden, false, 'T6 toggle revealed by piano.js');
+  assert.equal(btn.attrs['aria-pressed'], 'false', 'T6 default state is sound ON');
+  w.click(card);
+  const audible = w.ctx.oscs.length;
+  assert.ok(audible > 0, 'T6 unmuted click sounds');
+  btn.listeners.click(); // mute
+  assert.equal(store.map.get('sl-audio'), 'off', 'T6 mute persisted');
+  assert.equal(btn.attrs['aria-pressed'], 'true', 'T6 aria-pressed flips on mute');
+  assert.equal(btn.attrs['aria-label'], 'Включить звук', 'T6 label offers unmute while muted');
+  const before = w.ctx.oscs.length;
+  w.click(card);
+  w.hover(card);
+  assert.equal(w.ctx.oscs.length, before, 'T6 muted click and hover schedule nothing');
+  btn.listeners.click(); // unmute
+  assert.equal(store.map.get('sl-audio'), 'on', 'T6 unmute persisted');
+  w.click(card);
+  assert.ok(w.ctx.oscs.length > before, 'T6 sound returns after unmute');
+}
+
+console.log('piano: 6/6 check groups passed');

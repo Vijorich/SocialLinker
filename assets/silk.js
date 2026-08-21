@@ -81,12 +81,20 @@ export function createSilk(container, options = {}) {
 
   const opts = { ...DEFAULTS, ...options };
 
-  const renderer = new Renderer({
-    webgl: 2,
-    alpha: false,
-    antialias: false,
-    dpr: Math.min(window.devicePixelRatio || 1, 2),
-  });
+  // WebGL2 can be unavailable (blocked, driverless, software-disabled). Fail
+  // silent like the rest of the site: the CSS gradient ground stays, no console
+  // crash — initSilk already skips null instances.
+  let renderer;
+  try {
+    renderer = new Renderer({
+      webgl: 2,
+      alpha: false,
+      antialias: false,
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
+    });
+  } catch {
+    return null;
+  }
 
   const gl = renderer.gl;
   const canvas = gl.canvas;
