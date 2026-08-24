@@ -1,53 +1,24 @@
 # AGENTS.md
 
-Personal business-card site for **Vijor**. Static Jekyll site on GitHub Pages (safe mode: **no plugins, no CI**). Content lives in `_data/*.yml`; page composed from includes in `index.html`. Liquid + plain HTML/CSS.
+Personal business-card site for **Vijor**. Static Jekyll site on GitHub Pages (safe mode: **no plugins, no CI**). Content lives in `_data/*.yml`; page composed from includes in `index.html`. Liquid + plain HTML/CSS. Single-language (RU), server-rendered — no client-side i18n.
 
-## Local preview
+## Verify changes
 
-```bash
-bundle install
-bundle exec jekyll serve --baseurl ""
-```
+`npm test` runs all three JS suites on plain node — no packages installed (piano/audio-engine, post-modal history sync, badge providers). The local Jekyll build fails on Windows: check JS with `node --check`, YAML with a parse, and let GitHub Pages do the real build — see [build-deploy.md](docs/agents/build-deploy.md).
 
-> [!IMPORTANT]
-> Always pass `--baseurl ""`. `_config.yml` sets `baseurl: "/SocialLinker"` for the live Pages URL, so a plain `jekyll serve` renders broken asset paths locally. `Gemfile` pins the `github-pages` gem so local build matches the Pages runtime exactly (Jekyll 3.9.x + curated plugin allowlist); transitive deps land in `vendor/` (gitignored).
+## Topic guides
 
-> [!WARNING]
-> Local build does not work on Windows: `bundle exec jekyll` fails with `command not found: jekyll` even after `bundle install`. Don't burn time on it — verify changes with `node --check` (JS) and a YAML parse, and let GitHub Pages do the real build. Modal history sync has a runnable harness: `node tests/modal-history.test.mjs`.
-
-## Composition
-
-`default.html` owns ALL shared chrome (head, meta, OG tags). Never duplicate it in includes.
-
-`index.html` iterates `_data/sections.yml` (order = render order, omit or add entries to show/hide sections). Each section `type` maps to a `_includes/*.html`. Titles: override via `title:` in sections.yml, omit for locale default, `false` to hide the heading.
-
-## Where to edit content
-
-| What | File |
+| Reach for | When |
 |---|---|
-| Section order, titles, visibility | `_data/sections.yml` |
-| Nick, avatar path, tagline | `_data/profile.yml` |
-| Bio | `_data/profile.yml` (`bio`, `|` block scalar) |
-| Social links + order + per-card `description` | `_data/social.yml` |
-| Live/New! badges | `_data/social.yml` (`badge` per item, `badge_days`) |
-| Projects list | `_data/projects.yml` |
-| Donate block | `_data/donate.yml` |
-| UI strings | `_data/locale.yml` |
-| Icons (inline SVG) | `_includes/icon.html` (`{% case %}`) |
-| Styles | `assets/style.css` |
+| [build-deploy.md](docs/agents/build-deploy.md) | Serving locally, `baseurl`, the github-pages gem pin, deploying to Pages |
+| [content-map.md](docs/agents/content-map.md) | Editing content: which `_data/*.yml` or include owns what; posts, UI strings, icons |
+| [layout-composition.md](docs/agents/layout-composition.md) | Shared-chrome invariant, `sections.yml` ordering, includes vs layouts |
+| [post-modal.md](docs/agents/post-modal.md) | The `<dialog>` post viewer: history sync, View Transitions, prev/next |
+| [badges.md](docs/agents/badges.md) | Live/New! chips: providers, CORS proxies, pin-to-top rule |
+| [audio-piano.md](docs/agents/audio-piano.md) | Sounds: hover piano, click vocab, attune glow, mute toggle |
 
-Posts: `_posts/YYYY-MM-DD-slug.md` with `layout: post`, `title`, `date`, `lang` — appear in `articles.html` automatically. On the index they open in a modal (`<dialog id="post-modal">`): JS fetches the post page, extracts `.post-article`, fills the dialog, and morphs the clicked card into the dialog via a shared-element View Transition (`view-transition-name: post-morph`; it morphs back on close). Prev/next nav swaps slide the new article in from the clicked button's side (240ms WAAPI). Both fall back to instant under `prefers-reduced-motion` or where View Transitions are unavailable. The modal is URL-synced (pushState on open/swap, popstate closes or reopens) — refreshing with a modal URL lands on the standalone post page, which remains the no-JS/direct-link fallback. In-flight fetches carry a generation token (`gen`); any open/swap/close/popstate invalidates them, so a stale fetch can't fill the modal or push out of order, and a popstate naming a post with no card on the page hard-navigates to its standalone URL. Prev/next nav lives inside `.post-article` (`_layouts/post.html`), so the modal copies it and intercepts its links to swap content in place.
+## Agent skills
 
-## Repo-specific quirks
-
-- **Icons**: `icon.html` renders a `{% when %}` per brand from simpleicons.org; unknown `name` falls back to a globe SVG. Add a `case` to add a brand.
-- **Badges (Live/New!)**: client-side only — `assets/badges.js` reveals hidden chips rendered by `links.html`. Standing rule: a revealed badge pins its card to the top of the list (stable in `social.yml` order; Twitch leads statically). Sources: decapi.me (Twitch uptime), public CORS proxy chain in `badges.js` (corsproxy.io → allorigins.win → codetabs.com) for YouTube RSS and t.me/s. All keyless; any fetch/parse error leaves the chip hidden. Confirmed Twitch live also adds `.live` to `.avatar` (sonar ring, gated by `prefers-reduced-motion`). No VK support: VK blocks public proxies, needs an API token — add only if one appears. YouTube needs `channel_id` in `social.yml` (owner finds it at youtube.com/account_advanced); empty = chip suppressed at render in `links.html`, never reaches the client.
-- **Hover piano + click vocab**: `assets/piano.js` plays a WebAudio-synthesized note when the pointer enters any `.link-card`/`.post-card` (loaded next to `badges.js` with `defer`). Card position in DOM order climbs an A-minor pentatonic scale across octaves (220 Hz base, 5 semitone steps per loop = position A3, A4, A5…). Every card entry sounds with no throttle — hovering up/down the list plays like an instrument. Clicks speak too: each card's click root is its OWN pentatonic tonic (the same `order` map hover uses), so re-clicking the same card sings in the same key. Click melodies follow the importance ladder — the more important the component, the longer and more playful the chord, exactly one voice per rung: donate (1) thank = `[0,4,7,11,14,21]` maj7-rise + octave sparkle, links (2) joy = `[0,4,7,11,14]`, projects (3) craft = `[0,4,7,14]`, posts (4) page = `[0,7,14]` open fifths, shortest. The popstate reopen swell matches the post rung. Middle-click (`auxclick` button=1) hits the same vocabs; right-click (`contextmenu`) is a questioning two-tone glance `[0, 5]` (a perfect fourth apart, left unresolved). Closing the post modal is two notes sagging RE→DO. All glide in on the voice — pitch glides to the chord rather than starting on it, which is what makes it read as resolve, not detune. The click-glide pattern is a shared symmetric mistune `GLIDE_SEMIS=[-7,-4,2,2…]` — warmer than the old minor-third/fifth alternation. The hover plink's octave partial is damped to 0.22 with its decay stretched to 0.85 s for the same reason. Skip-link (`.skip-link:focus`) is a single clean tone at 330 Hz — a soft *tok* that says **the door is this way**.
-
-**Focus instruments**: hovering `.avatar` layers an ember drone (three detuned sines 110/165/220 Hz through a 900 Hz lowpass, gain breathing on a 7.5 s LFO in step with the CSS ember-breath animation, ~1.8 s release on leave, tab-hide stops it). Hover-hold any card ~3.5 s and it attunes: a small 3-note chord (share pentatonic ladder with the card's hover root) runs an **evolving random-walk melody** clamped to the card's rung ±4 — pitch changes, no two attunes land on the same sequence. The ambient breathes on a real gain LFO of period 2×stepS, and the glow (`attune-shimmer` in `attune.css`) runs on that exact period — JS stamps `--attune-period` on the card at hold start, CSS adds a −¼-period delay, so the brightness peak lands on the loudness peak: one clock, two skins. Donate cards walk the same ladder on octave 5 (`ladderScale: 2`) so they sit above the fold. Tab-hide releases all holds, and a badge-reveal landing in a hidden tab stays silent. CSS (`.attuned::after`, `assets/attune.css`) raises a companion glow on the same 3.5 s delay — donation shimmers warmer, at higher contrast.
-
-**System-driven tick**: when badges.js reveals a live/new chip it dispatches `badge-reveal` — piano.js answers with a two-note wake-tick from E5 (660 Hz): up a major third `[0,4]` for Live, up a tritone `[0,6]` for New!, short. That is the only moment the page sounds without a gesture. GitHub link card (href `github.com/Vijorich/*`) gets a faint octave echo 30 ms after its hover-note — Vijor's own workshop voice in the same scale.
-
-All AudioContexts are created lazily on first pointer interaction so autoplay policy can't block them, and the module no-ops under `prefers-reduced-motion`. No-op on touch (no hover). **Mute**: the fixed `.sound-toggle` button (bottom-right, every page, revealed by piano.js — no-JS pages have no audio) kills every voice at the entry points and releases sounding holds/drone mid-flight; the choice persists in `localStorage` key `sl-audio` (`off`/`on`), default ON. Labels live in `locale.yml` (`sound_mute`/`sound_unmute`) and ride to JS via data-attributes on the button.
-- **Single-language (RU)**: server-rendered from `locale.yml` and `profile.yml`. No client-side i18n. Add strings to `locale.yml`, reference via `{{ site.data.locale.key }}`.
-- **Deploy**: push to `main`; Settings → Pages → Deploy from a branch, `/main`, root. Builds in ~1 min. Keep `baseurl`/`url` in `_config.yml` synced to the repo name.
+- **Issue tracker**: GitHub Issues on Vijorich/SocialLinker (`gh` CLI) — [issue-tracker.md](docs/agents/issue-tracker.md)
+- **Triage labels**: five-role vocabulary used verbatim — [triage-labels.md](docs/agents/triage-labels.md)
+- **Domain docs**: root `CONTEXT.md` + `docs/adr/` — [domain.md](docs/agents/domain.md)
