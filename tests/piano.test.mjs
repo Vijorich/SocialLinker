@@ -1,12 +1,19 @@
-// Runnable check for assets/piano.js — runs the real file against a stub
-// DOM/AudioContext and asserts what actually gets scheduled.
+// Runnable check for the audio stack — asserts on the deep surfaces directly:
+//   ladder math + walker bounds + vocabulary data  (assets/piano.js exports)
+//   engine gating, envelopes, release              (assets/audio-engine.js)
 // Usage: node tests/piano.test.mjs
-import { readFileSync } from 'node:fs';
 import assert from 'node:assert';
+import { SEMI, rungAt, nextRung, MELODIES, pickMelodyName } from '../assets/piano.js';
+import { createAudioEngine } from '../assets/audio-engine.js';
 
-const src = readFileSync(new URL('../assets/piano.js', import.meta.url), 'utf8');
+const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
 
-function makeWorld({ cards = [], dlg = null, suspended = false, soundBtn = null, storage = null } = {}) {
+function storageStub() {
+  const map = new Map();
+  return { getItem: k => (map.has(k) ? map.get(k) : null), setItem: (k, v) => map.set(k, String(v)) };
+}
+
+function makeCtx({ state = 'running', failResume = false } = {}) {
   const param = v => ({
     value: v,
     setValueAtTime(x) { this.value = x; },
@@ -15,217 +22,164 @@ function makeWorld({ cards = [], dlg = null, suspended = false, soundBtn = null,
     setTargetAtTime(x) { this.value = x; },
     cancelScheduledValues() {},
   });
+  const oscs = [];
   const ctx = {
     currentTime: 0,
-    state: suspended ? 'suspended' : 'running',
+    state,
     destination: {},
-    resume: () => (suspended ? Promise.reject(new Error('autoplay')) : Promise.resolve()),
-    oscs: [],
-    createOscillator() { const o = { frequency: param(440), connect: x => x, start() {}, stop() {} }; this.oscs.push(o); return o; },
+    resume: () => (failResume ? Promise.reject(new Error('autoplay')) : Promise.resolve()),
+    createOscillator() {
+      const o = {
+        frequency: param(440), connect: x => x,
+        started: 0, stopped: 0,
+        start() { this.started++; }, stop() { this.stopped++; },
+      };
+      oscs.push(o); return o;
+    },
     createGain() { return { gain: param(1), connect: x => x, disconnect() {} }; },
     createBiquadFilter() { return { frequency: param(350), Q: param(1), type: '', connect: x => x }; },
-    createDynamicsCompressor() { return { connect: x => x }; },
   };
-  const timers = new Map();
-  let timerId = 0;
-  const setTimeoutStub = fn => { timers.set(++timerId, fn); return timerId; };
-  const clearTimeoutStub = id => timers.delete(id);
-  const flushOne = () => {
-    const next = timers.entries().next().value;
-    if (!next) return false;
-    timers.delete(next[0]); next[1]();
-    return true;
-  };
-  let moCb = null;
-  const MOStub = class { constructor(cb) { moCb = cb; } observe() {} };
-  const docListeners = {}, winListeners = {};
-  const documentStub = {
-    hidden: false,
-    addEventListener: (ev, fn) => { (docListeners[ev] ??= []).push(fn); },
-    querySelectorAll: sel => {
-      if (sel === '.link-card, .post-card') return cards;
-      if (sel === '.attuned') return cards.filter(c => c.classList.contains('attuned'));
-      if (sel.startsWith('.donate-list') || sel.startsWith('a.link-card')) return [];
-      if (sel.includes('.link-card') || sel.includes('.post-card')) return cards; // wireHold selectors
-      return [];
-    },
-    querySelector: sel => (sel === '.sound-toggle' ? soundBtn : null),
-    getElementById: id => (id === 'post-modal' ? dlg : null),
-  };
-  const windowStub = {
-    AudioContext: function () { return ctx; },
-    addEventListener: (ev, fn) => { (winListeners[ev] ??= []).push(fn); },
-  };
-  new Function('window', 'document', 'matchMedia', 'setTimeout', 'clearTimeout', 'MutationObserver', 'localStorage', src)
-    (windowStub, documentStub, () => ({ matches: false }), setTimeoutStub, clearTimeoutStub, MOStub, storage);
-  const fireDoc = (ev, e) => (docListeners[ev] || []).forEach(fn => fn(e));
-  return {
-    ctx, cards, timers, flushOne, moCb: () => moCb, fireDoc, documentStub,
-    fireWin: (ev, e) => (winListeners[ev] || []).forEach(fn => fn(e)),
-    hover: card => fireDoc('mouseover', { target: card, relatedTarget: null }),
-    click: card => fireDoc('click', { target: card }),
-  };
-}
-const makeCard = (cls, label = '') => ({
-  label,
-  style: { props: {}, setProperty(k, v) { this.props[k] = v; } },
-  classList: {
-    _s: new Set(cls),
-    contains(c) { return this._s.has(c); },
-    add(c) { this._s.add(c); },
-    remove(c) { this._s.delete(c); },
-  },
-  closest(sel) {
-    if (sel === '.donate-list') return null;
-    return cls.some(k => sel.includes('.' + k)) ? this : null;
-  },
-  contains: () => false,
-  addEventListener() {},
-  href: '',
-});
-const closeTo = (a, b) => Math.abs(a - b) < 1e-6;
-
-// T1: pitch ladder follows DOM order top→bottom — even when the FIRST hovered card
-// is in the middle of the list, its note is its DOM-position pitch, not the base A3.
-// A suspended context (no gesture yet) must stay fully silent AND not throw:
-// since af4a508 pre-gesture hovers never schedule into the frozen clock.
-{
-  const cards = [makeCard(['link-card']), makeCard(['link-card']), makeCard(['link-card']), makeCard(['link-card'])];
-  const w = makeWorld({ cards });
-  w.hover(cards[3]); // DOM position 3 → 220 * 2^(7/12), NOT 220
-  const f3 = 220 * Math.pow(2, 7 / 12);
-  assert.ok(closeTo(w.ctx.oscs[0].frequency.value, f3), 'T1 hover pitch follows DOM position');
-  w.hover(cards[0]);
-  assert.ok(closeTo(w.ctx.oscs[2].frequency.value, 220), 'T1 first DOM card stays the base A3');
-}
-{
-  const cards = [makeCard(['link-card']), makeCard(['link-card'])];
-  const w = makeWorld({ cards, suspended: true });
-  w.hover(cards[1]); // must not throw on the rejecting resume path
-  w.hover(cards[0]);
-  assert.equal(w.ctx.oscs.length, 0, 'T1 pre-gesture hover schedules nothing');
+  return { ctx, oscs };
 }
 
-// T2: attune walker voices are a real 3-note chord — root × 2^(semi/12). The old
-// code indexed the pentatonic ladder with a fraction → undefined → NaN frequency.
-{
-  const handlers = {};
-  const card = makeCard(['link-card']);
-  card.addEventListener = (ev, fn) => { (handlers[ev] ??= []).push(fn); };
-  const w = makeWorld({ cards: [card] });
-  handlers.mouseenter.forEach(fn => fn());       // queue the 3.5 s attune timer
-  w.flushOne();                                   // hold starts: lfo + 3 voices
-  const lfo = w.ctx.oscs[0];
-  const [v0, v1, v2] = w.ctx.oscs.slice(1, 4);
-  const root = 220; // card is DOM position 0
-  assert.ok(Number.isFinite(v0.frequency.value) && Number.isFinite(v1.frequency.value) && Number.isFinite(v2.frequency.value),
-    'T2 all walker voices have finite frequency (was NaN)');
-  assert.ok(closeTo(v0.frequency.value, root), 'T2 voice 0 is the rung root');
-  assert.ok(closeTo(v1.frequency.value, root * Math.pow(2, 4 / 12)), 'T2 voice 1 is +M3');
-  assert.ok(closeTo(v2.frequency.value, root * Math.pow(2, 7 / 12)), 'T2 voice 2 is +P5');
-  w.flushOne();                                   // one random-walk step retunes the chord
-  const r = v0.frequency.value;
-  assert.ok(Number.isFinite(r) && r > 0, 'T2 step keeps the root finite');
-  assert.ok(closeTo(v1.frequency.value / r, Math.pow(2, 4 / 12)), 'T2 step keeps the chord shape (M3)');
-  assert.ok(closeTo(v2.frequency.value / r, Math.pow(2, 7 / 12)), 'T2 step keeps the chord shape (P5)');
-  // Breath: gain LFO at 1/(2×stepS).
-  assert.ok(closeTo(lfo.frequency.value, 1 / 6.4), 'T2 breath LFO runs on 2×stepS');
+function makeEngine(opts = {}) {
+  const c = makeCtx(opts);
+  const storage = storageStub();
+  const eng = createAudioEngine({ storage, ctxFactory: () => c.ctx });
+  return { eng, ...c, storage };
 }
 
-// T3: one modal opening = exactly one sound. Card click plays page(), the observer
-// swallows its swell; a popstate-style open (no click) still gets the swell; close
-// gets the farewell. page/swell = [0,7,14] = 3 voices × 2 oscs = 6 oscs each.
+// T1: pentatonic ladder math — DOM-position pitches, octave wrap at 5 steps.
 {
-  const handlers = {};
-  const post = makeCard(['post-card', 'link-card']);
-  const dlg = { open: false };
-  const w = makeWorld({ cards: [post], dlg });
-  const count = () => w.ctx.oscs.length;
-  w.click(post);                                  // page() chord: 3 voices × 2 oscs
-  const afterClick = count();
-  assert.equal(afterClick, 6, 'T3 post-card click sounds its page() chord');
-  dlg.open = true; w.moCb()();                    // modal opens → flag consumed
-  assert.equal(count(), afterClick, 'T3 click-open does NOT double with the observer swell');
-  dlg.open = false; w.moCb()();                   // farewell: 2 voices × 2 oscs
-  assert.equal(count(), afterClick + 4, 'T3 close sounds the farewell');
-  dlg.open = true; w.moCb()();                    // popstate reopen: swell plays
-  assert.equal(count(), afterClick + 10, 'T3 a no-click open still gets its swell');
+  assert.ok(closeTo(rungAt(0), 220), 'T1 base rung is A3');
+  assert.ok(closeTo(rungAt(3), 220 * Math.pow(2, 7 / 12)), 'T1 fourth rung is +P5');
+  assert.ok(closeTo(rungAt(5), 440), 'T1 sixth rung wraps an octave up');
+  assert.equal(SEMI.length, 5, 'T1 five semitone steps per loop');
+  assert.ok(closeTo(rungAt(2, 440), 440 * Math.pow(2, 5 / 12)), 'T1 donate scale rides the same ladder an octave up');
 }
 
-// T4: tab-hide stops an active attune (timer queue drains, .attuned class drops)
-// and keeps a badge-reveal silent.
+// T2: walker stays bounded — never below 0, never above pos+4, steps within ±2.
 {
-  const handlers = {};
-  const card = makeCard(['link-card']);
-  card.addEventListener = (ev, fn) => { (handlers[ev] ??= []).push(fn); };
-  const w = makeWorld({ cards: [card] });
-  handlers.mouseenter.forEach(fn => fn());
-  w.flushOne();                                   // hold active → walk timer pending
-  assert.ok(w.timers.size > 0, 'T4 walker timer pending while attuned');
-  w.documentStub.hidden = true;
-  w.fireDoc('visibilitychange', {});
-  assert.equal(w.timers.size, 0, 'T4 tab-hide clears the walker');
-  assert.ok(!card.classList.contains('attuned'), 'T4 tab-hide drops the attuned glow');
-  const before = w.ctx.oscs.length;
-  w.fireWin('badge-reveal', { detail: 'twitch' });
-  assert.equal(w.ctx.oscs.length, before, 'T4 badge-reveal stays silent in a hidden tab');
-  w.documentStub.hidden = false;
-  w.fireWin('badge-reveal', { detail: 'twitch' });
-  assert.equal(w.ctx.oscs.length, before + 4, 'T4 visible badge-reveal sounds the wake-tick');
+  for (const pos of [0, 3, 9]) {
+    let rung = pos;
+    for (let n = 0; n < 1000; n++) {
+      const prev = rung;
+      rung = nextRung(rung, pos);
+      assert.ok(rung >= 0, 'T2 walker never dips below the first rung');
+      assert.ok(rung <= pos + 4, 'T2 walker never exceeds pos+4');
+      assert.ok(Math.abs(rung - prev) <= 2, 'T2 walker leaps at most a third');
+    }
+  }
 }
 
-// T5: importance ladder — click melody length grows one voice per rung,
-// donate > links > projects > posts. Each voice = 2 oscs (fundamental + octave).
+// T3: importance ladder as DATA — exactly one voice per rung, donate fullest.
 {
-  const don = makeCard(['link-card', 'donate']);
-  don.closest = sel => (sel === '.donate-list' ? {} : (sel.includes('.link-card') ? don : null));
-  const link = makeCard(['link-card']);
-  const proj = makeCard(['link-card', 'project-card']);
-  const post = makeCard(['link-card', 'post-card']);
-  const w = makeWorld({ cards: [don, link, proj, post] });
-  const voices = card => { const n = w.ctx.oscs.length; w.click(card); return (w.ctx.oscs.length - n) / 2; };
-  assert.equal(voices(post), 3, 'T5 posts are the shortest rung (3 voices)');
-  assert.equal(voices(proj), 4, 'T5 projects add one voice (4)');
-  assert.equal(voices(link), 5, 'T5 links add one voice (5)');
-  assert.equal(voices(don), 6, 'T5 donate is the longest, most playful rung (6)');
+  assert.deepEqual(MELODIES.thank.semis, [0, 4, 7, 11, 14, 21], 'T3 donate thank = maj7 rise + sparkle');
+  assert.deepEqual(MELODIES.joy.semis, [0, 4, 7, 11, 14], 'T3 links joy = maj7 lift');
+  assert.deepEqual(MELODIES.craft.semis, [0, 4, 7, 14], 'T3 projects craft = add9 arpeggio');
+  assert.deepEqual(MELODIES.page.semis, [0, 7, 14], 'T3 posts page = open fifths, shortest');
+  assert.ok(MELODIES.thank.semis.length > MELODIES.joy.semis.length, 'T3 donate > links');
+  assert.ok(MELODIES.joy.semis.length > MELODIES.craft.semis.length, 'T3 links > projects');
+  assert.ok(MELODIES.craft.semis.length > MELODIES.page.semis.length, 'T3 projects > posts');
+  assert.deepEqual(MELODIES.glance.semis, [0, 5], 'T3 right-click glance hangs a fourth apart');
+  assert.equal(MELODIES.swell.root, 440, 'T3 reopen swell root');
+  assert.deepEqual(MELODIES.farewell.semis, [2, 0], 'T3 close sigh sags RE→DO');
 }
 
-// T6: master mute — the .sound-toggle button gates every entry point, persists
-// its state to localStorage ('sl-audio'), and releases sounding voices when
-// engaged mid-flight. Default is ON (aria-pressed="false").
+// T4: melody lookup follows the importance ladder's card classes.
 {
-  const card = makeCard(['link-card']);
-  const btn = {
-    hidden: true,
-    dataset: { labelMute: 'Выключить звук', labelUnmute: 'Включить звук' },
-    attrs: {},
-    listeners: {},
-    setAttribute(k, v) { this.attrs[k] = v; },
-    addEventListener(ev, fn) { this.listeners[ev] = fn; },
-  };
-  const store = {
-    map: new Map(),
-    getItem(k) { return this.map.has(k) ? this.map.get(k) : null; },
-    setItem(k, v) { this.map.set(k, String(v)); },
-  };
-  const w = makeWorld({ cards: [card], soundBtn: btn, storage: store });
-  assert.equal(btn.hidden, false, 'T6 toggle revealed by piano.js');
-  assert.equal(btn.attrs['aria-pressed'], 'false', 'T6 default state is sound ON');
-  w.click(card);
-  const audible = w.ctx.oscs.length;
-  assert.ok(audible > 0, 'T6 unmuted click sounds');
-  btn.listeners.click(); // mute
-  assert.equal(store.map.get('sl-audio'), 'off', 'T6 mute persisted');
-  assert.equal(btn.attrs['aria-pressed'], 'true', 'T6 aria-pressed flips on mute');
-  assert.equal(btn.attrs['aria-label'], 'Включить звук', 'T6 label offers unmute while muted');
-  const before = w.ctx.oscs.length;
-  w.click(card);
-  w.hover(card);
-  assert.equal(w.ctx.oscs.length, before, 'T6 muted click and hover schedule nothing');
-  btn.listeners.click(); // unmute
-  assert.equal(store.map.get('sl-audio'), 'on', 'T6 unmute persisted');
-  w.click(card);
-  assert.ok(w.ctx.oscs.length > before, 'T6 sound returns after unmute');
+  const card = (cls, donateList = false) => ({
+    classList: { contains: c => cls.includes(c) },
+    closest: sel => (sel === '.donate-list' && donateList ? {} : null),
+  });
+  assert.equal(pickMelodyName(card(['link-card'], true)), 'thank', 'T4 donate cards thank');
+  assert.equal(pickMelodyName(card(['link-card'])), 'joy', 'T4 plain link cards joy');
+  assert.equal(pickMelodyName(card(['project-card'])), 'craft', 'T4 project cards craft');
+  assert.equal(pickMelodyName(card(['post-card'])), 'page', 'T4 post cards page');
 }
 
-console.log('piano: 6/6 check groups passed');
+// T5: pre-gesture silence — suspended context schedules nothing and never throws
+// (the rejecting-resume path included). Ambient voices gate; play() swallows.
+{
+  const { eng, oscs } = makeEngine({ state: 'suspended', failResume: true });
+  assert.equal(eng.running(), false, 'T5 context not running yet');
+  eng.play(() => eng.chord(220, [0, 4]));
+  eng.note(220);
+  eng.tok();
+  eng.echo(330);
+  assert.equal(eng.hold({ root: 220 }), null, 'T5 hold refuses to start pre-gesture');
+  assert.equal(eng.drone(), null, 'T5 drone refuses to start pre-gesture');
+  assert.equal(oscs.length, 0, 'T5 nothing scheduled into the frozen clock');
+}
+
+// T6: master mute — persisted ('sl-audio'), gates every voice creator inside the
+// engine, default ON, unmute restores scheduling.
+{
+  const { eng, oscs, storage } = makeEngine({});
+  assert.equal(eng.muted, false, 'T6 default is sound ON');
+  assert.equal(storage.getItem('sl-audio'), null, 'T6 no key written before first toggle');
+
+  eng.toggleMuted();
+  assert.equal(eng.muted, true, 'T6 muted after toggle');
+  assert.equal(storage.getItem('sl-audio'), 'off', 'T6 mute persisted');
+  const before = oscs.length;
+  eng.note(220); eng.chord(220, [0, 4]); eng.tok(); eng.echo(330);
+  assert.equal(eng.hold({ root: 220 }), null, 'T6 hold gated while muted');
+  assert.equal(oscs.length, before, 'T6 muted page schedules nothing');
+
+  eng.toggleMuted();
+  assert.equal(storage.getItem('sl-audio'), 'on', 'T6 unmute persisted');
+  eng.chord(220, [0, 7, 14]);
+  assert.equal(oscs.length - before, 6, 'T6 sound returns: 3 voices × 2 oscs');
+}
+
+// T7: attune hold voices are a real chord — root × 2^(semi/12) (the old NaN
+// regression), retune keeps the shape, breath LFO runs on 2×stepS.
+{
+  const { eng, oscs } = makeEngine({});
+  const h = eng.hold({ root: 220, semis: [0, 4, 7], stepS: 3.2 });
+  assert.ok(h, 'T7 hold starts');
+  const lfo = oscs[0]; // first oscillator created by hold is the breath LFO
+  assert.ok(closeTo(lfo.frequency.value, 1 / 6.4), 'T7 breath LFO runs on 2×stepS');
+  const voices = oscs.slice(-3);
+  assert.ok(voices.every(o => Number.isFinite(o.frequency.value) && o.frequency.value > 0), 'T7 all walker voices finite');
+  assert.ok(closeTo(voices[0].frequency.value, 220), 'T7 voice 0 is the rung root');
+  assert.ok(closeTo(voices[1].frequency.value / voices[0].frequency.value, Math.pow(2, 4 / 12)), 'T7 voice 1 is +M3');
+  assert.ok(closeTo(voices[2].frequency.value / voices[0].frequency.value, Math.pow(2, 7 / 12)), 'T7 voice 2 is +P5');
+  h.retune(rungAt(3));
+  const [v0, v1, v2] = voices;
+  assert.ok(closeTo(v1.frequency.value / v0.frequency.value, Math.pow(2, 4 / 12)), 'T7 retune keeps M3');
+  assert.ok(closeTo(v2.frequency.value / v0.frequency.value, Math.pow(2, 7 / 12)), 'T7 retune keeps P5');
+  h.stop();
+}
+
+// T8: releaseAll is the single chokepoint — active holds AND the drone stop
+// their oscillators; calling it twice is safe; new voices still work.
+{
+  const { eng, oscs } = makeEngine({});
+  eng.hold({ root: 220 });
+  eng.drone();
+  const withStop = oscs.filter(o => o.stopped > 0).length;
+  assert.equal(withStop, 0, 'T8 voices sustain before release');
+  eng.releaseAll();
+  assert.equal(oscs.filter(o => o.stopped > 0).length, 8, 'T8 hold (3 voices + LFO) + drone (3 sines + LFO) all stop');
+  eng.releaseAll(); // idempotent
+  const fresh = eng.hold({ root: 220 });
+  assert.ok(fresh, 'T8 fresh hold starts after release');
+  assert.ok(oscs.some(o => o.started > 0 && o.stopped === 0), 'T8 fresh voice schedules and sustains after release');
+  fresh.stop();
+}
+
+// T9: drone singleton — second call returns the live handle, stop is idempotent.
+{
+  const { eng } = makeEngine({});
+  const d1 = eng.drone();
+  assert.ok(d1, 'T9 drone started');
+  assert.equal(eng.drone(), d1, 'T9 same handle returned while alive');
+  d1.stop();
+  d1.stop(); // must not re-run envelopes on dead nodes
+  const d2 = eng.drone();
+  assert.notEqual(d2, d1, 'T9 fresh drone after stop');
+}
+
+console.log('piano: 9/9 check groups passed');

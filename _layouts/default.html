@@ -22,11 +22,12 @@
   <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/attune.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/silk.css' | relative_url }}">
-  <script src="{{ '/assets/badges.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/piano.js' | relative_url }}" defer></script>
+  <script type="module" src="{{ '/assets/badges.js' | relative_url }}"></script>
+  <script type="module" src="{{ '/assets/piano.js' | relative_url }}"></script>
+  <script type="module" src="{{ '/assets/post-modal.js' | relative_url }}"></script>
   <script type="module" src="{{ '/assets/silk.js' | relative_url }}"></script>
 </head>
-<body>
+<body data-home="{{ '/' | relative_url }}">
 {% if site.data.silk.enabled %}<div class="silk-bg" data-silk data-config='{{ site.data.silk | jsonify }}' aria-hidden="true"></div>{% endif %}
 {% unless page.url == '/404.html' %}
 <a class="skip-link" href="{% if page.layout == 'post' %}#post-content{% else %}#links{% endif %}">{% if page.layout == 'post' %}{{ site.data.locale.skip_to_content }}{% else %}{{ site.data.locale.skip_to_links }}{% endif %}</a>
@@ -40,106 +41,10 @@
 {{ content }}
 
 <script>
+/* Card tilt: pointer-follow parallax on desktop hover devices only. The post
+   modal machine lives in assets/post-modal.js; the standalone-post close
+   button and all other behaviour moved there. */
 if(window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{let fx=0,fy=0,raf=0;const run=()=>{raf=0;const r=c.getBoundingClientRect(),dx=(fx-r.left)/r.width-.5,dy=(fy-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`};c.addEventListener('mousemove',e=>{fx=e.clientX;fy=e.clientY;if(!raf)raf=requestAnimationFrame(run)});c.addEventListener('mouseleave',()=>{if(raf)cancelAnimationFrame(raf);raf=0;c.style.transform=''})})}
-(function(){const a=document.querySelector('.post-article');if(!a)return;const close=document.querySelector('.post-close');const leave=()=>{if(history.length>1){history.back()}else{location.href='{{ "/" | relative_url }}'}};if(close)close.addEventListener('click',leave)})();
-/* Post modal — card ⇄ dialog morph + directional prev/next swap. Fetch+cache the
-   article, fill the dialog, showModal. Open/close share-element morph (View
-   Transitions): the clicked card expands into the dialog and morphs back on close;
-   the dialog is shown/closed synchronously inside the transition, so continuity
-   never delays the action. Prev/next swaps slide the article in from the clicked
-   button's side (WAAPI). All motion falls back to instant under reduced-motion or
-   where View Transitions are unavailable. URL synced: open pushes the post URL
-   (refresh = standalone page = no-JS fallback); Back closes, Forward reopens. gen
-   invalidates in-flight fetches so a stale completion can't fill the modal or push
-   out of order. */
-(function(){
-  const cards=document.querySelectorAll('.post-card');
-  if(!cards.length)return;
-  const dlg=document.getElementById('post-modal');
-  if(!dlg)return;
-  const body=dlg.querySelector('.post-modal-body');
-  const cache=new Map();
-  let gen=0, current=null;
-  /* Scroll lock = overflow:hidden on html only: no position:fixed, no saved offset,
-     so close never touches scroll position (the old fixed-body restore could jump to 0).
-     ponytail: iOS Safari can still wheel-scroll behind the modal; if that matters, the
-     upgrade is position:fixed + scrollY save/restore. 'close' fires on every dismiss
-     path (button, backdrop, Esc, popstate) — the single unlock chokepoint. */
-  dlg.addEventListener('close',()=>{document.documentElement.style.overflow=''});
-  const reduce=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const canVT=()=>!reduce()&&'function'===typeof document.startViewTransition;
-  async function getArticle(url){
-    if(cache.has(url))return cache.get(url);
-    let art=null;
-    try{const r=await fetch(url);if(r.ok)art=new DOMParser().parseFromString(await r.text(),'text/html').querySelector('.post-article')}catch{}
-    /* Cache successes only: a failed fetch must retry on the next click, not
-       hard-navigate forever off one transient network blip. */
-    if(art)cache.set(url,art);
-    return art;
-  }
-  /* Instant jump to top — not body.scroll(0,0), which is smooth under CSS
-     scroll-behavior and would animate the old post's scroll away instead of
-     resetting it. rAF re-asserts once post-fill layout / morph settles. */
-  const top=()=>{body.scrollTop=0;requestAnimationFrame(()=>{body.scrollTop=0})};
-  function fill(article){body.innerHTML=article.innerHTML;const t=article.querySelector('.post-title');if(t){dlg.setAttribute('aria-label',t.textContent);/* Demote h1→h2 inside the modal so the page keeps one document h1 (the hero nick); the standalone post page keeps its server-rendered h1. */const h=body.querySelector('.post-title');if(h&&h.tagName==='H1'){const d=document.createElement('h2');d.className=h.className;while(h.firstChild)d.appendChild(h.firstChild);h.replaceWith(d)}}top()}
-  async function open(card,push){
-    if(dlg.open)return;
-    const g=++gen,url=card.getAttribute('href');
-    const article=await getArticle(url);
-    if(g!==gen)return;
-    if(!article){location.href=url;return}
-    current=card;
-    const show=()=>{fill(article);document.documentElement.style.overflow='hidden';dlg.showModal();top();if(push!==false)history.pushState({postModal:url},'',url)};
-    if(!canVT()){show();return}
-    card.style.viewTransitionName='post-morph';
-    const vt=document.startViewTransition(()=>{show();dlg.style.viewTransitionName='post-morph';card.style.viewTransitionName=''});
-    /* The morph animates the DIALOG — it must not inherit the old scroll offset
-       mid-transition. Assert once more when it finishes. */
-    vt.finished.catch(()=>{}).finally(()=>{top();card.style.viewTransitionName='';dlg.style.viewTransitionName=''});
-  }
-  async function swap(url,push,dir){
-    const g=++gen;
-    const article=await getArticle(url);
-    if(g!==gen)return;
-    if(!article){location.href=url;return}
-    const card=[...cards].find(c=>c.getAttribute('href')===url);if(card)current=card;
-    if(!dlg.open){document.documentElement.style.overflow='hidden';dlg.showModal()}
-    fill(article);
-    // replaceState, not pushState: in-modal next/prev must NOT stack history entries,
-    // else close->back only pops one post and reopens the previous instead of main.
-    // One entry per modal session; close->back always lands on the index.
-    if(push!==false)history.replaceState({postModal:url},'',url);
-    if(reduce()||!dir)return;
-    body.animate([{opacity:0,transform:`translateX(${dir*28}px)`},{opacity:1,transform:'none'}],{duration:240,easing:'cubic-bezier(0.16,1,0.3,1)'});
-  }
-  function close(){
-    if(!dlg.open)return;
-    const hide=()=>{dlg.close();dlg.style.viewTransitionName='';if(history.state&&history.state.postModal)history.back()};
-    if(!canVT()||!current){hide();return}
-    dlg.style.viewTransitionName='post-morph';
-    const vt=document.startViewTransition(()=>{hide();if(current)current.style.viewTransitionName='post-morph'});
-    vt.finished.catch(()=>{}).finally(()=>{if(current)current.style.viewTransitionName=''});
-  }
-  cards.forEach(c=>{
-    c.addEventListener('click',e=>{e.preventDefault();open(c)});
-    if('onpointerover' in c)c.addEventListener('pointerover',()=>getArticle(c.getAttribute('href')));
-  });
-  dlg.querySelector('.post-close').addEventListener('click',close);
-  dlg.addEventListener('click',e=>{
-    if(e.target===dlg){close();return}
-    const nav=e.target.closest('.post-nav a');
-    if(nav&&dlg.contains(nav)){e.preventDefault();swap(nav.getAttribute('href'),undefined,nav.classList.contains('post-nav-next')?1:-1)}
-  });
-  dlg.addEventListener('cancel',e=>{e.preventDefault();close()});
-  window.addEventListener('popstate',e=>{
-    gen++;
-    const u=e.state&&e.state.postModal;
-    if(!u){if(dlg.open){dlg.close();dlg.style.viewTransitionName='';}return}
-    const card=[...cards].find(c=>c.getAttribute('href')===u);
-    if(!card){if(dlg.open){dlg.close();dlg.style.viewTransitionName='';}location.href=u;return}
-    if(!dlg.open)open(card,false);else swap(u,false,0);
-  });
-})();
 </script>
 </body>
 </html>
