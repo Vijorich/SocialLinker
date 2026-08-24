@@ -12,7 +12,7 @@ Single source of truth per content type — all content lives in `_data/*.yml`.
 | Projects list | `_data/projects.yml` |
 | Donate block | `_data/donate.yml` |
 | UI strings | `_data/locale.yml` |
-| Icons (inline SVG) | `_includes/icon.html` (`{% case %}`) |
+| Icons (inline SVG) | `_includes/icon.html` (Liquid `case` over brand name) |
 | Styles | `assets/style.css` |
 
 ## Posts
@@ -21,8 +21,8 @@ Single source of truth per content type — all content lives in `_data/*.yml`.
 
 ## Icons
 
-`_includes/icon.html` renders a `{% when %}` per brand from simpleicons.org; unknown `name` falls back to a globe SVG. Add a `case` to add a brand.
+`_includes/icon.html` renders a `when` branch per brand from simpleicons.org; unknown `name` falls back to a globe SVG. Add a `case` to add a brand.
 
 ## Language
 
-Single language (RU), fully server-rendered from `locale.yml` and `profile.yml`. Add strings to `locale.yml`, reference them via `{{ site.data.locale.key }}`.
+Single language (RU), fully server-rendered from `locale.yml` and `profile.yml`. Add strings to `locale.yml`, reference them via `{% raw %}{{ site.data.locale.key }}{% endraw %}`.

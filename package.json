@@ -4,6 +4,6 @@
   "type": "module",
   "description": "Static Jekyll site; package.json only marks ES modules for node test runs.",
   "scripts": {
-    "test": "node tests/piano.test.mjs && node tests/modal-history.test.mjs && node tests/badges.test.mjs"
+    "test": "node tests/piano.test.mjs && node tests/modal-history.test.mjs && node tests/badges.test.mjs && ruby scripts/check-liquid.rb"
   }
 }
