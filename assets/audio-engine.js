@@ -18,7 +18,7 @@
  * crackle — af4a508). All envelopes are setTargetAtTime only: exponentialRamp
  * kinks at segment ends and phones render the kink as crackle (275e2f5, 4a21d2e).
  */
-export function createAudioEngine({ storage, ctxFactory } = {}) {
+export function createAudioEngine({ storage, ctxFactory = () => new AudioContext() } = {}) {
   let ctx = null, out = null, droneVoice = null;
   const holds = new Set();
 

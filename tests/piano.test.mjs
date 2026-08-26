@@ -182,4 +182,23 @@ function makeEngine(opts = {}) {
   assert.notEqual(d2, d1, 'T9 fresh drone after stop');
 }
 
-console.log('piano: 9/9 check groups passed');
+// T10: browser boot path — production creates the engine WITHOUT an injected
+// ctxFactory (piano.js passes { storage } only), so the engine must fall back
+// to the ambient AudioContext constructor (the 12cd182 total-silence regression).
+{
+  const c = makeCtx({ state: 'running' });
+  const saved = globalThis.AudioContext;
+  globalThis.AudioContext = function () { return c.ctx; };
+  try {
+    const eng = createAudioEngine({ storage: storageStub() });
+    eng.chord(220, [0, 7, 14]);
+    assert.equal(c.oscs.length, 6, 'T10 factory-less engine schedules 3 voices × 2 oscs');
+    eng.play(() => eng.note(330));
+    assert.equal(c.oscs.length, 8, 'T10 gesture play path uses the same default factory');
+  } finally {
+    if (saved === undefined) delete globalThis.AudioContext;
+    else globalThis.AudioContext = saved;
+  }
+}
+
+console.log('piano: 10/10 check groups passed');

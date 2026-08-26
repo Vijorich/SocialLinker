@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Personal business-card site for **Vijor**. Static Jekyll site on GitHub Pages (safe mode: **no plugins, no CI**). Content lives in `_data/*.yml`; page composed from includes in `index.html`. Liquid + plain HTML/CSS. Single-language (RU), server-rendered — no client-side i18n.
+Personal business-card site. Static Jekyll site on GitHub Pages (safe mode: **no plugins, no CI**). Content lives in `_data/*.yml`; page composed from includes in `index.html`. Liquid + plain HTML/CSS. Single-language (RU), server-rendered — no client-side i18n.
 
 ## Verify changes
 
