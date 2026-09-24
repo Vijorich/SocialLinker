@@ -10,7 +10,7 @@
 
 - Секции набираются из `_data/sections.yml`: порядок строк = порядок на странице, удалил строку — секция скрыта.
 - Соцссылки с живыми бейджами **Live** (Twitch) и **New!** (YouTube, Telegram) — клиентский JS, без ключей API.
-- Список проектов, блок донатов, блог на `_posts/*.md`.
+- Список проектов, блок донатов и посты на `_posts/*.md` (посты доступны по прямым URL; витрина статей временно скрыта).
 - Без custom plugins и CI: работает в safe mode GitHub Pages, деплой пушем в `main` (allowlisted `jekyll-redirect-from` используется только для старых URL).
 
 ## Форк под себя
@@ -55,7 +55,7 @@ bundle exec jekyll serve --baseurl ""
 
 - Заголовок секции: `title: "Текст"` — свой, без `title` — из `locale.yml`, `title: false` — скрыть.
 - Бейдж YouTube требует `channel_id` (смотрите на youtube.com/account_advanced); пустой — бейдж не рендерится.
-- Посты: `_posts/YYYY-MM-DD-slug.md` с `title`, `date`, `lang` в front matter — попадают в секцию «Статьи» автоматически.
+- Посты: `_posts/YYYY-MM-DD-slug.md` с `title`, `date`, `lang` в front matter — доступны по прямым URL. Чтобы вернуть витрину, добавь `- type: articles` в `_data/sections.yml`.
 
 Больше деталей — в [AGENTS.md](AGENTS.md).
 
