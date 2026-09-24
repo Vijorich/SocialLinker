@@ -201,19 +201,19 @@ Flat by doctrine. No element casts a shadow at rest; depth is conveyed by tonal 
 
 ## Shapes
 
-The pill is the form language for cards and badges. Interactive controls use a softer 1rem control radius (1.25rem for the 404 CTA) so icon buttons feel related to the cards without reading as circular. Cards inside a list default to 1rem so a list reads as one clipped block: first and last cards carry 2rem outer caps, and a hovered card inflates to the full 2rem pill — visually breaking out of the block. Avatars and badges remain fully round. Code chips use the small 0.25rem radius.
+The form language is now quieter for link cards: cards use a compact 0.75rem radius, with 1.25rem outer caps and more internal padding. Badges keep their pill shape, while icon controls use a softer 1rem control radius (1.25rem for the 404 CTA). Avatars remain fully round. Code chips use the small 0.25rem radius.
 
 ### Named Rules
-**The Block-And-Breakout Rule.** Lists are one block at rest (1rem inner, 2rem caps). Hover grants the full pill (2rem). A list that doesn't break out on hover is off-brand.
+**The Block-And-Breakout Rule.** Lists are one block at rest (0.75rem inner radius, 1.25rem caps). Hover grants the same restrained outer radius rather than inflating into a large pill. A list that doesn't break out on hover is off-brand.
 
 ## Components
 
 ### Link Cards (signature)
 The product's core unit — every social link, project, and post is one.
-- **Shape:** gently rounded (1rem) inside lists, full pill (2rem) at list ends and on hover
-- **Default:** Oxblood background, Bone White 500-weight text, 1rem padding, 2rem brand icon left, external-link glyph right at 40% opacity
+- **Shape:** compact rounded rectangle (0.75rem) with 1.25rem outer caps and restrained hover radius
+- **Default:** Oxblood background, Bone White 500-weight text, 1.25rem padding, 2rem brand icon left, external-link glyph right at 40% opacity
 - **Description line:** optional `description:` (social.yml) renders one muted line (Ash Rose, 1rem, 400-weight, ellipsis) under the card name — disambiguates same-brand links (YouTube vs YouTube Second)
-- **Hover:** background heats to Ember Red, scale 1.055, radius inflates to the full 2rem master pill, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted at 28% alpha; gold-tinted at 38% on the donate variant) — the Heat-On-Touch rule made literal. The hover reads physical: cards lean forward and glow hotter, but never change hue. Cursor-tracking parallax (±4px, pointer-fine only, reduced-motion-gated) composes with the hover scale — default.html.
+- **Hover:** background heats to Ember Red, scale 1.055, radius settles at the restrained 1.25rem outer radius, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted at 28% alpha; gold-tinted at 38% on the donate variant) — the Heat-On-Touch rule made literal. The hover reads physical: cards lean forward and glow hotter, but never change hue. Cursor-tracking parallax (±4px, pointer-fine only, reduced-motion-gated) composes with the hover scale — default.html.
 - **Focus (`:focus-visible`):** mirrors hover heat + a double keyboard ring (`box-shadow: 0 0 0 2px Cinder, 0 0 0 4px Signal Link`) so the focused row is unambiguous. Donate variant heats to full gold + dark text. Focus is not hover-gated — keyboard users on any device get the ring. Mouse clicks suppress it via `:focus-visible`.
 - **Touch:** no hover — press scales to 0.96 (0.15s). Deep enough that the tap reads as an intentional physical action, not a missed tap.
 - **Donate variant:** Hearth Brown + Spotlight Gold text at rest; full gold fill with dark text and a soft gold glow on hover
@@ -258,7 +258,7 @@ Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separate
 ## Do's and Don'ts
 
 ### Do:
-- **Do** build every new interactive row as a link card: Oxblood at rest, Ember Red + scale on hover, full pill on breakout.
+- **Do** build every new interactive row as a link card: Oxblood at rest, Ember Red + scale on hover, restrained breakout radius.
 - **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the teal/ember ramp.
 - **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the card⇄modal morph (~0.34s) are the exceptions — the morph is continuity; cache misses show a busy state immediately rather than waiting silently, the others are exit-style state feedback.
 - **Do** keep badges honest: hidden by default, revealed only on confirmed data, silent on any fetch error.

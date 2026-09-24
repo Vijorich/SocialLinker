@@ -10,6 +10,7 @@ const postLayout = readFileSync(new URL('../_layouts/post.html', import.meta.url
 assert.match(css, /\.post-single\s*\{[^}]*z-index:\s*1/s, 'post content stacks above Silk');
 assert.match(css, /\.sound-toggle\[hidden\]\s*\{\s*display:\s*none;/, 'hidden sound control is not focusable by layout');
 assert.match(css, /--control-radius:\s*1rem/, 'controls use the shared soft-square radius');
+assert.match(css, /--card-radius:\s*0\.75rem/, 'link cards use the restrained radius');
 assert.doesNotMatch(css, /\.hero:has\(\.avatar\.live\)\s*~\s*\.container/, 'live selector has valid ancestor structure');
 assert.match(modal, /showModal\s*!==\s*'function'/, 'unsupported dialogs keep native post links');
 assert.match(modal, /if \(g !== gen\) return;/, 'stale modal work is invalidated');
