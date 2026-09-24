@@ -110,6 +110,7 @@ function makeWorld(cardUrls) {
 
 // T3: history navigation during a slow open — the pending open is superseded (its late
 // fetch can't push or fill), and Forward reopens the cached entry the user navigated to.
+// The busy dialog is visible immediately; stale work cannot replace its state.
 {
   const w = makeWorld(['/posts/a/', '/posts/b/']);
   w.clickCard('/posts/a/');
@@ -118,7 +119,8 @@ function makeWorld(cardUrls) {
   w.historyLike.back();
   await tick(); // closed, idx 0
   w.clickCard('/posts/b/'); // open B: fetch pending, modal not yet open (fetch-first)
-  assert.ok(!w.dlg.open, 'T3 no modal until the article resolves');
+  assert.ok(w.dlg.open, 'T3 loading dialog opens immediately');
+  assert.match(w.body.innerHTML, /Loading/, 'T3 loading state is visible');
   w.historyLike.forward(); // user navigates to the A entry → A reopens from cache
   w.fetches[1].resolve(okArticle('/posts/b/')); // B resolves late — must be dropped
   await tick();
@@ -183,12 +185,11 @@ function makeWorld(cardUrls) {
   assert.equal(w.events.filter(e => e.type === 'post-modal-close').length, 0, 'T5 hard handoff is silent');
 }
 
-// T6: fetch failure falls back to the standalone page (the no-JS/direct-link route).
-// Fetch-first means no modal opens on failure — the click resolves straight to navigation.
+// T6: a fetch failure dismisses the busy modal and falls back to the standalone page.
 {
   const w = makeWorld(['/posts/a/']);
   w.clickCard('/posts/a/');
-  assert.ok(!w.dlg.open, 'T6 no modal until the article resolves');
+  assert.ok(w.dlg.open, 'T6 busy modal opens immediately');
   w.fetches[0].resolve(null);
   await tick();
   assert.deepEqual(w.navigated, ['/posts/a/'], 'T6 falls back to standalone page');
@@ -233,4 +234,29 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w3.body.style.writes.filter(([k]) => k.includes('position')), [], 'T9 body style untouched (no position:fixed)');
 }
 
-console.log('modal-history: 9/9 checks passed');
+// T10: prefetch and open share one in-flight request.
+{
+  const w = makeWorld(['/posts/a/']);
+  w.machine.prefetch('/posts/a/');
+  w.clickCard('/posts/a/');
+  assert.equal(w.fetches.length, 1, 'T10 in-flight article request is deduplicated');
+  w.fetches[0].resolve(okArticle('/posts/a/'));
+  await tick();
+  assert.ok(w.dlg.open, 'T10 shared request opens the modal');
+}
+
+// T11: closing while a swap is pending invalidates the late result.
+{
+  const w = makeWorld(['/posts/a/', '/posts/b/']);
+  w.clickCard('/posts/a/');
+  w.fetches[0].resolve(okArticle('/posts/a/'));
+  await tick();
+  w.machine.swap('/posts/b/', true, 0);
+  w.machine.close();
+  w.fetches[1].resolve(okArticle('/posts/b/'));
+  await tick();
+  assert.ok(!w.dlg.open, 'T11 late swap cannot reopen a closed modal');
+  assert.equal(w.body.innerHTML, 'body-of /posts/a/', 'T11 closed modal keeps its prior fill');
+}
+
+console.log('modal-history: 11/11 checks passed');

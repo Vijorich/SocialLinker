@@ -7,26 +7,33 @@
   {% assign _rel = 'noopener me' %}
   {% assign _default_title = site.data.locale.nav_links %}
 {% endif %}
-<section class="section" id="{{ include.section_id | default: _id }}"{% if _id == 'links' %} tabindex="-1"{% endif %}>
-  {% if include.title != false %}{% assign t = include.title | default: _default_title %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+<section class="section" id="{{ include.section_id | default: _id | escape }}"{% if _id == 'links' %} tabindex="-1"{% endif %}>
+  {% if include.title != false %}{% assign t = include.title | default: _default_title %}<h2 class="section-title">{{ t | escape }}</h2>{% endif %}
+  {% if include.items.size > 0 %}
   <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}" data-badge-days="{{ site.data.social.badge_days | default: 3 }}">
     {% for item in include.items %}
     {% assign b = item.badge %}
     {% if b and b.type == 'youtube' and b.channel_id == '' %}{% assign b = nil %}{% endif %}
+    {% assign _url = item.url | default: '#' %}
+    {% assign _url_parts = _url | split: ':' %}
+    {% assign _url_scheme = _url_parts | first | downcase %}
+    {% if _url_parts.size > 1 and _url_scheme != 'http' and _url_scheme != 'https' and _url_scheme != 'mailto' and _url_scheme != 'tel' %}
+      {% assign _url = '#' %}
+    {% endif %}
     <li>
-      <a href="{{ item.url | escape }}" target="_blank" rel="{{ _rel }}" class="link-card">
+      <a href="{{ _url | escape }}" target="_blank" rel="{{ _rel }}" class="link-card">
         {% include icon.html name=item.icon %}
         <span class="link-card-body">
-          <span>{{ item.name | escape }}<span class="visually-hidden"> ({{ site.data.locale.new_tab }})</span></span>
+          <span>{{ item.name | escape }}<span class="visually-hidden"> ({{ site.data.locale.new_tab | escape }})</span></span>
           {% if item.description %}<span class="link-desc">{{ item.description | escape }}</span>{% endif %}
         </span>
         {% if b %}
         <span class="badge badge-{% if b.type == 'twitch' %}live{% else %}new{% endif %}" hidden
-              data-badge-type="{{ b.type }}"
-              {%- if b.login %} data-badge-login="{{ b.login }}"{% endif %}
-              {%- if b.channel_id %} data-badge-id="{{ b.channel_id }}"{% endif %}
-              {%- if b.channel %} data-badge-channel="{{ b.channel }}"{% endif %}>
-          {%- if b.type == 'twitch' %}{{ site.data.locale.badge_live }}{% else %}{{ site.data.locale.badge_new }}{% endif -%}
+              data-badge-type="{{ b.type | escape }}"
+              {%- if b.login %} data-badge-login="{{ b.login | escape }}"{% endif %}
+              {%- if b.channel_id %} data-badge-id="{{ b.channel_id | escape }}"{% endif %}
+              {%- if b.channel %} data-badge-channel="{{ b.channel | escape }}"{% endif %}>
+          {%- if b.type == 'twitch' %}{{ site.data.locale.badge_live | escape }}{% else %}{{ site.data.locale.badge_new | escape }}{% endif -%}
         </span>
         {% endif %}
         {% include icon.html name='external' %}
@@ -34,4 +41,8 @@
     </li>
     {% endfor %}
   </ul>
+  {% else %}
+  <p class="post-excerpt">{% if include.style == 'donate' %}{{ site.data.locale.donate_empty | escape }}{% else %}{{ site.data.locale.social_empty | escape }}{% endif %}</p>
+  {% endif %}
+  {% unless include.style == 'donate' %}<p class="badge-privacy-note">{{ site.data.locale.badge_privacy_note | escape }}</p>{% endunless %}
 </section>

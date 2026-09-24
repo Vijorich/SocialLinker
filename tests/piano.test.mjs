@@ -32,7 +32,8 @@ function makeCtx({ state = 'running', failResume = false } = {}) {
       const o = {
         frequency: param(440), connect: x => x,
         started: 0, stopped: 0,
-        start() { this.started++; }, stop() { this.stopped++; },
+        start() { this.started++; },
+        stop() { this.stops = this.stops || []; this.stops.push([...arguments]); this.stopped++; },
       };
       oscs.push(o); return o;
     },
@@ -201,4 +202,42 @@ function makeEngine(opts = {}) {
   }
 }
 
-console.log('piano: 10/10 check groups passed');
+// T11: releaseAll stops already-scheduled transient voices too.
+{
+  const { eng, oscs } = makeEngine({});
+  eng.chord(220, [0, 4]);
+  const before = oscs.map(o => (o.stops || []).length);
+  eng.releaseAll();
+  assert.ok(oscs.every((o, i) => (o.stops || []).length > before[i]), 'T11 transient voices receive an early stop');
+}
+
+// T12: a persisted mute does not create an AudioContext during unlock.
+{
+  const c = makeCtx();
+  const storage = storageStub();
+  storage.setItem('sl-audio', 'off');
+  let created = 0;
+  const eng = createAudioEngine({ storage, ctxFactory: () => { created++; return c.ctx; } });
+  eng.unlock();
+  assert.equal(created, 0, 'T12 muted unlock creates no context');
+  assert.equal(eng.available, true, 'T12 muted engine remains available for a later unmute');
+}
+
+// T13: the factory-less production path supports the legacy WebKit constructor.
+{
+  const c = makeCtx({ state: 'running' });
+  const savedAudio = globalThis.AudioContext;
+  const savedWebkit = globalThis.webkitAudioContext;
+  delete globalThis.AudioContext;
+  globalThis.webkitAudioContext = function () { return c.ctx; };
+  try {
+    const eng = createAudioEngine({ storage: storageStub() });
+    eng.chord(220, [0]);
+    assert.equal(c.oscs.length, 2, 'T13 WebKit fallback schedules a voice');
+  } finally {
+    if (savedAudio === undefined) delete globalThis.AudioContext; else globalThis.AudioContext = savedAudio;
+    if (savedWebkit === undefined) delete globalThis.webkitAudioContext; else globalThis.webkitAudioContext = savedWebkit;
+  }
+}
+
+console.log('piano: 13/13 check groups passed');

@@ -13,7 +13,7 @@ Sources are all keyless:
 - Twitch uptime via decapi.me.
 - YouTube RSS and t.me/s via a public CORS proxy chain (corsproxy.io → allorigins.win → codetabs.com), with one internal seam in `get()`.
 
-Any fetch/parse error leaves the chip hidden.
+Requests use an 8-second timeout, omit credentials/referrers, and announce a confirmed reveal through the page status live region. Any fetch/parse error leaves the chip hidden.
 
 Per-type presentation concentrates in `announce()` below the seam: confirmed Twitch live also adds `.live` to `.avatar` (sonar ring, gated by `prefers-reduced-motion`) and dispatches `badge-reveal` for piano (see [audio-piano.md](audio-piano.md)).
 

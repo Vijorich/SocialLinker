@@ -1,103 +1,142 @@
 /* Post-modal session machine.
  *
- * Deep module: article fetch+cache, generation token, dialog fill (h1→h2
- * demotion), scroll lock, View Transition morph on open/close, directional
- * prev/next swap, and history sync all live behind a small interface:
- *
- *   open(card)        card click → fetch, show, push post URL
- *   swap(url, dir)    in-modal prev/next: replaceState, never stacks history
- *   close()           every dismiss path; pops the session entry
- *   popstate(state)   Back/Forward: close, reopen from cache, or hand off
- *   prefetch(url)     pointerover warm-up of the cache
- *
- * Everything that varies outside enters as an injected adapter — two adapters
- * per seam make each one real (prod vs tests):
- *   fetcher(url)   -> Promise<article|null>   null = failure, never cached
- *   hist           -> { state, push(s,u), replace(s,u), back() }
- *   navigate(url)  -> hard navigation (failed fetch / unknown popstate URL)
- *   host           -> { dlg, body, root }     elements the machine drives
- *   vt(cb) | null  -> startViewTransition wrapper; null = unsupported
- *   reduce()       -> prefers-reduced-motion
- *   raf(cb)
- *   emit(type, detail) -> 'post-modal-open' {url, source} / 'post-modal-close'
- *
- * The layout wires DOM events onto this interface via initPostModal(); tests
- * import createPostModal and pass fakes across the seams.
+ * Deep module: article fetch+cache, generation token, dialog fill, scroll lock,
+ * View Transition morph, directional prev/next swap, and history sync.
+ * Everything that varies outside enters as an injected adapter, which keeps the
+ * normal path testable without a browser.
  */
+
 export function createPostModal(deps) {
-  const { cards, host, fetcher, hist, navigate, vt, reduce, raf, emit } = deps;
-  const { dlg, body, root } = host;
-  /* Scroll lock = overflow:hidden on html only: no position:fixed, no saved offset,
-     so close never touches scroll position. 'close' fires on every dismiss path
-     (button, backdrop, Esc, popstate) — the single unlock chokepoint. */
+  const { cards, host, fetcher, hist, navigate, vt, reduce, raf, emit, labels = {} } = deps;
+  const { dlg, body, root, status, loading } = host;
+
   dlg.addEventListener('close', () => { root.overflow = ''; });
-  /* Esc routes through the same close() as every other dismiss path. */
   dlg.addEventListener('cancel', e => { e.preventDefault(); close(); });
 
   const cache = new Map();
-  let gen = 0, current = null;
+  const pending = new Map();
+  let gen = 0, current = null, sessionLoading = false;
 
   async function getArticle(url) {
     if (cache.has(url)) return cache.get(url);
-    const art = await fetcher(url);
-    /* Cache successes only: a failed fetch must retry on the next click, not
-       hard-navigate forever off one transient network blip. */
-    if (art) cache.set(url, art);
-    return art;
+    if (pending.has(url)) return pending.get(url);
+    let result;
+    try { result = fetcher(url); } catch (error) { result = Promise.reject(error); }
+    const request = Promise.resolve(result)
+      .then(article => {
+        if (article) cache.set(url, article);
+        return article;
+      })
+      .finally(() => pending.delete(url));
+    pending.set(url, request);
+    return request;
   }
 
-  /* Instant jump to top — not body.scroll(0,0), which is smooth under CSS
-     scroll-behavior and would animate the old post's scroll away instead of
-     resetting it. rAF re-asserts once post-fill layout / morph settles. */
   const top = () => { body.scrollTop = 0; raf(() => { body.scrollTop = 0; }); };
+
+  const focusTitle = () => {
+    const heading = body.querySelector('.post-title');
+    if (heading && typeof heading.focus === 'function') {
+      try { heading.focus({ preventScroll: true }); } catch { heading.focus(); }
+    } else if (body && typeof body.focus === 'function') {
+      try { body.focus({ preventScroll: true }); } catch { body.focus(); }
+    }
+  };
 
   function fill(article) {
     body.innerHTML = article.innerHTML;
-    const t = article.querySelector('.post-title');
-    if (t) {
-      dlg.setAttribute('aria-label', t.textContent);
-      /* Demote h1→h2 inside the modal so the page keeps one document h1 (the
-         hero nick); the standalone post page keeps its server-rendered h1. */
-      const h = body.querySelector('.post-title');
-      if (h && h.tagName === 'H1') {
-        const d = document.createElement('h2');
-        d.className = h.className;
-        while (h.firstChild) d.appendChild(h.firstChild);
-        h.replaceWith(d);
+    const sourceTitle = article.querySelector('.post-title');
+    if (sourceTitle) {
+      const title = sourceTitle.textContent.trim();
+      dlg.setAttribute('aria-label', title);
+      if (status) status.textContent = title;
+    } else if (status) {
+      status.textContent = '';
+    }
+
+    /* Demote h1→h2 inside the modal so the page keeps one document h1. */
+    const heading = body.querySelector('.post-title');
+    if (heading?.tagName === 'H1') {
+      const ownerDocument = body.ownerDocument || (typeof document !== 'undefined' ? document : null);
+      if (ownerDocument) {
+        const replacement = ownerDocument.createElement('h2');
+        for (const attr of heading.attributes || []) replacement.setAttribute(attr.name, attr.value);
+        while (heading.firstChild) replacement.appendChild(heading.firstChild);
+        heading.replaceWith(replacement);
       }
     }
+    const renderedTitle = body.querySelector('.post-title');
+    if (renderedTitle) renderedTitle.setAttribute('tabindex', '-1');
+    body.querySelectorAll?.('pre').forEach(pre => {
+      pre.tabIndex = 0;
+      pre.setAttribute('role', 'region');
+      pre.setAttribute('aria-label', labels.codeBlock || 'Code');
+    });
     top();
   }
 
   async function open(card, push = true) {
-    if (dlg.open) return;
+    if (dlg.open && !sessionLoading) return;
     const g = ++gen, url = card.getAttribute('href');
+    const wasOpen = dlg.open;
+    current = card;
+    let prepared = false;
+
+    const prepare = () => {
+      prepared = true;
+      sessionLoading = true;
+      if (!dlg.open) {
+        root.overflow = 'hidden';
+        dlg.showModal();
+      }
+      body.setAttribute?.('aria-busy', 'true');
+      if (loading) {
+        loading.hidden = false;
+        body.innerHTML = '';
+      } else {
+        body.innerHTML = `<p class="post-modal-loading-fallback">${labels.loading || 'Loading…'}</p>`;
+      }
+      if (status) status.textContent = labels.loading || 'Loading…';
+      top();
+      if (typeof body.focus === 'function') body.focus({ preventScroll: true });
+    };
+
+    /* Open a busy dialog immediately so a slow/mobile fetch never feels inert. */
+    if (vt && !reduce() && !wasOpen) {
+      card.style.viewTransitionName = 'post-morph';
+      try {
+        const transition = vt(() => { if (g === gen && !prepared) prepare(); });
+        transition.finished.catch(() => {}).finally(() => {
+          card.style.viewTransitionName = '';
+          dlg.style.viewTransitionName = '';
+        });
+      } catch {
+        card.style.viewTransitionName = '';
+        prepare();
+      }
+    } else {
+      prepare();
+    }
+
     const article = await getArticle(url);
     if (g !== gen) return;
-    if (!article) { navigate(url); return; }
-    current = card;
+    if (!article) {
+      dismiss();
+      navigate(url);
+      return;
+    }
     const show = () => {
+      if (!prepared) prepare();
+      sessionLoading = false;
+      if (loading) loading.hidden = true;
+      body.removeAttribute?.('aria-busy');
       fill(article);
-      root.overflow = 'hidden';
-      dlg.showModal();
+      focusTitle();
       top();
       if (push !== false) hist.push({ postModal: url }, url);
       emit('post-modal-open', { url, source: push === false ? 'history' : 'card' });
     };
-    if (!vt || reduce()) { show(); return; }
-    card.style.viewTransitionName = 'post-morph';
-    const transition = vt(() => {
-      show();
-      dlg.style.viewTransitionName = 'post-morph';
-      card.style.viewTransitionName = '';
-    });
-    /* The morph animates the DIALOG — it must not inherit the old scroll offset
-       mid-transition. Assert once more when it finishes. */
-    transition.finished.catch(() => {}).finally(() => {
-      top();
-      card.style.viewTransitionName = '';
-      dlg.style.viewTransitionName = '';
-    });
+    show();
   }
 
   async function swap(url, push = true, dir = 0) {
@@ -106,38 +145,63 @@ export function createPostModal(deps) {
     if (g !== gen) return;
     if (!article) { navigate(url); return; }
     const card = cards.find(c => c.getAttribute('href') === url);
-    if (card) current = card;
-    if (!dlg.open) { root.overflow = 'hidden'; dlg.showModal(); }
+    current = card || null;
+    if (!dlg.open) {
+      root.overflow = 'hidden';
+      dlg.showModal();
+    }
+    if (loading) loading.hidden = true;
+    body.removeAttribute?.('aria-busy');
     fill(article);
-    /* replaceState, not pushState: in-modal next/prev must NOT stack history
-       entries — one entry per modal session; close→back always lands on index. */
     if (push !== false) hist.replace({ postModal: url }, url);
-    if (reduce() || !dir) return;
-    body.animate(
-      [{ opacity: 0, transform: `translateX(${dir * 28}px)` }, { opacity: 1, transform: 'none' }],
-      { duration: 240, easing: 'cubic-bezier(0.16,1,0.3,1)' }
-    );
+    const focusAfterSwap = () => { focusTitle(); raf(focusTitle); };
+    if (reduce() || !dir || typeof body.animate !== 'function') {
+      focusAfterSwap();
+      return;
+    }
+    try {
+      body.animate(
+        [{ opacity: 0, transform: `translateX(${dir * 28}px)` }, { opacity: 1, transform: 'none' }],
+        { duration: 240, easing: 'cubic-bezier(0.16,1,0.3,1)' }
+      );
+    } catch {}
+    focusAfterSwap();
   }
 
-  /* Single dismiss path: dlg.close() fires the 'close' listener (scroll unlock),
-     the emitted event voices the piano farewell, then we pop our session entry. */
-  function dismiss() {
+  /* Invalidate before any close transition starts. This is deliberately
+     synchronous: history.back() and ViewTransition callbacks are asynchronous. */
+  function dismiss(invalidate = true) {
+    if (invalidate) gen++;
+    sessionLoading = false;
     dlg.close();
     dlg.style.viewTransitionName = '';
+    if (loading) loading.hidden = true;
+    body.removeAttribute?.('aria-busy');
     emit('post-modal-close', {});
     if (hist.state && hist.state.postModal) hist.back();
   }
 
   function close() {
     if (!dlg.open) return;
-    if (!vt || reduce() || !current) { dismiss(); return; }
+    gen++;
+    const source = current;
+    if (!vt || reduce() || !source) { dismiss(false); return; }
     dlg.style.viewTransitionName = 'post-morph';
-    const transition = vt(() => {
-      dismiss();
-      if (current) current.style.viewTransitionName = 'post-morph';
-    });
+    const closeGen = gen;
+    let transition;
+    try {
+      transition = vt(() => {
+        if (closeGen !== gen) return;
+        dismiss(false);
+        if (source) source.style.viewTransitionName = 'post-morph';
+      });
+    } catch {
+      dlg.style.viewTransitionName = '';
+      dismiss(false);
+      return;
+    }
     transition.finished.catch(() => {}).finally(() => {
-      if (current) current.style.viewTransitionName = '';
+      if (source) source.style.viewTransitionName = '';
     });
   }
 
@@ -147,36 +211,56 @@ export function createPostModal(deps) {
     if (!u) { if (dlg.open) dismiss(); return; }
     const card = cards.find(c => c.getAttribute('href') === u);
     if (!card) {
-      /* A post URL with no card on this page: land on its standalone page. */
       if (dlg.open) { dlg.close(); dlg.style.viewTransitionName = ''; }
       navigate(u);
       return;
     }
-    if (!dlg.open) open(card, false);
+    if (!dlg.open || sessionLoading) open(card, false);
     else swap(u, false, 0);
   }
 
-  function prefetch(url) { getArticle(url); }
+  function prefetch(url) { getArticle(url).catch(() => {}); }
 
   return { open, swap, close, popstate, prefetch };
 }
 
-/* Browser wiring: build prod adapters, attach listeners, nothing else. */
-export function initPostModal(doc = document) {
+const absoluteURL = (value, base) => {
+  try { return new URL(value, base).href; } catch { return value; }
+};
+
+/* Browser wiring: build production adapters and attach listeners. */
+export function initPostModal(doc = (typeof document !== 'undefined' ? document : null)) {
+  if (!doc) return;
+  const win = doc.defaultView || (typeof window !== 'undefined' ? window : null);
+  if (!win) return;
   const article = doc.querySelector('.post-article');
   const dlgEl = doc.getElementById('post-modal');
   if (!article && !dlgEl) return;
+  const codeLabel = doc.body?.dataset?.codeLabel || 'Code';
+  const makeCodeAccessible = root => root.querySelectorAll('pre').forEach(pre => {
+    pre.tabIndex = 0;
+    pre.setAttribute('role', 'region');
+    pre.setAttribute('aria-label', codeLabel);
+  });
 
-  /* Standalone post page (no dialog): close button = back, else home.
-     Home URL rides on <body data-home="..."> so the layout keeps owning URLs. */
+  /* Standalone post page (no dialog): the close control is a real home link;
+     JS upgrades it to history.back() when possible. */
   if (!dlgEl) {
+    makeCodeAccessible(doc);
     const closeBtn = doc.querySelector('.post-close');
-    if (closeBtn) closeBtn.addEventListener('click', () => {
-      if (history.length > 1) history.back();
-      else location.href = doc.body?.dataset?.home || '/';
+    if (closeBtn) closeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      let sameOrigin = false;
+      try { sameOrigin = !!doc.referrer && new URL(doc.referrer, win.location.href).origin === win.location.origin; } catch {}
+      if (sameOrigin && win.history.length > 1) win.history.back();
+      else win.location.href = doc.body?.dataset?.home || '/';
     });
     return;
   }
+
+  /* Leave native post links untouched when the dialog API is unavailable. */
+  if (typeof dlgEl.showModal !== 'function' || typeof dlgEl.close !== 'function') return;
+  dlgEl.hidden = false;
 
   const machine = createPostModal({
     cards: [...doc.querySelectorAll('.post-card')],
@@ -184,43 +268,86 @@ export function initPostModal(doc = document) {
       dlg: dlgEl,
       body: dlgEl.querySelector('.post-modal-body'),
       root: doc.documentElement.style,
+      status: dlgEl.querySelector('[data-post-status]'),
+      loading: dlgEl.querySelector('[data-post-loading]'),
+    },
+    labels: {
+      codeBlock: dlgEl.dataset.codeLabel || 'Code',
+      loading: dlgEl.dataset.loadingLabel || 'Loading…',
     },
     fetcher: async url => {
+      const controller = typeof win.AbortController === 'function' ? new win.AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 8000) : 0;
       try {
-        const r = await fetch(url);
+        const options = { credentials: 'same-origin' };
+        if (controller) options.signal = controller.signal;
+        const r = await win.fetch(url, options);
         if (!r.ok) return null;
-        return new DOMParser().parseFromString(await r.text(), 'text/html').querySelector('.post-article');
-      } catch { return null; }
+        const parsed = new win.DOMParser().parseFromString(await r.text(), 'text/html');
+        const result = parsed.querySelector('.post-article');
+        if (!result) return null;
+        const base = new URL(r.url || url, win.location.href);
+        result.querySelectorAll('[href]').forEach(node => {
+          const value = node.getAttribute('href');
+          if (value) node.setAttribute('href', absoluteURL(value, base));
+        });
+        result.querySelectorAll('[src]').forEach(node => {
+          const value = node.getAttribute('src');
+          if (value) node.setAttribute('src', absoluteURL(value, base));
+        });
+        result.querySelectorAll('[srcset]').forEach(node => {
+          const value = node.getAttribute('srcset');
+          if (!value) return;
+          const normalized = value.split(',').map(part => {
+            const [url, ...descriptor] = part.trim().split(/\s+/);
+            return [absoluteURL(url, base), ...descriptor].join(' ');
+          }).join(', ');
+          node.setAttribute('srcset', normalized);
+        });
+        return result;
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
     },
     hist: {
-      get state() { return history.state; },
-      push: (s, u) => history.pushState(s, '', u),
-      replace: (s, u) => history.replaceState(s, '', u),
-      back: () => history.back(),
+      get state() { return win.history.state; },
+      push: (s, u) => win.history.pushState(s, '', u),
+      replace: (s, u) => win.history.replaceState(s, '', u),
+      back: () => win.history.back(),
     },
-    navigate: u => { location.href = u; },
+    navigate: u => { win.location.href = u; },
     vt: typeof doc.startViewTransition === 'function'
       ? cb => doc.startViewTransition(cb)
       : null,
-    reduce: () => matchMedia('(prefers-reduced-motion: reduce)').matches,
-    raf: cb => requestAnimationFrame(cb),
-    emit: (type, detail) => window.dispatchEvent(new CustomEvent(type, { detail })),
+    reduce: () => typeof win.matchMedia === 'function' && win.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    raf: cb => typeof win.requestAnimationFrame === 'function' ? win.requestAnimationFrame(cb) : setTimeout(cb, 0),
+    emit: (type, detail) => win.dispatchEvent(new win.CustomEvent(type, { detail })),
   });
 
+  const plainClick = e => !e.defaultPrevented && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
   for (const c of doc.querySelectorAll('.post-card')) {
-    c.addEventListener('click', e => { e.preventDefault(); machine.open(c); });
-    if ('onpointerover' in c) c.addEventListener('pointerover', () => machine.prefetch(c.getAttribute('href')));
+    c.setAttribute('aria-haspopup', 'dialog');
+    c.addEventListener('click', e => {
+      if (!plainClick(e)) return;
+      e.preventDefault();
+      machine.open(c);
+    });
+    c.addEventListener('pointerenter', () => machine.prefetch(c.getAttribute('href')));
   }
-  dlgEl.querySelector('.post-close').addEventListener('click', machine.close);
+  const closeBtn = dlgEl.querySelector('.post-close');
+  if (closeBtn) closeBtn.addEventListener('click', machine.close);
   dlgEl.addEventListener('click', e => {
     if (e.target === dlgEl) { machine.close(); return; }
-    const nav = e.target.closest('.post-nav a');
+    const nav = e.target?.closest?.('.post-nav a');
     if (nav && dlgEl.contains(nav)) {
+      if (!plainClick(e)) return;
       e.preventDefault();
       machine.swap(nav.getAttribute('href'), true, nav.classList.contains('post-nav-next') ? 1 : -1);
     }
   });
-  window.addEventListener('popstate', e => machine.popstate(e.state));
+  win.addEventListener('popstate', e => machine.popstate(e.state));
 }
 
 if (typeof document !== 'undefined') initPostModal();

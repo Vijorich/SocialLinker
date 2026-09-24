@@ -13,45 +13,105 @@
  *   releaseAll()      stop every sounding voice (tab-hide, mute)
  *   setMuted/toggleMuted/muted/running/unlock
  *
- * Invariant owned HERE, not by callers: a muted page never schedules a voice,
- * and nothing schedules into a suspended clock (that pile-up was the startup
- * crackle — af4a508). All envelopes are setTargetAtTime only: exponentialRamp
- * kinks at segment ends and phones render the kink as crackle (275e2f5, 4a21d2e).
+ * Invariant owned HERE, not by callers: a muted page never creates or schedules
+ * a voice, and nothing schedules into a suspended clock. All envelopes are
+ * setTargetAtTime only: exponentialRamp kinks at segment ends and phones render
+ * the kink as crackle.
  */
-export function createAudioEngine({ storage, ctxFactory = () => new AudioContext() } = {}) {
-  let ctx = null, out = null, droneVoice = null;
+
+const globalObject = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : {});
+const defaultCtxFactory = () => {
+  const Ctor = globalObject.AudioContext || globalObject.webkitAudioContext;
+  if (!Ctor) throw new Error('Web Audio API is unavailable');
+  return new Ctor();
+};
+
+export function createAudioEngine({ storage, ctxFactory = defaultCtxFactory } = {}) {
+  let ctx = null, out = null, droneVoice = null, unavailable = false;
+  const hasDefaultCtor = typeof globalObject.AudioContext === 'function' || typeof globalObject.webkitAudioContext === 'function';
   const holds = new Set();
+  const transients = new Set();
 
   let muted = false;
   try { muted = (storage && storage.getItem('sl-audio')) === 'off'; } catch {}
 
-  const ac = () => ctx ??= ctxFactory();
+  /* Context creation is deliberately fail-soft: unsupported WebViews and
+     privacy modes must not turn a card click into an uncaught exception. */
+  const ac = () => {
+    if (ctx) return ctx;
+    if (unavailable) return null;
+    try {
+      ctx = typeof ctxFactory === 'function' ? ctxFactory() : null;
+      if (!ctx) unavailable = true;
+    } catch {
+      ctx = null;
+      /* A browser may reject construction before the first gesture, rather than
+         report an unsupported API. Keep the control available for a later retry. */
+      if (ctxFactory === defaultCtxFactory && !globalObject.AudioContext && !globalObject.webkitAudioContext) {
+        unavailable = true;
+      }
+    }
+    return ctx;
+  };
   const running = () => !!ctx && ctx.state === 'running';
-  const bus = () => {
-    const c = ac();
+  const bus = c => {
     if (!out) { out = c.createGain(); out.connect(c.destination); }
     return out;
+  };
+
+  const scheduleTransient = (node, when) => {
+    if (!node) return;
+    transients.add(node);
+    try {
+      node.stop(when);
+    } catch {
+      transients.delete(node);
+    }
+    if (typeof node.addEventListener === 'function') {
+      node.addEventListener('ended', () => transients.delete(node), { once: true });
+    }
+  };
+  const stopTransients = () => {
+    if (!ctx) {
+      transients.clear();
+      return;
+    }
+    const now = ctx.currentTime;
+    for (const node of transients) {
+      try { node.stop(now); } catch {}
+    }
+    transients.clear();
   };
 
   /* Gesture path: the very first tap may arrive with a suspended context. */
   const play = fn => {
     if (muted) return;
     const c = ac();
-    if (c.state === 'running') fn(c);
-    else c.resume().then(() => fn(c)).catch(() => {});
+    if (!c) return;
+    if (c.state === 'running') {
+      try { fn(c); } catch {}
+      return;
+    }
+    let resumed;
+    try { resumed = c.resume(); } catch { return; }
+    Promise.resolve(resumed).then(() => {
+      if (!muted && c.state === 'running') fn(c);
+    }).catch(() => {});
   };
   /* Shared voice gate: muted pages schedule nothing; nothing schedules into a
-     suspended clock (the pile-up was the startup crackle). Creates the context
-     lazily like every accessor before it. */
+     suspended clock. */
   const gate = () => {
     if (muted) return null;
     const c = ac();
-    return c.state === 'running' ? c : null;
+    return c && c.state === 'running' ? c : null;
   };
-  /* Ambient paths (hover, drones, ticks) stay silent until the context runs —
-     never queued. Autoplay policy needs a gesture, but browsers with media-
-     engagement history allow resume at load; callers invoke this optimistically. */
-  const unlock = () => { try { ac().resume().catch(() => {}); } catch {} };
+  /* Ambient paths stay silent until the context runs — never queued. */
+  const unlock = () => {
+    if (muted) return;
+    const c = ac();
+    if (!c) return;
+    try { Promise.resolve(c.resume()).catch(() => {}); } catch {}
+  };
 
   const note = f => {
     const c = gate();
@@ -62,18 +122,16 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
     g.gain.setTargetAtTime(0.09, t, 0.02);
     g.gain.setTargetAtTime(0, t + 0.06, 0.28);
     o.frequency.value = f;
-    /* Fifth (not octave) partial at low level: sine+octave at the top of a chord
-       sum is exactly what phone speakers render as buzzing crackle. */
     o2.frequency.value = f * 1.5;
     const g2 = c.createGain(); g2.gain.value = 0.1;
-    o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
-    o.start(t); o2.start(t); o.stop(t + 1.2); o2.stop(t + 1.2);
+    o.connect(g); o2.connect(g2).connect(g); g.connect(bus(c));
+    o.start(t); o2.start(t);
+    scheduleTransient(o, t + 1.2);
+    scheduleTransient(o2, t + 1.2);
   };
 
   /* Short chord stabs: [semitones from root], glide between voices, output gain
-     per voice. Voices start mistuned and glide onto the chord — that arrival
-     reads as "resolve". Timing is in beats of `beat` seconds so all events
-     share a grid. Warmth: symmetric gentle mistune curve (GLIDE_SEMIS). */
+     per voice. Voices start mistuned and glide onto the chord. */
   const GLIDE_SEMIS = [-7, -4, 2, 2, 2, -4];
   const chord = (root, semis, { beat = 0.14, glide = 0.06, vols = [0.07, 0.055, 0.05, 0.04], dur = null } = {}) => {
     const c = gate();
@@ -91,17 +149,16 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
       o.frequency.setTargetAtTime(f, tOn, Math.max(0.03, glide));
       o2.frequency.value = f * 1.5;
       const g2 = c.createGain(); g2.gain.value = 0.12;
-      o.connect(g); o2.connect(g2).connect(g); g.connect(bus());
+      o.connect(g); o2.connect(g2).connect(g); g.connect(bus(c));
       o.start(tOn); o2.start(tOn);
-      o.stop(tOn + dur * 1.75 + 0.3); o2.stop(tOn + dur * 1.75 + 0.3);
+      scheduleTransient(o, tOn + dur * 1.75 + 0.3);
+      scheduleTransient(o2, tOn + dur * 1.75 + 0.3);
     });
   };
 
   /* Sustained hold: N voices + a real breath LFO swelling the master gain of
-     THIS voice on a period of 2×stepS (CSS attune glow rides the same period).
-     retune(root) glides the whole chord onto a new rung across the first 60%
-     of a step. Chord offsets are semitones above the rung root — the caller
-     supplies an ABSOLUTE root frequency; ladder math lives in piano.js. */
+     THIS voice on a period of 2×stepS. The current CSS attune treatment is a
+     steady outer glow; the LFO is intentionally audio-only. */
   const hold = ({ root, semis = [0, 4, 7], gain = 0.05, stepS = 3.2 } = {}) => {
     const c = gate();
     if (!c) return null;
@@ -122,31 +179,34 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
       o.connect(og).connect(g);
       return o;
     });
-    g.connect(filt).connect(bus());
+    g.connect(filt).connect(bus(c));
     voices.forEach((o, k) => o.frequency.setValueAtTime(root * Math.pow(2, semis[k] / 12), t0));
     voices.forEach(o => o.start(t0));
     lfo.start(t0);
+    let stopped = false;
     const h = {
       retune(nextRoot) {
+        if (stopped) return;
         voices.forEach((o, k) =>
           o.frequency.setTargetAtTime(nextRoot * Math.pow(2, semis[k] / 12), c.currentTime, stepS * 0.2));
       },
       stop() {
+        if (stopped) return;
+        stopped = true;
         holds.delete(h);
         const te = c.currentTime;
-        lfoGain.gain.setTargetAtTime(0, te, 0.05); // freeze the LFO so the release tail is smooth
+        lfoGain.gain.setTargetAtTime(0, te, 0.05);
         g.gain.cancelScheduledValues(te);
         g.gain.setTargetAtTime(0, te, 0.5);
-        voices.forEach(o => o.stop(te + 2));
-        lfo.stop(te + 2);
+        voices.forEach(o => { try { o.stop(te + 2); } catch {} });
+        try { lfo.stop(te + 2); } catch {}
       },
     };
     holds.add(h);
     return h;
   };
 
-  /* Avatar warmth → ember drone: three detuned sines, gain breathing with a
-     7.5 s LFO matching the CSS ember-breath animation period. Singleton. */
+  /* Avatar warmth → ember drone: three detuned sines with a 7.5 s breath. */
   const drone = () => {
     if (droneVoice) return droneVoice;
     const c = gate();
@@ -161,15 +221,15 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
     lfo.connect(lfoGain).connect(g.gain);
     const osc = [110, 165.5, 220].map((f, k) => {
       const o = c.createOscillator(), og = c.createGain();
-      o.frequency.value = f + k * 0.35; // slight detune per voice = chorused warmth
+      o.frequency.value = f + k * 0.35;
       og.gain.value = [0.6, 0.25, 0.15][k];
       o.connect(og).connect(g);
       o.start(t);
       return o;
     });
-    const filt = c.createBiquadFilter(); // low-pass tames the sines into a glow, not a whine
+    const filt = c.createBiquadFilter();
     filt.type = 'lowpass'; filt.frequency.value = 900; filt.Q.value = 0.4;
-    g.disconnect(); g.connect(filt).connect(bus());
+    g.disconnect(); g.connect(filt).connect(bus(c));
     lfo.start(t);
     droneVoice = {
       stop() {
@@ -179,14 +239,14 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
         lfoGain.gain.setTargetAtTime(0, te, 0.05);
         g.gain.cancelScheduledValues(te);
         g.gain.setTargetAtTime(0, te, 0.55);
-        osc.forEach(o => o.stop(te + 2));
-        lfo.stop(te + 2);
+        osc.forEach(o => { try { o.stop(te + 2); } catch {} });
+        try { lfo.stop(te + 2); } catch {}
       },
     };
     return droneVoice;
   };
 
-  /* Skip-link: one clean fundamental, no harmonic — a soft *tok*, "door's here". */
+  /* Skip-link: one clean fundamental, no harmonic. */
   const tok = () => {
     const c = gate();
     if (!c) return;
@@ -195,9 +255,9 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
     g.gain.setValueAtTime(0, t);
     g.gain.setTargetAtTime(0.08, t, 0.008);
     g.gain.setTargetAtTime(0, t + 0.05, 0.06);
-    o.frequency.value = 330; // perfect fifth above the pentatonic root
-    o.connect(g); g.connect(bus());
-    o.start(t); o.stop(t + 0.4);
+    o.frequency.value = 330;
+    o.connect(g); g.connect(bus(c));
+    o.start(t); scheduleTransient(o, t + 0.4);
   };
 
   /* GitHub link card echo: faint octave tap riding after its hover-note. */
@@ -210,21 +270,22 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
     g.gain.setTargetAtTime(0.045, t, 0.008);
     g.gain.setTargetAtTime(0, t + 0.04, 0.09);
     o.frequency.value = f * 2;
-    o.connect(g); g.connect(bus());
-    o.start(t); o.stop(t + 0.5);
+    o.connect(g); g.connect(bus(c));
+    o.start(t); scheduleTransient(o, t + 0.5);
   };
 
-  /* One chokepoint for "stop everything sounding": tab-hide and mute both land
-     here. Voice release tails stay smooth (setTargetAtTime, ~2 s). */
+  /* One chokepoint for tab-hide and mute. Short voices are tracked as well as
+     holds/drone, so a mute does not leave a scheduled chord ringing. */
   const releaseAll = () => {
     holds.forEach(h => h.stop());
     holds.clear();
     droneVoice?.stop();
     droneVoice = null;
+    stopTransients();
   };
 
   const setMuted = v => {
-    muted = v;
+    muted = Boolean(v);
     try { storage && storage.setItem('sl-audio', muted ? 'off' : 'on'); } catch {}
     if (muted) releaseAll();
     return muted;
@@ -235,6 +296,7 @@ export function createAudioEngine({ storage, ctxFactory = () => new AudioContext
     setMuted,
     toggleMuted: () => setMuted(!muted),
     get muted() { return muted; },
+    get available() { return !unavailable && (ctxFactory !== defaultCtxFactory || hasDefaultCtor); },
     running,
   };
 }

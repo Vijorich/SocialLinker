@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Personal business-card site. Static Jekyll site on GitHub Pages (safe mode: **no plugins, no CI**). Content lives in `_data/*.yml`; page composed from includes in `index.html`. Liquid + plain HTML/CSS. Single-language (RU), server-rendered — no client-side i18n.
+Personal business-card site. Static Jekyll site on GitHub Pages (safe mode: no custom plugins, no CI; the allowlisted `jekyll-redirect-from` plugin preserves old post URLs). Content lives in `_data/*.yml`; page composed from includes in `index.html`. Liquid + plain HTML/CSS. Single-language (RU), server-rendered — no client-side i18n.
 
 ## Verify changes
 
-`npm test` runs all three JS suites on plain node — no packages installed (piano/audio-engine, post-modal history sync, badge providers). The local Jekyll build fails on Windows: check JS with `node --check`, YAML with a parse, and let GitHub Pages do the real build — see [build-deploy.md](docs/agents/build-deploy.md).
+`npm test` runs syntax checks, all JS suites on plain node — no packages installed (piano/audio-engine, post-modal history sync, badge providers, Silk import). The local Jekyll build fails on Windows: check YAML with a parse and let GitHub Pages do the real build — see [build-deploy.md](docs/agents/build-deploy.md).
 
 ## Topic guides
 

@@ -2,7 +2,7 @@ require 'liquid'
 
 patterns = [
   'index.html', '404.html', 'DESIGN.md', 'CONTEXT.md',
-  '_posts/*.md', 'docs/**/*.md', '_includes/*.html', '_layouts/*.html'
+  '_posts/*.md', 'docs/**/*.md', '_includes/*.html', '_layouts/*.html', '*.xml', 'robots.txt'
 ]
 files = patterns.flat_map { |p| Dir.glob(p) }.uniq.sort
 

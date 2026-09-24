@@ -9,7 +9,7 @@ This file is the vocabulary source of truth; ADRs live in `docs/adr/`.
 - **Post card** — an article teaser row on the index (`_includes/articles.html`); clicking it opens the **post modal** instead of navigating.
 - **Post modal** — the `<dialog id="post-modal">` session: fetches a post page, extracts `.post-article`, morphs the clicked post card into the dialog (View Transition `post-morph`), syncs the URL. Refreshing a modal URL lands on the **standalone post page** — the no-JS/direct-link fallback rendered by `_layouts/post.html`.
 - **Badge** — a hidden "Live" / "New!" chip on a link card; revealed client-side when its provider feed confirms. A revealed badge **pins** its card to the top of the list.
-- **Attune** — the ~3.5 s hover-hold state on a card: an evolving pentatonic walker melody plus the `.attuned` glow. One clock, two skins (audio breath LFO + CSS shimmer period).
+- **Attune** — the ~3.5 s hover-hold state on a card: an evolving pentatonic walker melody plus a static outer `.attuned` ember glow. The audio LFO remains internal to the voice; the current visual treatment is a steady bloom.
 - **Silk** — the WebGL background layer (`silk.js`, config in `_data/silk.yml`); fails silent to the CSS gradient ground.
 - **Sound toggle** — fixed mute button; persisted choice, default ON.
 

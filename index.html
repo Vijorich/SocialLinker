@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<div class="container">
+<main class="container" id="main-content" tabindex="-1">
   {% for s in site.data.sections %}
     {% case s.type %}
     {% when 'hero' %}
@@ -20,5 +20,5 @@ layout: default
       <!-- ponytail: unknown section type "{{ s.type }}" in _data/sections.yml — typo check -->
     {% endcase %}
   {% endfor %}
-</div>
-<footer class="site-footer"><a href="{{ site.data.profile.owner_url }}" target="_blank" rel="noopener me">Made with <span class="footer-heart">{% include icon.html name='heart' %}</span> by {{ site.data.profile.nick }}</a></footer>
+</main>
+<footer class="site-footer"><a href="{{ site.data.profile.owner_url | escape }}" target="_blank" rel="noopener me">Made with <span class="footer-heart">{% include icon.html name='heart' %}</span> by {{ site.data.profile.nick | escape }}<span class="visually-hidden"> ({{ site.data.locale.new_tab | escape }})</span></a></footer>

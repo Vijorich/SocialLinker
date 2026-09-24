@@ -1,8 +1,8 @@
 ---
 layout: default
 ---
-<div class="post-single" id="post-content" tabindex="-1">
-  <button class="post-close" type="button" aria-label="{{ site.data.locale.close }}">{% include icon.html name='close' %}</button>
+<main class="post-single" id="post-content" tabindex="-1">
+  <a class="post-close" href="{{ '/' | relative_url | escape }}" aria-label="{{ site.data.locale.close | escape }}">{% include icon.html name='close' %}</a>
   <article class="post-article">
     <header class="post-header">
       <h1 class="post-title">{{ page.title | escape }}</h1>
@@ -13,9 +13,9 @@ layout: default
     </div>
     {% comment %} Nav lives inside .post-article so the index modal copies it for free;
          modal JS intercepts these links and swaps content instead of navigating. {% endcomment %}
-    <nav class="post-nav">
-      {% if page.previous %}<a class="post-nav-prev" href="{{ page.previous.url | relative_url }}" aria-label="{{ site.data.locale.post_newer | escape }}: {{ page.previous.title | escape }}">← {{ page.previous.title | escape }}</a>{% endif %}
-      {% if page.next %}<a class="post-nav-next" href="{{ page.next.url | relative_url }}" aria-label="{{ site.data.locale.post_older | escape }}: {{ page.next.title | escape }}">{{ page.next.title | escape }} →</a>{% endif %}
+    <nav class="post-nav" aria-label="{{ site.data.locale.post_navigation | escape }}">
+      {% if page.previous %}<a class="post-nav-prev" href="{{ page.previous.url | relative_url | escape }}" aria-label="{{ site.data.locale.post_older | escape }}: {{ page.previous.title | escape }}">← {{ page.previous.title | escape }}</a>{% endif %}
+      {% if page.next %}<a class="post-nav-next" href="{{ page.next.url | relative_url | escape }}" aria-label="{{ site.data.locale.post_newer | escape }}: {{ page.next.title | escape }}">{{ page.next.title | escape }} →</a>{% endif %}
     </nav>
   </article>
-</div>
+</main>

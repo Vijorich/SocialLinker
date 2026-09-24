@@ -3,15 +3,20 @@ title: SocialLinker
 description: "Личная визитка."
 author: Vijor
 lang: ru
+timezone: UTC
 
 # ponytail: project-page URL. For user page (user.github.io), set url + leave baseurl empty.
 url: "https://vijorich.github.io"
 baseurl: "/SocialLinker"
 
 # Build
+theme: null
 markdown: kramdown
 kramdown:
   input: GFM
+permalink: /:year/:month/:day/:title/
+plugins:
+  - jekyll-redirect-from
 
 # Defaults
 defaults:
@@ -26,3 +31,31 @@ exclude:
   - README.md
   - AGENTS.md
   - LICENSE
+  - CONTEXT.md
+  - DESIGN.md
+  - Gemfile
+  - Gemfile.lock
+  - package.json
+  - package-lock.json
+  - yarn.lock
+  - pnpm-lock.yaml
+  - node_modules
+  - tests
+  - scripts
+  - reports
+  - docs
+  - vendor
+  - .bundle
+  - .codegraph
+  - .impeccable
+  - .git
+  - .github
+  - .jekyll-cache
+  - .sass-cache
+  - .jekyll-metadata
+  - .env
+  - .env.*
+  - secrets.yml
+  - '*.pem'
+  - '*.key'
+  - '*.log'

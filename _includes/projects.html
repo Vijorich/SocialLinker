@@ -1,14 +1,20 @@
 <section class="section projects" id="projects">
-  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_projects %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_projects %}<h2 class="section-title">{{ t | escape }}</h2>{% endif %}
   {% assign items = site.data.projects.items %}
   {% if items.size > 0 %}
   <ul class="link-list project-list">
     {% for item in items %}
+    {% assign _project_url = item.url | default: '#' %}
+    {% assign _project_parts = _project_url | split: ':' %}
+    {% assign _project_scheme = _project_parts | first | downcase %}
+    {% if _project_parts.size > 1 and _project_scheme != 'http' and _project_scheme != 'https' and _project_scheme != 'mailto' and _project_scheme != 'tel' %}
+      {% assign _project_url = '#' %}
+    {% endif %}
     <li>
-      <a href="{{ item.url | escape }}" target="_blank" rel="noopener" class="link-card project-card">
+      <a href="{{ _project_url | escape }}" target="_blank" rel="noopener" class="link-card project-card">
         {% include icon.html name=item.icon %}
         <span class="post-card-body">
-          <span class="project-name">{{ item.name | escape }}<span class="visually-hidden"> ({{ site.data.locale.new_tab }})</span></span>
+          <span class="project-name">{{ item.name | escape }}<span class="visually-hidden"> ({{ site.data.locale.new_tab | escape }})</span></span>
           {% if item.description %}<span class="project-desc">{{ item.description | escape }}</span>{% endif %}
         </span>
         {% include icon.html name='external' %}
@@ -17,6 +23,6 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p class="post-excerpt">{{ site.data.locale.projects_empty }}</p>
+  <p class="post-excerpt">{{ site.data.locale.projects_empty | escape }}</p>
   {% endif %}
 </section>

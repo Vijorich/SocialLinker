@@ -6,22 +6,22 @@ colors:
   # structural, not accidental. Anchor hue 27 (ember red); neutrals drift warm
   # at h30 low-chroma. One signal hue in three steps: Deep/Live (fills) →
   # Bright (text/icon on any surface incl. Ember hover).
-  cinder-black: "#0d0706"
-  cinder-grad: "#140c0b"
+  cinder-black: "#0a1718"
+  cinder-grad: "#0d1c1e"
   oxblood: "#301512"
   ember-red: "#7b2a25"
   hearth-brown: "#4c2f19"
-  signal-red: "#d1433c"
-  signal-link: "#f67e6c"
-  signal-deep: "#af302b"
-  signal-live: "#bb3c35"
-  signal-sel: "#d65048"
-  on-live: "#ffffff"          # white on the Live fill — bone dips to 4.41 (fails AA); white clears 5.51
+  signal-red: "#d80e05"
+  signal-link: "#ffb4a6"
+  signal-deep: "#b3271e"
+  signal-live: "#b9392f"
+  signal-sel: "#ea5046"
+  on-live: "#ffffff"          # white on the Live fill — bone dips below AA; white clears it
   spotlight-gold: "#fdd171"
-  ash-rose: "#b1a09d"
+  ash-rose: "#d6c9c5"
   bone-white: "#eee4e0"
-  scrollbar: "#795b56"
-  scrollbar-hover: "#997770"
+  scrollbar: "#448b8e"
+  scrollbar-hover: "#5fb5b8"
 typography:
   # Two voices: Unbounded (display: logo, headings) + Rubik (body/UI).
   # Fluid clamp scale; system stacks as load-time floor (fail-silent like badges).
@@ -123,14 +123,14 @@ components:
 
 **Creative North Star: "The Ember Stage"**
 
-A late-night stream made tangible: a dark room, an ember-red glow, one gold spotlight reserved for the donate block. The palette is warm and nocturnal — near-black maroon ground, oxblood cards, a hot signal red that acts as both accent and alarm. Nothing here is corporate, nothing is daylight.
+A late-night stream made tangible: a dark room, an ember-red glow, one gold spotlight reserved for the donate block. The palette is warm and nocturnal — near-black teal ground, oxblood cards, a hot signal red that acts as both accent and alarm. Nothing here is corporate, nothing is daylight.
 
 The personality is playful inside the dark frame. Cards scale up when touched, badges float gently with a recording-dot pulse, and clicking an article morphs the card into a modal via a shared-element View Transition (with a directional slide for prev/next). Motion is the brand's voice; the static page is just the intermission.
 
 Confirmed anti-references: never a sterile light-mode SaaS look, never purple/blue gamer gradients, never corporate blue links on white. The ember palette is the identity; departure from it is departure from the product.
 
 **Key Characteristics:**
-- Single centered column (40rem) on a near-black maroon gradient
+- Single centered column (40rem) on a near-black teal gradient
 - One accent (Signal Red) + one reserved spotlight (gold = donate only)
 - Lists read as one clipped pill-block; hover breaks a card out into a full pill
 - Flat surfaces; depth comes from tonal steps and motion, never resting shadows
@@ -138,7 +138,7 @@ Confirmed anti-references: never a sterile light-mode SaaS look, never purple/bl
 
 ## Colors
 
-A warm maroon family graded as an **OKLCH lightness ramp** from near-black ground to hot red, with a single gold that appears exactly once per page. Every role has a defined lightness, so contrast is structural rather than accidental — the palette was rebuilt this way to retire the contrast patches the old hex-by-feel values forced.
+A warm ember palette over a deep teal ground, graded as an **OKLCH lightness ramp** from near-black teal through oxblood surfaces to hot signal red, with a single gold that appears exactly once per page. Every role has a defined lightness, so contrast is structural rather than accidental.
 
 ### Primary — one signal hue, three roles
 The signal red lives at anchor hue 27 (ember) and appears in three lightness steps with non-overlapping jobs:
@@ -156,7 +156,7 @@ The signal red lives at anchor hue 27 (ember) and appears in three lightness ste
 - **Hearth Brown** (`{colors.hearth-brown}`): donate card surface; a warm brown (hue drifts toward gold, h55) lifted to a clear tonal step above Oxblood so the donate block reads as a warm peak at rest.
 - **Bone White** (`{colors.bone-white}`): primary text.
 - **Ash Rose** (`{colors.ash-rose}`): muted text — section titles, dates, excerpts, descriptions, footer. Lifted to clear 4.5:1 on every resting surface including Hearth (the old value failed on the donate card).
-- **Scrollbar** / **Scrollbar Hover** (`{colors.scrollbar}` / `{colors.scrollbar-hover}`): warm ember scrollbar tones, tonal with the maroon ramp rather than neutral gray.
+- **Scrollbar** / **Scrollbar Hover** (`{colors.scrollbar}` / `{colors.scrollbar-hover}`): teal-tinted scrollbar tones, tonal with the deep-teal ground rather than neutral gray.
 
 ### Named Rules
 **The One Spotlight Rule.** Gold appears only in the donate block. Anywhere else it stops meaning "support" and starts meaning "decoration."
@@ -194,14 +194,14 @@ Desktop is the base stylesheet; type is a fluid `clamp` scale, so phones adapt a
 
 ## Elevation & Depth
 
-Flat by doctrine. No element casts a shadow at rest; depth is conveyed by tonal steps — Cinder Black page → Oxblood card → Ember hover — and by motion (hover scale 1.03, press scale 0.97). Soft ambient glows are permitted only as a state response: hover, focus, or live activity. The modal's dim backdrop (`rgba(13,7,6,0.6)`) is the sole overlay treatment.
+Flat by doctrine. No element casts a shadow at rest; depth is conveyed by tonal steps — Cinder Black page → Oxblood card → Ember hover — and by motion (hover scale 1.03, press scale 0.97). Soft ambient glows are permitted only as a state response: hover, focus, or live activity. The modal's dim backdrop (`rgba(10,23,24,0.6)`) is the sole overlay treatment.
 
 ### Named Rules
 **The Flat-At-Rest Rule.** If a surface needs to feel closer, move it (scale) or heat it (Ember Red). Do not give it a resting shadow.
 
 ## Shapes
 
-The pill is the form language. The master radius is 2rem (`--radius`), applied to card caps, article surfaces, the modal, and circular controls. Cards inside a list default to 1rem so a list reads as one clipped block: first and last cards carry 2rem outer caps, and a hovered card inflates to the full 2rem pill — visually breaking out of the block. Avatars, badges, and close buttons are fully round. Code chips use the small 0.25rem radius.
+The pill is the form language for cards and badges. Interactive controls use a softer 1rem control radius (1.25rem for the 404 CTA) so icon buttons feel related to the cards without reading as circular. Cards inside a list default to 1rem so a list reads as one clipped block: first and last cards carry 2rem outer caps, and a hovered card inflates to the full 2rem pill — visually breaking out of the block. Avatars and badges remain fully round. Code chips use the small 0.25rem radius.
 
 ### Named Rules
 **The Block-And-Breakout Rule.** Lists are one block at rest (1rem inner, 2rem caps). Hover grants the full pill (2rem). A list that doesn't break out on hover is off-brand.
@@ -215,7 +215,7 @@ The product's core unit — every social link, project, and post is one.
 - **Description line:** optional `description:` (social.yml) renders one muted line (Ash Rose, 1rem, 400-weight, ellipsis) under the card name — disambiguates same-brand links (YouTube vs YouTube Second)
 - **Hover:** background heats to Ember Red, scale 1.055, radius inflates to the full 2rem master pill, glyph fades to full opacity (0.3s ease), and a soft radial ember bloom fades in inside the card (`::before`, Signal-Link-tinted at 28% alpha; gold-tinted at 38% on the donate variant) — the Heat-On-Touch rule made literal. The hover reads physical: cards lean forward and glow hotter, but never change hue. Cursor-tracking parallax (±4px, pointer-fine only, reduced-motion-gated) composes with the hover scale — default.html.
 - **Focus (`:focus-visible`):** mirrors hover heat + a double keyboard ring (`box-shadow: 0 0 0 2px Cinder, 0 0 0 4px Signal Link`) so the focused row is unambiguous. Donate variant heats to full gold + dark text. Focus is not hover-gated — keyboard users on any device get the ring. Mouse clicks suppress it via `:focus-visible`.
-- **Touch:** no hover — press scales to 0.94 (0.15s). Deep enough that the tap reads as an intentional physical action, not a missed tap.
+- **Touch:** no hover — press scales to 0.96 (0.15s). Deep enough that the tap reads as an intentional physical action, not a missed tap.
 - **Donate variant:** Hearth Brown + Spotlight Gold text at rest; full gold fill with dark text and a soft gold glow on hover
 
 ### Badges
@@ -229,15 +229,15 @@ Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on 
 - **Motion safety:** animations off under `prefers-reduced-motion`
 
 ### Post Cards & Article
-Post cards reuse the link-card block with `user-select: none`; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` and morphs the clicked card into the dialog via a shared-element View Transition; it morphs back to the card on close. The dialog is shown/closed synchronously inside the transition, so continuity never delays the action surface; the fallback is plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
+Post cards reuse the link-card block while keeping their text selectable; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` and morphs the clicked card into the dialog via a shared-element View Transition; it morphs back to the card on close. A cache miss opens a localized busy state immediately, while the fallback remains plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
 
 ### Modal
-`<dialog>` morphing into place over the page via a shared-element View Transition — the clicked card expands into the dialog on open and morphs back on close (`view-transition-name: post-morph`, ~0.34s confident-arrival): Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim maroon backdrop, circular close button top-right. Falls back to instant open/close under `prefers-reduced-motion` or where View Transitions are unavailable.
+`<dialog>` morphing into place over the page via a shared-element View Transition — the clicked card expands into the dialog on open and morphs back on close (`view-transition-name: post-morph`, ~0.34s confident-arrival): Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim teal backdrop, soft-square close control top-right. Falls back to instant open/close under `prefers-reduced-motion` or where View Transitions are unavailable.
 
-**Deferred — modal loading state (backlog, implement only if it bites):** `open()` currently `await`s `getArticle()` *before* `showModal()`, so a cache-miss fetch (mobile, no reliable `pointerover` prefetch, slow data) produces ~1-3s of dead air on the clicked card with no status signal. Acceptable while fetches stay fast (they typically do — posts are tiny, cached after first hit, and desktop prefetches on hover). If slow opens are ever observed, upgrade to: `showModal()` (or start the View Transition) immediately with an ember-pulse skeleton in `.post-modal-body`, then `fill()` on resolve — keep the gen-token guard so a stale fetch can't overwrite.
+`open()` shows a localized busy state immediately on a cache miss, with a bounded fetch timeout. The dialog fills when the request resolves; the generation token prevents stale work from replacing newer content. A failed fetch dismisses the busy dialog and hands off to the standalone URL.
 
 ### Close Button
-- **Style:** 48px circle, Oxblood, no border
+- **Style:** 48px soft-square control (1rem radius), Oxblood, no border
 - **Hover:** Ember background, Signal Bright icon, scale 1.08. (Resolved: Signal Bright on Ember ≈ 3.7:1, clearing the 3:1 non-text floor — the close button no longer carries the documented contrast tension. Kept the "red on heat" intent without dropping to a bone-white icon.)
 - **Focus (`:focus-visible`):** double ring (Cinder gap + Signal Link), no bg change.
 - **Touch:** press scales to 0.92
@@ -253,14 +253,14 @@ On hover, the avatar warms under the visitor: border heats to Signal Bright, sca
 Optional one-liner (`profile.tagline`) under the nick: Ash Rose, 1.125rem (1rem phone), centered with the hero. Absent key = absent element.
 
 ### Post Nav
-Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separated by a hairline Bone-White-at-12% rule. Muted links (1rem, ellipsis-truncated titles) heating to Signal Bright on hover. Lives inside the article so the index modal copies it; modal JS swaps content instead of navigating — the new article slides in from the clicked button's side (240ms WAAPI: Новее from the left, Старее from the right), explaining the newer/older step. Instant under `prefers-reduced-motion`.
+Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separated by a hairline Bone-White-at-12% rule. Muted links (1rem, ellipsis-truncated titles) heating to Signal Bright on hover. Lives inside the article so the index modal copies it; modal JS swaps content instead of navigating — the new article slides in from the clicked button's side (240ms WAAPI: Старее from the left, Новее from the right), explaining the newer/older step. Instant under `prefers-reduced-motion`.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** build every new interactive row as a link card: Oxblood at rest, Ember Red + scale on hover, full pill on breakout.
-- **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the maroon ramp.
-- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the card⇄modal morph (~0.34s) are the exceptions — the morph is continuity (the dialog shows synchronously inside the transition, so nothing waits), the others are exit-style state feedback.
+- **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the teal/ember ramp.
+- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the card⇄modal morph (~0.34s) are the exceptions — the morph is continuity; cache misses show a busy state immediately rather than waiting silently, the others are exit-style state feedback.
 - **Do** keep badges honest: hidden by default, revealed only on confirmed data, silent on any fetch error.
 - **Do** use native platform features (View Transitions, `<dialog>`) before writing JS or adding assets.
 

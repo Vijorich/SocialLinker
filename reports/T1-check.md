@@ -1,4 +1,6 @@
-# T1 Checker Report
+# T1 Checker Report (historical)
+
+> This report describes an earlier review and is not a current test record.
 verdict: PASS
 commit: 04bf0593d5a01bd11658251d07fc065d7f30b6b6
 build: SUCCESSFUL (Jekyll static site — build check is `node --check`, see below)

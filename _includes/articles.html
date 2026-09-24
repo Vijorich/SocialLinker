@@ -1,5 +1,5 @@
 <section class="section posts" id="posts">
-  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_posts %}<h2 class="section-title">{{ t }}</h2>{% endif %}
+  {% if include.title != false %}{% assign t = include.title | default: site.data.locale.nav_posts %}<h2 class="section-title">{{ t | escape }}</h2>{% endif %}
   {% assign posts = site.posts %}
   {% if posts.size > 0 %}
   <ul class="link-list post-list">
@@ -12,18 +12,25 @@
             <span class="post-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time></span>
           </span>
           {% if post.excerpt %}
-          <p class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
+          <p class="post-excerpt">{{ post.excerpt | strip_html | strip_newlines | truncatewords: 30 | escape }}</p>
           {% endif %}
         </span>
       </a>
     </li>
     {% endfor %}
   </ul>
-  <dialog id="post-modal" class="post-modal">
-    <button class="post-close" type="button" aria-label="{{ site.data.locale.close }}">{% include icon.html name='close' %}</button>
-    <div class="post-modal-body"></div>
+  <dialog id="post-modal" class="post-modal" aria-label="{{ site.data.locale.post_content | escape }}" data-code-label="{{ site.data.locale.code_block | escape }}" data-loading-label="{{ site.data.locale.post_loading | escape }}" hidden>
+    <button class="post-close" type="button" aria-label="{{ site.data.locale.close | escape }}">{% include icon.html name='close' %}</button>
+    <button class="sound-toggle post-modal-sound-toggle" type="button" hidden aria-pressed="false" aria-label="{{ site.data.locale.sound_mute | escape }}"
+            data-label-mute="{{ site.data.locale.sound_mute | escape }}" data-label-unmute="{{ site.data.locale.sound_unmute | escape }}">
+      <span class="sound-on">{% include icon.html name='sound' %}</span>
+      <span class="sound-off">{% include icon.html name='mute' %}</span>
+    </button>
+    <div class="visually-hidden" data-post-status aria-live="polite" aria-atomic="true"></div>
+    <div class="post-modal-loading" data-post-loading role="status" hidden>{{ site.data.locale.post_loading | escape }}</div>
+    <article class="post-modal-body" tabindex="0" aria-label="{{ site.data.locale.post_content | escape }}"></article>
   </dialog>
   {% else %}
-  <p class="post-excerpt">{{ site.data.locale.posts_empty }}</p>
+  <p class="post-excerpt">{{ site.data.locale.posts_empty | escape }}</p>
   {% endif %}
 </section>

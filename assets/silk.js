@@ -95,6 +95,12 @@ export function createSilk(container, options = {}) {
   } catch {
     return null;
   }
+  /* The shader below is GLSL ES 3.00. Do not accept OGL's WebGL1 fallback:
+     it would compile a 300-es shader on a WebGL1 context and hide the CSS
+     fallback behind a black canvas. */
+  if (renderer.isWebgl2 === false) return null;
+  if (typeof WebGL2RenderingContext !== 'undefined' && !(renderer.gl instanceof WebGL2RenderingContext)) return null;
+  if (typeof ResizeObserver !== 'function' || typeof IntersectionObserver !== 'function') return null;
 
   const gl = renderer.gl;
   const canvas = gl.canvas;
@@ -103,22 +109,38 @@ export function createSilk(container, options = {}) {
   canvas.style.display = 'block';
   container.appendChild(canvas);
 
-  const geometry = new Triangle(gl);
-  const program = new Program(gl, {
-    vertex,
-    fragment,
-    uniforms: {
-      iResolution: { value: new Float32Array([1, 1]) },
-      uTime: { value: 0 },
-      uSpeed: { value: 5 },
-      uScale: { value: 1 },
-      uRotation: { value: 0 },
-      uNoiseIntensity: { value: 1.5 },
-      uColor: { value: new Float32Array([0.482, 0.459, 0.506]) },
-    },
-  });
+  let geometry;
+  let program;
+  try {
+    geometry = new Triangle(gl);
+    program = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        iResolution: { value: new Float32Array([1, 1]) },
+        uTime: { value: 0 },
+        uSpeed: { value: 5 },
+        uScale: { value: 1 },
+        uRotation: { value: 0 },
+        uNoiseIntensity: { value: 1.5 },
+        uColor: { value: new Float32Array([0.482, 0.459, 0.506]) },
+      },
+    });
+  } catch {
+    try { container.removeChild(canvas); } catch {}
+    return null;
+  }
 
-  const mesh = new Mesh(gl, { geometry, program });
+  if (!program || !program.uniforms) {
+    try { container.removeChild(canvas); } catch {}
+    return null;
+  }
+  let mesh;
+  try { mesh = new Mesh(gl, { geometry, program }); }
+  catch {
+    try { container.removeChild(canvas); } catch {}
+    return null;
+  }
 
   const applyOpts = () => {
     const u = program.uniforms;
@@ -133,7 +155,11 @@ export function createSilk(container, options = {}) {
     // Clear to the silk base color so the first frame never flashes black.
     gl.clearColor(c[0], c[1], c[2], 1);
   };
-  applyOpts();
+  try { applyOpts(); }
+  catch {
+    try { container.removeChild(canvas); } catch {}
+    return null;
+  }
 
   const setSize = () => {
     const rect = container.getBoundingClientRect();
@@ -159,7 +185,7 @@ export function createSilk(container, options = {}) {
   let isVisible = true;
   let isPageVisible = !document.hidden;
   const t0 = performance.now();
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const render = (t) => {
     // Faithful to the original: uTime accumulates at 0.1 * delta (three.js
@@ -200,6 +226,13 @@ export function createSilk(container, options = {}) {
   };
   document.addEventListener('visibilitychange', onVisibility);
 
+  const onContextLost = event => {
+    event.preventDefault();
+    tryStop();
+  };
+  const canListen = typeof gl.canvas.addEventListener === 'function';
+  if (canListen) gl.canvas.addEventListener('webglcontextlost', onContextLost, { passive: false });
+
   if (reduced) {
     render(performance.now());
   } else {
@@ -214,6 +247,7 @@ export function createSilk(container, options = {}) {
     ro.disconnect();
     io.disconnect();
     document.removeEventListener('visibilitychange', onVisibility);
+    if (canListen) gl.canvas.removeEventListener('webglcontextlost', onContextLost);
     try {
       container.removeChild(canvas);
     } catch {}
@@ -223,13 +257,15 @@ export function createSilk(container, options = {}) {
   return {
     update(next = {}) {
       Object.assign(opts, next);
-      if (!destroyed) applyOpts();
+      if (destroyed) return;
+      try { applyOpts(); } catch { tryStop(); }
     },
     destroy,
   };
 }
 
-export function initSilk(root = document) {
+export function initSilk(root = (typeof document !== 'undefined' ? document : null)) {
+  if (!root) return [];
   const instances = [];
   root.querySelectorAll('[data-silk]').forEach((el) => {
     let opts = {};
@@ -245,8 +281,10 @@ export function initSilk(root = document) {
   return instances;
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => initSilk());
-} else {
-  initSilk();
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initSilk());
+  } else {
+    initSilk();
+  }
 }

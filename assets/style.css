@@ -29,6 +29,9 @@
   --scrollbar-hover: #5fb5b8;
   --max-width: 40rem;
   --radius: 2rem;
+  /* Controls use a softer square than the card/pill surfaces. */
+  --control-radius: 1rem;
+  --control-radius-lg: 1.25rem;
 
   /* Type — three voices: Unbounded (display: logo, headings) + Rubik (body/UI)
      + JetBrains Mono (code). Fluid clamp scale; system stacks as load-time floor
@@ -116,18 +119,17 @@ strong, b { font-weight: 700; }
   background: var(--accent-link);
   color: var(--bg);
   font-weight: 800;
-  border-radius: 999px;
+  border-radius: var(--control-radius);
   text-decoration: none;
   transform: translateY(-150%);
   transition: transform .15s ease-out;
 }
 .skip-link:focus { transform: translateY(0); }
-/* Skip-link landing region: focus moves here, but the whole section shouldn't carry the
-   keyboard ring — the skip link's own activation was the affordance, and the next Tab
-   lands on the first card inside. Only the socials section is focusable (tabindex="-1"). */
-.section:focus { outline: none; }
-/* Same for the skip-link landing region on standalone post pages. */
-.post-single:focus { outline: none; }
+/* Skip-link landing region: keep a visible focus boundary so programmatic focus is
+   observable, while the next Tab still lands on the first actionable child. */
+.section:focus,
+.container:focus,
+.post-single:focus { outline: 2px solid var(--accent-link); outline-offset: -2px; }
 
 /* Focus — visible keyboard ring on every control. Ring counts as a state response
    (allowed glow); link cards also heat so the focused row is unambiguous. */
@@ -143,13 +145,14 @@ strong, b { font-weight: 700; }
      corners. max() falls back to the original insets where env() is unsupported/zero. */
   padding: max(2rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right)) 3rem max(1.5rem, env(safe-area-inset-left));
   position: relative;
+  z-index: 1;
   flex: 1;
   width: 100%;
 }
 
 /* Single post reuses .container; padding-top clears the fixed close button.
    Safe-area bottom keeps the article foot clear of the home indicator in cover mode. */
-.post-single { max-width: var(--max-width); margin: 0 auto; padding: 5rem max(1.5rem, env(safe-area-inset-right)) max(3rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left)); font-size: var(--text-body); flex: 1; width: 100%; }
+.post-single { max-width: var(--max-width); margin: 0 auto; padding: 5rem max(1.5rem, env(safe-area-inset-right)) max(3rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left)); font-size: var(--text-body); flex: 1; width: 100%; position: relative; z-index: 1; }
 
 /* Hero */
 .hero {
@@ -302,19 +305,19 @@ strong, b { font-weight: 700; }
       avatar-ring tint so the two twitch states share a colour) and the card
       itself bobs one gentle settle over 0.7s. Donate and quiet cards do not
       ripple; one spark is the storyteller, the rest of the room stays dark. */
-.hero:has(.avatar.live) ~ .container .link-card:has(.badge-live:not([hidden])) svg:last-child,
-.hero:has(.avatar.live) ~ .container .post-card:has(.badge-live:not([hidden])) svg:last-child {
+.container:has(.hero .avatar.live) .link-card:has(.badge-live:not([hidden])) svg:last-child,
+.container:has(.hero .avatar.live) .post-card:has(.badge-live:not([hidden])) svg:last-child {
   color: var(--accent-link);
   opacity: 1;
 }
-.hero:has(.avatar.live) ~ .container .link-card:has(.badge-live:not([hidden])) .external-link-icon,
-.hero:has(.avatar.live) ~ .container .post-card:has(.badge-live:not([hidden])) .external-link-icon {
+.container:has(.hero .avatar.live) .link-card:has(.badge-live:not([hidden])) .external-link-icon,
+.container:has(.hero .avatar.live) .post-card:has(.badge-live:not([hidden])) .external-link-icon {
   color: var(--accent-link);
   opacity: 1;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .hero:has(.avatar.live) ~ .container .link-list li:has(.badge-live:not([hidden])) .link-card,
-  .hero:has(.avatar.live) ~ .container .link-list li:has(.badge-live:not([hidden])) .post-card {
+  .container:has(.hero .avatar.live) .link-list li:has(.badge-live:not([hidden])) .link-card,
+  .container:has(.hero .avatar.live) .link-list li:has(.badge-live:not([hidden])) .post-card {
     animation: live-card-settle 0.7s cubic-bezier(0.05, 0.7, 0.1, 1) 1.1s both;
   }
 }
@@ -330,7 +333,7 @@ strong, b { font-weight: 700; }
       card's pull for the flare second, then back. The one move the One
       Spotlight Rule can afford — a lean, not a tint change. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero:has(.avatar.live) ~ .container .donate-list .link-card::before {
+  .container:has(.hero .avatar.live) .donate-list .link-card::before {
     animation: donate-lean 1s ease-out 0.9s;
   }
 }
@@ -389,18 +392,29 @@ strong, b { font-weight: 700; }
 
 .bio-content { text-align: center; }
 
-/* Bio + post prose share styling */
-.bio-content, .post-content {
-  :first-child { margin-top: 0; }
-  :last-child { margin-bottom: 0; }
-  a { color: var(--accent-link); text-decoration: underline; text-underline-offset: 0.15em; }
-  @media (hover: hover) { a:hover { color: var(--fg); text-decoration-thickness: 2px; } }
-  code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
-  pre { font-family: var(--font-mono); background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
-  pre code { background: none; border: none; padding: 0; }
-  blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); font-style: italic; font-weight: 500; }
-  ul, ol { padding-left: 1.5rem; }
+/* Bio + post prose share styling. Kept flat for browsers without CSS nesting. */
+.bio-content > :first-child,
+.post-content > :first-child { margin-top: 0; }
+.bio-content > :last-child,
+.post-content > :last-child { margin-bottom: 0; }
+.bio-content a,
+.post-content a { color: var(--accent-link); text-decoration: underline; text-underline-offset: 0.15em; }
+@media (hover: hover) {
+  .bio-content a:hover,
+  .post-content a:hover { color: var(--fg); text-decoration-thickness: 2px; }
 }
+.bio-content code,
+.post-content code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.5em 0.5em; border-radius: 0.25rem; font-size: 0.85em; }
+.bio-content pre,
+.post-content pre { font-family: var(--font-mono); background: var(--bg-card); padding: 1rem; border-radius: 1rem; overflow-x: auto; }
+.bio-content pre:focus-visible,
+.post-content pre:focus-visible { outline: 2px solid var(--accent-link); outline-offset: 2px; }
+.bio-content pre code,
+.post-content pre code { background: none; border: none; padding: 0; }
+.bio-content blockquote,
+.post-content blockquote { border-left: 0.25rem solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem; color: var(--fg-muted); font-style: italic; font-weight: 500; }
+.bio-content ul, .bio-content ol,
+.post-content ul, .post-content ol { padding-left: 1.5rem; }
 
 /* Link list — cards read as one block via clipped container */
 .link-list {
@@ -523,6 +537,7 @@ strong, b { font-weight: 700; }
              badge-bob 3s ease-in-out infinite 0.35s;
 }
 .badge[hidden] { display: none; }
+.badge-privacy-note { color: var(--fg-muted); font-size: .75rem; line-height: 1.4; margin: .75rem 0 0; text-align: center; }
 .badge-new { background: var(--accent-deep); color: var(--fg); }
 /* ponytail: text/dot are white, not bone — bone dips to 4.41 on the hotter Live fill (fails AA at 12px); white clears 5.51. New!'s Deep fill is dark enough for bone (5.12); Live's lighter fill isn't. */
 .badge-live { background: var(--accent-live); color: var(--on-live); }
@@ -567,6 +582,21 @@ strong, b { font-weight: 700; }
   /* Glow stays (it's ambient light, not motion) — just stop breathing. */
   .hero::before { animation: none; opacity: 0.12; }
   .hero:has(.avatar.live)::before { opacity: 0.20; }
+  .skip-link,
+  .link-card,
+  .post-close,
+  .sound-toggle,
+  .not-found-home,
+  .avatar,
+  .footer-heart { transition-duration: 0s; }
+  .link-card:hover,
+  .link-card:active,
+  .post-close:hover,
+  .post-close:active,
+  .sound-toggle:hover,
+  .sound-toggle:active,
+  .not-found-home:hover,
+  .avatar:hover { transform: none; scale: 1; }
 }
 
 /* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
@@ -607,8 +637,7 @@ strong, b { font-weight: 700; }
    ponytail: :has() targets the section owning the donate list; unsupported = title stays Ash Rose. */
 .section:has(.donate-list) .section-title { color: var(--gold); }
 
-/* Posts list — reuses .link-list card block; click-only, no text selection */
-.post-card { user-select: none; }
+/* Posts list — reuses the link-list card block; text remains selectable. */
 .post-card-body { flex: 1; min-width: 0; }
 .post-card-head {
   display: flex;
@@ -667,7 +696,7 @@ strong, b { font-weight: 700; }
 .post-nav-prev { grid-column: 1; }
 .post-nav-next { grid-column: 2; text-align: right; }
 
-/* Close button — fixed top-right, circular, same card language */
+/* Close button — fixed top-right, soft-square control, same card language */
 .post-close {
   position: fixed;
   top: max(1.5rem, env(safe-area-inset-top));
@@ -680,9 +709,10 @@ strong, b { font-weight: 700; }
   height: 3rem;
   background: var(--bg-card);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--control-radius);
   color: var(--fg);
   cursor: pointer;
+  text-decoration: none;
   transition: background 0.3s ease, color 0.3s ease, scale 0.3s ease;
 }
 .post-close svg { width: 1.5rem; height: 1.5rem; }
@@ -715,11 +745,12 @@ strong, b { font-weight: 700; }
   height: 2.75rem;
   background: var(--bg-card);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--control-radius);
   color: var(--fg);
   cursor: pointer;
   transition: background 0.3s ease, color 0.3s ease, scale 0.3s ease;
 }
+.sound-toggle[hidden] { display: none; }
 .sound-toggle span { display: inline-flex; }
 .sound-toggle[aria-pressed="true"] .sound-on,
 .sound-toggle[aria-pressed="false"] .sound-off { display: none; }
@@ -752,6 +783,7 @@ strong, b { font-weight: 700; }
   transform: translate(-50%, -50%);
   margin: 0;
   width: min(56rem, calc(100vw - 2rem));
+  max-height: 85vh;
   max-height: 85dvh;
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -760,8 +792,12 @@ strong, b { font-weight: 700; }
 }
 .post-modal[open] { display: flex; flex-direction: column; }
 .post-modal::backdrop { background: rgba(10, 23, 24, 0.6); }
-.post-modal-body { overflow-y: auto; padding: 2rem; scrollbar-color: var(--scrollbar) transparent; }
+.post-modal-body { overflow-y: auto; padding: 4.5rem 2rem 4.5rem; scrollbar-color: var(--scrollbar) transparent; }
+.post-modal-loading { position: absolute; inset: 4.5rem 2rem auto; color: var(--fg-muted); text-align: center; }
+.post-modal-loading-fallback { margin: 2rem 0; color: var(--fg-muted); text-align: center; }
 .post-modal .post-close { position: absolute; top: 1rem; right: 1rem; }
+.post-modal .sound-toggle { position: absolute; right: 1rem; bottom: 1rem; z-index: 2; }
+.post-modal-body:focus-visible { outline: 2px solid var(--accent-link); outline-offset: -2px; }
 
 /* Post modal — card ⇄ dialog shared-element morph (View Transitions). The clicked
    card expands into the dialog on open and morphs back on close; the dialog is
@@ -800,9 +836,16 @@ strong, b { font-weight: 700; }
   font-size: clamp(5rem, 22vw, 9rem);
   font-weight: 900;
   line-height: 1;
-  background: var(--accent);
-  background-clip: text;
-  color: transparent;
+  margin: 0;
+  color: var(--accent);
+}
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .not-found-code {
+    background: var(--accent);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
 }
 .not-found-text {
   color: var(--fg-muted);
@@ -814,7 +857,7 @@ strong, b { font-weight: 700; }
   align-items: center;
   padding: 0.85rem 1.75rem;
   background: var(--bg-card);
-  border-radius: var(--radius);
+  border-radius: var(--control-radius-lg);
   color: var(--fg);
   text-decoration: none;
   font-weight: 800;
@@ -838,6 +881,7 @@ strong, b { font-weight: 700; }
   color: var(--fg-muted);
   font-size: var(--text-meta);
   position: relative; /* stack above the fixed background layer */
+  z-index: 1;
 
   /* Signal Bright like every other actionable accent — inherit (Ash Rose) read as plain text. */
   a { color: var(--accent-link); text-decoration: none; }
@@ -871,8 +915,12 @@ strong, b { font-weight: 700; }
   .post-card-head { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
   .post-single { padding: 4.5rem max(1rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
   .post-article { padding: 1.25rem; }
-  .post-modal { max-height: 92dvh; }
-  .post-modal-body { padding: 1.25rem; }
+  .post-modal { max-height: 92vh; max-height: 92dvh; }
+  .post-modal-body { padding: 4rem 1.25rem 4.5rem; }
+  .post-modal .post-close { top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); }
+  .post-modal .sound-toggle { right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); top: auto; }
+  .sound-toggle { top: max(1rem, env(safe-area-inset-top)); bottom: auto; }
+  body[data-page="post"] .sound-toggle { right: max(5.5rem, env(safe-area-inset-right)); }
   /* 44px touch-target floor (WCAG 2.5.8) — was 2.75rem (44px) nominal but padding shrink
      crowded the visual region; keep the hit area at 3rem everywhere. */
   .post-close { top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); }
@@ -897,6 +945,6 @@ strong, b { font-weight: 700; }
   .avatar { margin-bottom: 0.35rem; }
   .section { margin-bottom: 1rem; }
   .post-single { padding-top: 4rem; }
-  .post-modal { max-height: 96dvh; }
-  .post-modal-body { padding: 1.25rem; }
+  .post-modal { max-height: 96vh; max-height: 96dvh; }
+  .post-modal-body { padding: 3.5rem 1.25rem 4rem; }
 }

@@ -2,7 +2,9 @@
 // surface. Feed shapes are stub documents; network/proxy transport is out of scope.
 // Usage: node tests/badges.test.mjs
 import assert from 'node:assert';
-import { PROVIDERS } from '../assets/badges.js';
+import { PROVIDERS, initBadges } from '../assets/badges.js';
+
+assert.doesNotThrow(() => initBadges(), 'badge module is importable without a DOM');
 
 const NOW = Date.parse('2026-08-24T12:00:00Z');
 const daysAgo = n => new Date(NOW - n * 864e5).toISOString();
@@ -26,6 +28,9 @@ const htmlDoc = isos => ({
   assert.equal(check('somechannel is offline', cutoff), false, 'T1 offline stays hidden');
   assert.equal(check('', cutoff), false, 'T1 empty body stays hidden');
   assert.equal(check(undefined, cutoff), false, 'T1 missing body stays hidden');
+  assert.equal(check('Service unavailable', cutoff), false, 'T1 error body stays hidden');
+  assert.equal(check('<html>error</html>', cutoff), false, 'T1 HTML error stays hidden');
+  assert.equal(check('USER IS OFFLINE', cutoff), false, 'T1 uppercase offline stays hidden');
 }
 
 // T2: youtube — freshness vs cutoff, robustness against malformed feeds
@@ -52,4 +57,4 @@ const htmlDoc = isos => ({
   assert.equal(check('html', htmlDoc([])), false, 'T3 no timestamps stays hidden');
 }
 
-console.log('badges: 3/3 provider check groups passed');
+console.log('badges: 4/4 provider check groups passed');

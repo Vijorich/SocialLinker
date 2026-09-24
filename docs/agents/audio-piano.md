@@ -21,7 +21,7 @@ Exact frequencies, semitone sets, and timings live in the code — treat the cod
 
 - **Avatar hover** layers an ember drone: detuned sines through a lowpass, gain breathing in step with the CSS ember-breath animation; released on leave; tab-hide stops it.
 - **Attune** (hover-hold any card ~3.5 s): a small chord sharing the card's pentatonic ladder runs an evolving random-walk melody clamped to the card's rung ±4 — pitch changes, no two attunes land on the same sequence.
-- **One clock, two skins**: the ambient breathes on a real gain LFO, and the glow (`attune-shimmer` in `assets/attune.css`, `.attuned::after`) runs on that exact period — JS stamps `--attune-period` on the card at hold start, CSS adds a −¼-period delay, so the brightness peak lands on the loudness peak. Donation cards shimmer warmer, at higher contrast, walking the same ladder an octave up (`ladderScale: 2`) so they sit above the fold.
+- **One clock, two skins**: the ambient breathes on a real gain LFO, while the current CSS treatment is a steady outer ember glow. The glow appears at the same ~3.5 s hold threshold; there is intentionally no CSS shimmer period. Donation cards use a warmer, brighter bloom and walk the same ladder an octave up (`ladderScale: 2`) so they sit above the fold.
 - Tab-hide releases all holds; a badge-reveal landing in a hidden tab stays silent.
 
 ## System-driven tick
@@ -30,8 +30,8 @@ When badges.js reveals a live/new chip it dispatches `badge-reveal` (see [badges
 
 ## Autoplay & mute
 
-AudioContexts are created lazily inside the engine (an optimistic `unlock()` at load, re-armed on the first pointer/key) so autoplay policy can't block them. Piano no-ops under `prefers-reduced-motion` and on touch (no hover).
+AudioContexts are created lazily inside the engine (an optimistic `unlock()` at load, re-armed on the first pointer/key) so autoplay policy can't block them. Piano no-ops under `prefers-reduced-motion`; on touch it plays only the primary tap chord, with no hover, hold, context-menu, drone, or system tick.
 
 **Pre-gesture silence is by design, not a bug**: `mouseover`/hover is not a user-activating event in any browser, so for a fresh visitor nothing sounds until the first press (pointerdown / keydown / click). The optimistic load-time `resume()` only lands in browsers with media-engagement history for the site (regulars hear hovers immediately). Verified against the pre-extraction code with a Playwright loop — identical behavior, so this is platform policy plus our suspended-clock gate, not a regression. The node test suites can't catch this class of bug (fake contexts always resume); only a real-browser loop can.
 
-Mute: the fixed `.sound-toggle` button (bottom-right, every page, revealed by piano.js — no-JS pages have no audio) flips the engine gate and releases sounding holds/drone mid-flight via the single `releaseAll()` chokepoint (tab-hide lands there too). Persists in `localStorage` key `sl-audio` (`off`/`on`), default ON. Labels live in `locale.yml` (`sound_mute`/`sound_unmute`) and ride to JS via data-attributes on the button.
+Mute: the fixed `.sound-toggle` button (bottom-right, every content page, revealed by piano.js — no-JS pages have no audio) flips the engine gate and releases sounding holds/drone mid-flight via the single `releaseAll()` chokepoint (tab-hide lands there too). Persists in `localStorage` key `sl-audio` (`off`/`on`), default ON. Labels live in `locale.yml` (`sound_mute`/`sound_unmute`) and ride to JS via data-attributes on the button.

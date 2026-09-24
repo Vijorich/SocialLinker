@@ -1,4 +1,6 @@
-# T2 Checker Report
+# T2 Checker Report (historical)
+
+> This report describes an earlier review and is not a current test record.
 
 ## Verdict
 
