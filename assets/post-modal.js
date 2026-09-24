@@ -78,13 +78,11 @@ export function createPostModal(deps) {
   async function open(card, push = true) {
     if (dlg.open && !sessionLoading) return;
     const g = ++gen, url = card.getAttribute('href');
-    const wasOpen = dlg.open;
     current = card;
-    let prepared = false;
 
     const prepare = () => {
-      prepared = true;
       sessionLoading = true;
+      dlg.style.viewTransitionName = '';
       if (!dlg.open) {
         root.overflow = 'hidden';
         dlg.showModal();
@@ -98,25 +96,14 @@ export function createPostModal(deps) {
       }
       if (status) status.textContent = labels.loading || 'Loading…';
       top();
-      if (typeof body.focus === 'function') body.focus({ preventScroll: true });
+      if (typeof body.focus === 'function') {
+        try { body.focus({ preventScroll: true }); } catch { body.focus(); }
+      }
     };
 
-    /* Open a busy dialog immediately so a slow/mobile fetch never feels inert. */
-    if (vt && !reduce() && !wasOpen) {
-      card.style.viewTransitionName = 'post-morph';
-      try {
-        const transition = vt(() => { if (g === gen && !prepared) prepare(); });
-        transition.finished.catch(() => {}).finally(() => {
-          card.style.viewTransitionName = '';
-          dlg.style.viewTransitionName = '';
-        });
-      } catch {
-        card.style.viewTransitionName = '';
-        prepare();
-      }
-    } else {
-      prepare();
-    }
+    /* Open a busy dialog immediately. A post card is not used as a View Transition
+       source: its snapshot can sit above the dialog while the morph is running. */
+    prepare();
 
     const article = await getArticle(url);
     if (g !== gen) return;
@@ -126,13 +113,23 @@ export function createPostModal(deps) {
       return;
     }
     const show = () => {
-      if (!prepared) prepare();
       sessionLoading = false;
       if (loading) loading.hidden = true;
       body.removeAttribute?.('aria-busy');
       fill(article);
       focusTitle();
       top();
+      if (!reduce() && typeof dlg.animate === 'function') {
+        try {
+          dlg.animate(
+            [
+              { opacity: 0, transform: 'translate(-50%, -50%) translateY(8px) scale(.985)' },
+              { opacity: 1, transform: 'translate(-50%, -50%)' },
+            ],
+            { duration: 180, easing: 'cubic-bezier(0.16,1,0.3,1)' }
+          );
+        } catch {}
+      }
       if (push !== false) hist.push({ postModal: url }, url);
       emit('post-modal-open', { url, source: push === false ? 'history' : 'card' });
     };

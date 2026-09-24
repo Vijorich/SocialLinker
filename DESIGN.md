@@ -125,7 +125,7 @@ components:
 
 A late-night stream made tangible: a dark room, an ember-red glow, one gold spotlight reserved for the donate block. The palette is warm and nocturnal — near-black teal ground, oxblood cards, a hot signal red that acts as both accent and alarm. Nothing here is corporate, nothing is daylight.
 
-The personality is playful inside the dark frame. Cards scale up when touched, badges float gently with a recording-dot pulse, and clicking an article morphs the card into a modal via a shared-element View Transition (with a directional slide for prev/next). Motion is the brand's voice; the static page is just the intermission.
+The personality is playful inside the dark frame. Cards scale up when touched, badges float gently with a recording-dot pulse, and clicking an article opens a modal with a short scale/fade entrance (with a directional slide for prev/next). Motion is the brand's voice; the static page is just the intermission.
 
 Confirmed anti-references: never a sterile light-mode SaaS look, never purple/blue gamer gradients, never corporate blue links on white. The ember palette is the identity; departure from it is departure from the product.
 
@@ -229,10 +229,10 @@ Live/New! chips on link cards; rendered hidden, revealed by `badges.js` only on 
 - **Motion safety:** animations off under `prefers-reduced-motion`
 
 ### Post Cards & Article
-Post cards reuse the link-card block while keeping their text selectable; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` and morphs the clicked card into the dialog via a shared-element View Transition; it morphs back to the card on close. A cache miss opens a localized busy state immediately, while the fallback remains plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
+Post cards reuse the link-card block while keeping their text selectable; the single-article surface is an Oxblood card at full 2rem radius with 2rem padding. Opening a post fills the modal with the fetched `.post-article` using a short scale/fade entrance; the post card is never used as a transition snapshot, so it cannot cover the dialog during loading. Closing may morph back to the card via View Transition. A cache miss opens a localized busy state immediately, while the fallback remains plain navigation. Card heads and article headers carry the date. Article body reads at 1.7 line-height, capped at 44rem measure; headings get 2rem air above, 0.75rem below. The modal is URL-synced (pushState/popstate) — a refreshed modal URL lands on the standalone page.
 
 ### Modal
-`<dialog>` morphing into place over the page via a shared-element View Transition — the clicked card expands into the dialog on open and morphs back on close (`view-transition-name: post-morph`, ~0.34s confident-arrival): Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim teal backdrop, soft-square close control top-right. Falls back to instant open/close under `prefers-reduced-motion` or where View Transitions are unavailable.
+`<dialog>` opening over the page with a restrained 180ms scale/fade entrance, avoiding a source-card snapshot that can cover the content. Closing may use the shared-element View Transition back to the card (`view-transition-name: post-morph`): Oxblood surface, 2rem radius, `min(56rem, 100vw - 2rem)`, max 85vh (92vh phone), dim teal backdrop, soft-square close control top-right. Falls back to instant open/close under `prefers-reduced-motion` or where View Transitions are unavailable.
 
 `open()` shows a localized busy state immediately on a cache miss, with a bounded fetch timeout. The dialog fills when the request resolves; the generation token prevents stale work from replacing newer content. A failed fetch dismisses the busy dialog and hands off to the standalone URL.
 
@@ -260,7 +260,7 @@ Prev/next (`Новее`/`Старее`) at the foot of `.post-article`, separate
 ### Do:
 - **Do** build every new interactive row as a link card: Oxblood at rest, Ember Red + scale on hover, restrained breakout radius.
 - **Do** keep the page dark — Cinder Black ground, Oxblood surfaces; new surfaces pick from the teal/ember ramp.
-- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the card⇄modal morph (~0.34s) are the exceptions — the morph is continuity; cache misses show a busy state immediately rather than waiting silently, the others are exit-style state feedback.
+- **Do** animate routine state changes at 0.3s ease and gate all motion behind `prefers-reduced-motion`. One authored focal moment may run longer: the hero ignition flare (1s), the live-pin afterglow (1.4s), and the close morph (~0.34s) are the exceptions; modal entry is a short 180ms scale/fade, and cache misses show a busy state immediately rather than waiting silently.
 - **Do** keep badges honest: hidden by default, revealed only on confirmed data, silent on any fetch error.
 - **Do** use native platform features (View Transitions, `<dialog>`) before writing JS or adding assets.
 

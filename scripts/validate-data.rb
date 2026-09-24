@@ -11,7 +11,7 @@ Dir['_data/*.yml'].sort.each do |path|
   end
 end
 
-required_locale = %w[nav_links nav_support nav_projects nav_posts posts_empty projects_empty not_found back_home badge_live badge_new post_newer post_older skip_to_links skip_to_content sound_mute sound_unmute close new_tab post_content post_loading post_navigation code_block badge_privacy_note social_empty donate_empty]
+required_locale = %w[nav_links nav_support nav_projects nav_posts posts_empty projects_empty not_found back_home badge_live badge_new post_newer post_older skip_to_links skip_to_content sound_mute sound_unmute close new_tab post_content post_loading post_navigation code_block social_empty donate_empty]
 required_locale.each { |key| errors << "_data/locale.yml: missing #{key}" unless data.dig('locale', key) }
 
 known_sections = %w[hero bio projects socials donate articles]

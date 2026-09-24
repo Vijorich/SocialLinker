@@ -1,7 +1,6 @@
 # Section order = render order.
 # title: omit for locale default, false to hide heading, "Text" for custom.
 - type: hero
-- type: bio
 - type: socials
 - type: donate
 - type: projects

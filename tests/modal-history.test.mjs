@@ -50,6 +50,7 @@ function makeWorld(cardUrls) {
   const navigated = [];
   const events = [];
   const root = { overflow: '' };
+  let vtCalls = 0;
   const machine = createPostModal({
     cards,
     host: { dlg, body, root },
@@ -61,7 +62,7 @@ function makeWorld(cardUrls) {
       back: () => historyLike.back(),
     },
     navigate: u => navigated.push(u),
-    vt: cb => { cb(); return { finished: Promise.resolve() }; },
+    vt: cb => { vtCalls++; cb(); return { finished: Promise.resolve() }; },
     reduce: () => false,
     raf: cb => cb(),
     emit: (type, detail) => events.push({ type, detail }),
@@ -69,6 +70,7 @@ function makeWorld(cardUrls) {
   const deliverPop = () => machine.popstate(historyLike.state);
   const world = {
     machine, cards, dlg, body, st, historyLike, navigated, events, root,
+    get vtCalls() { return vtCalls; },
     fetches: [],
     clickCard: url => machine.open(cards.find(c => c.getAttribute('href') === url)),
     closeViaEsc: () => (dlgListeners.cancel || []).forEach(fn => fn({ preventDefault() {} })),
@@ -89,8 +91,10 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w.events.filter(e => e.type === 'post-modal-open'),
     [{ type: 'post-modal-open', detail: { url: '/posts/a/', source: 'card' } }],
     'T1 exactly one open event, sourced from the card click');
+  assert.equal(w.vtCalls, 0, 'T1 opening does not snapshot the post card above the dialog');
   w.machine.close();
   await tick();
+  assert.equal(w.vtCalls, 1, 'T1 close may use the shared-element transition');
   assert.ok(!w.dlg.open, 'T1 close dismisses via history.back');
   assert.equal(w.st.idx, 0, 'T1 popped back to index entry');
   assert.equal(w.events.filter(e => e.type === 'post-modal-close').length, 1, 'T1 one close event');

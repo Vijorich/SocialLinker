@@ -44,5 +44,4 @@
   {% else %}
   <p class="post-excerpt">{% if include.style == 'donate' %}{{ site.data.locale.donate_empty | escape }}{% else %}{{ site.data.locale.social_empty | escape }}{% endif %}</p>
   {% endif %}
-  {% unless include.style == 'donate' %}<p class="badge-privacy-note">{{ site.data.locale.badge_privacy_note | escape }}</p>{% endunless %}
 </section>

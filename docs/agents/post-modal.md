@@ -8,7 +8,7 @@ The whole session machine lives in `assets/post-modal.js`, loaded as an ES modul
 
 ## Behaviour
 
-Fetches the post page, extracts `.post-article`, fills the dialog, and morphs the clicked card into it via a shared-element View Transition (`post-morph`; morphs back on close). A cache miss opens a busy dialog immediately with a localized loading state and bounded fetch timeout. Prev/next swaps focus the new title, announce it through a live region, and slide in from the clicked side (WAAPI). Both fall back to instant under reduced motion or without View Transition support.
+Fetches the post page, extracts `.post-article`, and fills the dialog. A cache miss opens a busy dialog immediately with a localized loading state and bounded fetch timeout; the loaded content gets a short scale/fade entrance that never uses the post card as a transition snapshot. Closing may use the shared-element View Transition back to the card. Prev/next swaps focus the new title, announce it through a live region, and slide in from the clicked side (WAAPI). All motion falls back to instant under reduced motion or when the platform API is unavailable.
 
 URL-synced: `pushState` on open, `replaceState` per swap, `popstate` closes/reopens. Refreshing with a modal URL lands on the standalone post page — the no-JS/direct-link fallback.
 

@@ -128,11 +128,13 @@ strong, b { font-weight: 700; }
   transition: transform .15s ease-out;
 }
 .skip-link:focus { transform: translateY(0); }
-/* Skip-link landing region: keep a visible focus boundary so programmatic focus is
-   observable, while the next Tab still lands on the first actionable child. */
+/* Skip-link landing region: keep a visible focus boundary for focused sections,
+   but the main page container is only a programmatic skip target and should not
+   acquire a large outline when a pointer lands on its background. */
 .section:focus,
-.container:focus,
 .post-single:focus { outline: 2px solid var(--accent-link); outline-offset: -2px; }
+.container:focus,
+.container:focus-visible { outline: none; }
 
 /* Focus — visible keyboard ring on every control. Ring counts as a state response
    (allowed glow); link cards also heat so the focused row is unambiguous. */
@@ -512,6 +514,10 @@ strong, b { font-weight: 700; }
 .link-card:focus-visible .post-excerpt,
 .link-card:focus-visible .post-date { color: var(--fg); }
 .donate-list .link-card:focus-visible .link-desc { color: var(--bg); }
+/* A post card is the morph source, not a layer above the dialog. */
+.link-card.post-card,
+.link-card.post-card:hover,
+.link-card.post-card:focus-visible { z-index: 0; }
 .link-card svg { flex-shrink: 0; width: 2rem; height: 2rem; }
 /* ponytail: tap feedback for touch devices */
 @media (hover: none) {
@@ -540,7 +546,6 @@ strong, b { font-weight: 700; }
              badge-bob 3s ease-in-out infinite 0.35s;
 }
 .badge[hidden] { display: none; }
-.badge-privacy-note { color: var(--fg-muted); font-size: .75rem; line-height: 1.4; margin: .75rem 0 0; text-align: center; }
 .badge-new { background: var(--accent-deep); color: var(--fg); }
 /* ponytail: text/dot are white, not bone — bone dips to 4.41 on the hotter Live fill (fails AA at 12px); white clears 5.51. New!'s Deep fill is dark enough for bone (5.12); Live's lighter fill isn't. */
 .badge-live { background: var(--accent-live); color: var(--on-live); }
