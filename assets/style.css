@@ -1,18 +1,14 @@
 :root {
   color-scheme: dark;
-  /* Ember-on-Teal — OKLCH lightness ramp. Every role has a defined lightness so
-     contrast is structural, not accidental. Ground hue ~179 (deep teal, the silk
-     bg); neutrals stay warm at h30 low-chroma. One signal hue in three steps:
-     Deep (light-text fill), Live (hotter badge fill), Bright (text/icon on any
-     surface incl. the silk ground). */
-  --bg: #0a1718;            /* Deep Teal — page ground (dark teal-black) */
-  --bg-grad: #0d1c1e;       /* Deep Teal² — vertical-gradient bottom */
-  --bg-card: #301512;       /* Oxblood — card surface */
-  --bg-card-hover: #7b2a25; /* Ember   — heated surface (hover/focus) */
-  --bg-donate: #4c2f19;     /* Hearth  — donate surface, warm toward gold */
-  --fg: #eee4e0;            /* Bone    — primary text */
-  --fg-muted: #d6c9c5;      /* Ash     — muted text (clears 4.5:1 on every surface) */
-  --accent: #d80e05;        /* Signal  — resting accent: fills, borders, rings, rails (avatar red) */
+  /* Ember-on-Teal OKLCH ramp: contrast is structural; one signal hue in three steps. */
+  --bg: #0a1718;            /* Deep Teal: page ground (dark teal-black) */
+  --bg-grad: #0d1c1e;       /* Deep Teal²: vertical-gradient bottom */
+  --bg-card: #301512;       /* Oxblood: card surface */
+  --bg-card-hover: #7b2a25; /* Ember: heated surface (hover/focus) */
+  --bg-donate: #4c2f19;     /* Hearth: donate surface, warm toward gold */
+  --fg: #eee4e0;            /* Bone: primary text */
+  --fg-muted: #d6c9c5;      /* Ash: muted text (clears 4.5:1 on every surface) */
+  --accent: #d80e05;        /* Signal: resting accent for fills, borders, rings, rails (avatar red) */
   /* Signal lifted to a readable tint: accent as TEXT/ICON anywhere, including on
      the heated Ember surface (clears 3:1 icons; 4.5:1 text on Deep Teal & Oxblood). */
   --accent-link: #ffb4a6;
@@ -20,11 +16,11 @@
   --accent-deep: #b3271e;
   /* Hotter signal red for the Live badge fill; white text clears ≈ 5.7:1. */
   --accent-live: #b9392f;
-  /* Selection surface — tuned so Deep Teal text clears 4.5:1 on it. */
+  /* Selection surface: tuned so Deep Teal text clears 4.5:1 on it. */
   --accent-sel: #ea5046;
-  --gold: #fdd171;          /* Spotlight — donate block only */
-  --on-live: #ffffff;       /* white on the Live fill — bone dips below AA at 12px; white clears 5.7 */
-  /* Teal-tinted scrollbar — tonal with the Deep Teal ground, not warm gray. */
+  --gold: #fdd171;          /* Spotlight: donate block only */
+  --on-live: #ffffff;       /* white on the Live fill, bone is 4.56:1; white 5.69:1 */
+  /* Teal-tinted scrollbar: tonal with the Deep Teal ground, not warm gray. */
   --scrollbar: #448b8e;
   --scrollbar-hover: #5fb5b8;
   --max-width: 40rem;
@@ -36,10 +32,9 @@
   --card-radius: 0.75rem;
   --card-radius-outer: 1.25rem;
 
-  /* Type — three voices: Unbounded (display: logo, headings) + Rubik (body/UI)
-     + JetBrains Mono (code). Fluid clamp scale; system stacks as load-time floor
-     (fail-silent like live badges). No negative letter-spacing. */
-  --text-display: clamp(2.25rem, 1.59rem + 2.88vw, 3.25rem);  /* .nick — focal hero; bolder, still below the 6rem ceiling */
+  /* Type: three voices (Unbounded display, Rubik body/UI, JetBrains Mono code).
+     Fluid clamp scale; system stacks are the load-time floor. */
+  --text-display: clamp(2.25rem, 1.59rem + 2.88vw, 3.25rem);  /* .nick, focal hero; bolder, still below the 6rem ceiling */
   --text-headline: clamp(1.4rem, 1.19rem + 0.87vw, 1.75rem);  /* post titles, prose h1 */
   --text-title: 1rem;        /* section labels (uppercase, tracked) */
   --text-body: clamp(1rem, 0.76rem + 1.03vw, 1.25rem);        /* default body */
@@ -47,15 +42,12 @@
   --text-tagline: clamp(0.95rem, 0.85rem + 0.43vw, 1.125rem); /* hero one-liner */
   --text-label: 0.75rem;     /* badges */
   /* Leading tuned to size: tight at display, generous for reading. The arc mirrors
-     the Negative-Tracking Rule — tightness belongs to the big stuff, air to the small. */
+     the Negative-Tracking Rule: tightness belongs to the big stuff, air to the small. */
   --leading-display: 1.1;
   --leading-headline: 1.2;
   --leading-body: 1.5;
   --leading-read: 1.7;
-  /* ponytail: three webfont voices sourced (Unbounded + Rubik + JetBrains Mono);
-     system stacks remain as the load-time floor so a blocked font request degrades
-     to the incumbent look, not a broken one — same fail-silent discipline as the
-     live badges. optical sizing + kerning on. */
+  /* ponytail: three webfont voices; system stacks are the load-time floor. */
   --font-sans: Rubik, system-ui, sans-serif;
   --font-display: Unbounded, "Arial Black", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -64,16 +56,16 @@
 * { box-sizing: border-box; }
 ::selection { background: var(--accent-sel); color: var(--bg); }
 html { scrollbar-color: var(--scrollbar) var(--bg); background: var(--bg); overflow-x: clip; }
-/* scrollbar-gutter reserves layout space for the bar — only worth it where a real bar
+/* scrollbar-gutter reserves layout space for the bar: only worth it where a real bar
    shows (fine pointer). Touch/overlay scrollbars are zero-width, so reserving space on
    phones just steals ~15px of right margin. */
 @media (hover: hover) and (pointer: fine) { html { scrollbar-gutter: stable; } }
-/* Old browsers that lack `overflow: clip` fall back to hidden on both roots — the
+/* Old browsers that lack `overflow: clip` fall back to hidden on both roots; the
    decorative glow bleeds stay clipped, just as a scroll container instead. */
 @supports not (overflow-x: clip) {
   html, body { overflow-x: hidden; }
 }
-/* Smooth scroll is motion — gated so reduced-motion users get instant anchors. */
+/* Smooth scroll is motion: gated so reduced-motion users get instant anchors. */
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 /* ponytail: @supports guard silences "bad selector" warnings in Firefox (no -webkit- pseudos) */
 @supports selector(::-webkit-scrollbar) {
@@ -86,11 +78,11 @@ html { scrollbar-color: var(--scrollbar) var(--bg); background: var(--bg); overf
 
 body {
   margin: 0;
-  position: relative;      /* containing block for the absolute .silk-bg — lets it stretch to the full document height */
+  position: relative;      /* containing block for the absolute .silk-bg, lets it stretch to the full document height */
   display: flex;
   flex-direction: column;
   min-height: 100vh;       /* fallback for pre-dvh browsers */
-  min-height: 100dvh;      /* dynamic viewport — no jump when iOS Safari's bars collapse/expand */
+  min-height: 100dvh;      /* dynamic viewport, no jump when iOS Safari's bars collapse/expand */
   align-items: center;
   overflow-x: clip;   /* let the hero glow bleed full-width without a horizontal scrollbar (clip creates no scroll container) */
   font-family: var(--font-sans);
@@ -101,7 +93,7 @@ body {
   color: var(--fg);
   line-height: var(--leading-body);
   font-size: var(--text-body);
-  /* ponytail: light-on-dark compensation — a hair of tracking aids legibility
+  /* ponytail: light-on-dark compensation, a hair of tracking aids legibility
      without breaking the Negative-Tracking Rule's spirit (reads ~0 at a glance). */
   letter-spacing: 0.005em;
   text-wrap: pretty;
@@ -113,7 +105,7 @@ a { color: var(--accent-link); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 strong, b { font-weight: 700; }
 
-/* Skip link — first focusable, off-screen until keyboard focus reveals it top-left. */
+/* Skip link: first focusable, off-screen until keyboard focus reveals it top-left. */
 .skip-link {
   position: fixed;
   top: max(.5rem, env(safe-area-inset-top)); left: max(.5rem, env(safe-area-inset-left));
@@ -131,17 +123,18 @@ strong, b { font-weight: 700; }
 /* Skip-link landing region: keep a visible focus boundary for focused sections,
    but the main page container is only a programmatic skip target and should not
    acquire a large outline when a pointer lands on its background. */
+.container:focus:not(:focus-visible) { outline: none; }
 .section:focus,
-.post-single:focus { outline: 2px solid var(--accent-link); outline-offset: -2px; }
-.container:focus,
-.container:focus-visible { outline: none; }
+.post-single:focus,
+.container:focus-visible { outline: 2px solid var(--accent-link); outline-offset: -2px; }
 
-/* Focus — visible keyboard ring on every control. Ring counts as a state response
+/* Focus: visible keyboard ring on every control. Ring counts as a state response
    (allowed glow); link cards also heat so the focused row is unambiguous. */
 :where(a, button, input, [tabindex]):focus-visible {
   outline: 2px solid var(--accent-link);
   outline-offset: 2px;
 }
+
 
 .container {
   max-width: var(--max-width);
@@ -166,7 +159,7 @@ strong, b { font-weight: 700; }
   position: relative;
   /* Geometry vars the ember glow consumes: --hero-pad + half --avatar-size is the
      avatar's exact center. Media queries below change only these two values and the
-     glow follows by construction — no per-breakpoint magic offset. */
+     glow follows by construction, no per-breakpoint magic offset. */
   --hero-pad: 1rem;
   --avatar-size: 6rem;
   padding-top: var(--hero-pad);
@@ -192,25 +185,18 @@ strong, b { font-weight: 700; }
   color: var(--fg-muted);
   font-size: var(--text-tagline);
 }
-/* Live avatar ring — badges.js adds .live on confirmed Twitch uptime.
-   Sonar ping (1.6s, ease-out) fading outward, plus a persistent soft glow —
+/* Live avatar ring: badges.js adds .live on confirmed Twitch uptime.
+   Sonar ping (1.6s, ease-out) fading outward, plus a persistent soft glow;
    both are live-activity state responses, so allowed under the Flat-At-Rest rule. */
-.avatar.live { animation: avatar-live 1.6s ease-out infinite; }
+.avatar.live { animation: avatar-live 1.6s ease-out infinite; box-shadow: 0 0 0.5rem rgba(216, 14, 5, 0.45); }
 @keyframes avatar-live {
   0%   { box-shadow: 0 0 0 0 rgba(216, 14, 5, 0.55), 0 0 0.5rem rgba(216, 14, 5, 0.45); }
   70%  { box-shadow: 0 0 0 0.6rem rgba(216, 14, 5, 0), 0 0 0.5rem rgba(216, 14, 5, 0.45); }
   100% { box-shadow: 0 0 0 0 rgba(216, 14, 5, 0), 0 0 0.5rem rgba(216, 14, 5, 0.45); }
 }
 
-/* ── Ember Stage ────────────────────────────────────────────────────────
-   Ambient glow behind the hero: the stage at rest breathes (~6s), ignites
-   when .avatar.live lands (badges.js). :has() lights the stage in pure CSS.
-   ponytail: Heat-On-Touch targets surfaces (cards); this is stage-light —
-   the Ember Stage north star literally calls for "a dark room, an ember-red
-   glow." Ignition escalates intensity (scale/opacity/brightness), not hue —
-   hotter = bigger + brighter, same fire. Tuning knob: the rgba alpha below.
-   The glow bleeds past the hero to the viewport edges (no hard cutoff at the
-   header bounds); body's overflow-x:clip keeps the bleed from causing scroll. */
+/* Ember Stage: the hero glow breathes at rest and ignites when Twitch is live.
+   Tuning knob: the rgba alpha below. */
 .hero::before {
   content: "";
   position: absolute;
@@ -218,10 +204,7 @@ strong, b { font-weight: 700; }
      translate shifts with `top` so keyframe scale stays centered on the avatar. */
   top: calc(var(--hero-pad) + var(--avatar-size) / 2);
   left: 50%;
-  /* Fit the hero column: full-width bleed on phones, 38rem cap on desktop. A fixed
-     38rem disc is wider than any phone viewport — when overflow clipping didn't hold
-     it left scrollable empty space to the right. Now the disc can never exceed the
-     hero box, so there is nothing left to scroll into. */
+  /* Fit the hero column: full-width bleed on phones, 38rem cap on desktop. */
   width: min(38rem, 100%);
   aspect-ratio: 1;
   translate: -50% -50%;
@@ -230,33 +213,26 @@ strong, b { font-weight: 700; }
   filter: blur(48px);
   pointer-events: none;
   z-index: 0;
+  opacity: 0.14;
   animation: ember-wake 1s cubic-bezier(0.16, 1, 0.3, 1) both,
              ember-breath 7.5s ease-in-out infinite 1s;
   will-change: transform, opacity, filter;
 }
 /* Hero content sits above the glow. */
 .hero > * { position: relative; z-index: 1; }
-/* Rest: coal warming/cooling. Bolder: brighter coal floor (0.14 → 0.22 peak),
-   bigger inhale (×1.12), longer cycle (7.5s). The room reads *alive* before any
-   interaction instead of faintly warm. Opacity ceiling checked: Bone (#eee4e0,
-   6.4:1 on Deep Teal) blended over Signal-link-tinted center at 22% peak stays ≥3:1
-   for the nick (large-text floor); tagline sits in the faded 65% zone where the
-   effective alpha is ~0.08, far above its own 4.5:1 floor. */
+/* Rest: coal warming/cooling; 0.14 floor, 0.22 peak, 7.5s cycle. */
 @keyframes ember-breath {
   0%, 100% { opacity: 0.14; transform: scale(1); }
   50%      { opacity: 0.22; transform: scale(1.12); }
 }
 /* Arrival: the glow swells from cold to its resting breath baseline once, then
-   hands off — the dark room warming up. 100% matches breath's floor so the
+   hands off: the dark room warming up. 100% matches breath's floor so the
    seam is invisible. Ignition (.avatar.live) overrides this later via :has(). */
 @keyframes ember-wake {
   0%   { opacity: 0;    transform: scale(0.8); }
   100% { opacity: 0.14; transform: scale(1); }
 }
-/* Ignition: one-time catch flare (match-strike surge) hands off to a hotter breath.
-   Bolder surge: ×1.35 scale, ×1.7 brightness at 35%; afterglow keeps a hotter
-   breath (0.24 floor / 0.42 peak, scale 1.14→1.22) so live reads unmistakable.
-   flare's 100% matches ignited's baseline so the seam is invisible. */
+/* Ignition: one catch flare, then a hotter 0.24-0.42 breath. */
 @keyframes ember-flare {
   0%   { opacity: 0.14; transform: scale(1);    filter: blur(48px) brightness(1); }
   35%  { opacity: 0.55; transform: scale(1.35); filter: blur(40px) brightness(1.7); }
@@ -267,26 +243,18 @@ strong, b { font-weight: 700; }
   50%      { opacity: 0.42; transform: scale(1.22); filter: blur(48px) brightness(1.18); }
 }
 .hero:has(.avatar.live)::before {
+  opacity: 0.24;
   animation: ember-flare 1s cubic-bezier(0.16, 1, 0.3, 1) both,
              ember-ignited 7s ease-in-out infinite 1s;
 }
 
-/* ── Delight: the match-strike ripples outward ───────────────────────────────
-   When badges.js confirms Twitch live the hero catches (ember-flare above);
-   .avatar.live is the single switch the whole page reads. The ripple is a set
-   of secondary answers to that one event, in this order, staggered so the eye
-   traces the fire from its source to the room around it. No new colors — the
-   ripple reuses the Signal tint; it is light, not paint. */
+/* Live ignition ripple: one staggered sequence from avatar to room. */
 
-/* 1. The avatar itself answers within the same 900 ms as its ring heats up:
-      a 2px outward swell of the whole avatar, spring-settled. The ring's color
-      move already says "hot"; this little puff says "alive". */
+/* Avatar swell with the live ring. */
 .avatar { transition: border-color 0.9s ease, transform 0.9s cubic-bezier(0.05, 0.7, 0.1, 1); }
 .avatar.live { border-color: var(--accent-link); transform: scale(1.03); }
 
-/* 2. Nick warms with the flare: an underline trace drawn by the heat. One 2px
-      bar, Signal tint 40%, growing from 0 to the nick's full width over 0.8s.
-      Settles and STAYS while live (no forever-pulse). */
+/* Nick underline stays while live. */
 .nick { position: relative; display: inline-block; padding-bottom: 0.35rem; }
 .nick::after {
   content: "";
@@ -306,10 +274,7 @@ strong, b { font-weight: 700; }
   to   { transform: scaleX(1); }
 }
 
-/* 3. Only the LIVE card moves — Signal Bright icon pops full-sat (matches the
-      avatar-ring tint so the two twitch states share a colour) and the card
-      itself bobs one gentle settle over 0.7s. Donate and quiet cards do not
-      ripple; one spark is the storyteller, the rest of the room stays dark. */
+/* Live card icon and one settle. */
 .container:has(.hero .avatar.live) .link-card:has(.badge-live:not([hidden])) svg:last-child,
 .container:has(.hero .avatar.live) .post-card:has(.badge-live:not([hidden])) svg:last-child {
   color: var(--accent-link);
@@ -333,12 +298,9 @@ strong, b { font-weight: 700; }
   100% { transform: translateY(0); }
 }
 
-/* 4. The donate card's gold spot tilts ever so slightly toward the sparks:
-      a 4° skew on its ::before point so the spotlight leans toward the live
-      card's pull for the flare second, then back. The one move the One
-      Spotlight Rule can afford — a lean, not a tint change. */
+/* Donate glare leans toward the live spark. */
 @media (prefers-reduced-motion: no-preference) {
-  .container:has(.hero .avatar.live) .donate-list .link-card::before {
+  .container:has(.hero .avatar.live) .donate-list .link-card::after {
     animation: donate-lean 1s ease-out 0.9s;
   }
 }
@@ -348,30 +310,19 @@ strong, b { font-weight: 700; }
   100% { transform: translateX(0); opacity: 0; }
 }
 
-/* ── Delight: avatar warms under cursor ──────────────────────────────────────
-   The avatar is the only face on the page — leaning into it should reward the
-   visitor with warmth, not just the existing ring pulse. One move, hover-gated
-   so touch gets nothing: the coal ring heats from Signal (rest) toward Signal
-   Bright and the avatar image itself gains a whisper of glow around its edge,
-   as if the stage light noticed you stepping up to it. */
+/* Avatar hover warmth: hover-gated; touch gets the press state instead. */
 @media (hover: hover) {
-  .avatar {     transition: border-color 0.9s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease; }
+  .avatar { transition: border-color 0.9s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
   .avatar:hover {
     border-color: var(--accent-link);
     transform: scale(1.06);
-    /* box-shadow is ring color at low alpha; the avatar's existing border
-       still owns the strong ring. */
-    box-shadow: 0 0 12px rgba(255, 180, 166, 0.4), 0 0 22px rgba(216, 14, 5, 0.2);
   }
   /* While live + hovered, hover wins over live's border so the warmth still
      answers directly even when the room's already hot. */
   .avatar.live:hover { border-color: var(--accent-link); transform: scale(1.06); }
 }
 
-/* Arrival: the stage warms into presence once. Content settles out of a soft blur
-   as the room comes into focus — only the hero; cards stay instant so the action
-   surface is ready at first paint. ponytail: blur-clearing is the material idea
-   (not a generic fade-and-rise); one-shot, no layout props, reduced-motion-gated. */
+/* Arrival: one soft blur-clear on the hero; cards stay instant. */
 @media (prefers-reduced-motion: no-preference) {
   .hero > * { animation: hero-settle 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .hero > *:nth-child(2) { animation-delay: 0.1s; }
@@ -421,7 +372,7 @@ strong, b { font-weight: 700; }
 .bio-content ul, .bio-content ol,
 .post-content ul, .post-content ol { padding-left: 1.5rem; }
 
-/* Link list — cards read as one block via clipped container */
+/* Link list: cards read as one block via clipped container */
 .link-list {
   list-style: none;
   margin: 0;
@@ -446,21 +397,6 @@ strong, b { font-weight: 700; }
   transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, border-radius 0.3s ease, scale 0.3s ease, transform 0.3s ease-out;
   position: relative;
   overflow: hidden;
-}
-/* Heat-on-touch bloom: soft radial ember glow inside the card on hover/focus.
-   Strengthens the Heat-On-Touch rule — cards literally heat, not just recolor.
-   overflow:hidden clips the bloom to the card. Donate variant glows gold. */
-.link-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 180, 166, 0.28), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-.donate-list .link-card::before {
-  background: transparent;
 }
 /* Card body: name + optional muted description line (social.yml `description:`) */
 .link-card-body { min-width: 0; }
@@ -489,18 +425,17 @@ strong, b { font-weight: 700; }
 @media (hover: hover) {
 .link-card:hover { background-color: var(--bg-card-hover); color: var(--fg); scale: 1.055; z-index: 1; }
 .link-list li .link-card:hover { border-radius: var(--card-radius-outer); }
-  .donate-list .link-card:hover { background-color: var(--gold); color: var(--bg); box-shadow: 0 0 1.2rem rgba(253, 209, 113, 0.3); }
-/* Heat-On-Touch lifts muted secondary lines too — Ash on the heated Ember surface
-   would dip below 4.5:1, so descriptions/excerpts/dates brighten with the card.
+  .donate-list .link-card:hover { background-color: var(--gold); color: var(--bg); }
+/* Heat-On-Touch lifts muted secondary lines with the card.
    Donate variant goes Deep Teal on gold (dark text on the spotlight fill). */
 .link-card:hover .link-desc,
 .link-card:hover .post-excerpt,
+.link-card:hover .project-desc,
 .link-card:hover .post-date { color: var(--fg); }
 .donate-list .link-card:hover .link-desc { color: var(--bg); }
-.link-card:hover::before { opacity: 1; }
 .link-card:hover .external-link-icon { opacity: 1; }
 }
-/* Keyboard focus: not gated by hover capability — mirrors the hover heat + adds a
+/* Keyboard focus: not gated by hover capability; mirrors the hover heat + adds a
    double-ring (gap in --bg, ring in --accent-link) that reads on any surface. */
 .link-card:focus-visible {
   background-color: var(--bg-card-hover);
@@ -508,10 +443,10 @@ strong, b { font-weight: 700; }
   outline: none;
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
-.link-card:focus-visible::before { opacity: 1; }
 .donate-list .link-card:focus-visible { background-color: var(--gold); color: var(--bg); }
 .link-card:focus-visible .link-desc,
 .link-card:focus-visible .post-excerpt,
+.link-card:focus-visible .project-desc,
 .link-card:focus-visible .post-date { color: var(--fg); }
 .donate-list .link-card:focus-visible .link-desc { color: var(--bg); }
 /* A post card is the morph source, not a layer above the dialog. */
@@ -525,7 +460,7 @@ strong, b { font-weight: 700; }
 .post-close:active { scale: 0.96; transition: scale 0.15s; }
 }
 
-/* Badges — "Live"/"New!" chips on link cards. Rendered hidden, shown by badges.js.
+/* Badges: "Live"/"New!" chips on link cards. Rendered hidden, shown by badges.js.
    bob = a gentle float (translateY + soft scale) so the whole chip lifts like a
    bubble, not a side-pivot wobble; dot = recording-style pulse. */
 .badge {
@@ -539,7 +474,7 @@ strong, b { font-weight: 700; }
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1.4;
-  /* Reveal pop: one-shot scale-in when badges.js un-hides the chip — freshness
+  /* Reveal pop: one-shot scale-in when badges.js un-hides the chip; freshness
      arrival feels earned, not silent. Runs once (hidden→shown render), then the
      idle bob takes over. Overshoot lives in the 70% keyframe; ease stays exponential. */
   animation: badge-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both,
@@ -547,7 +482,7 @@ strong, b { font-weight: 700; }
 }
 .badge[hidden] { display: none; }
 .badge-new { background: var(--accent-deep); color: var(--fg); }
-/* ponytail: text/dot are white, not bone — bone dips to 4.41 on the hotter Live fill (fails AA at 12px); white clears 5.51. New!'s Deep fill is dark enough for bone (5.12); Live's lighter fill isn't. */
+/* ponytail: text/dot are white, not bone; bone is 4.56:1 on the hotter Live fill, white gives 5.69:1. New!'s Deep fill lets bone pass at 5.21:1. */
 .badge-live { background: var(--accent-live); color: var(--on-live); }
 .badge-live::before {
   content: "";
@@ -571,7 +506,7 @@ strong, b { font-weight: 700; }
   50% { opacity: 0.25; }
 }
 /* Pin afterglow: badges.js adds .just-pinned to the live card's <li> on confirm.
-   Brief ember flash (bg-card-hover = the heated surface) settles to oxblood —
+   Brief ember flash (bg-card-hover = the heated surface) settles to oxblood,
    literally "this card just got hot." One-shot, ties the pin to the ignition theme. */
 .link-list li.just-pinned .link-card {
   animation: pin-afterglow 1.4s ease-out;
@@ -584,10 +519,10 @@ strong, b { font-weight: 700; }
   .badge, .badge-live::before,
   .link-list li.just-pinned .link-card,
   .footer-heart { animation: none; }
-  /* Live avatar: stop the sonar ping but keep the persistent soft glow —
+  /* Live avatar: stop the sonar ping but keep the persistent soft glow;
      it's the page's primary "on air" signal (ambient light, not motion). */
   .avatar.live { animation: none; box-shadow: 0 0 0.5rem rgba(216, 14, 5, 0.45); }
-  /* Glow stays (it's ambient light, not motion) — just stop breathing. */
+  /* Glow stays (it's ambient light, not motion): just stop breathing. */
   .hero::before { animation: none; opacity: 0.12; }
   .hero:has(.avatar.live)::before { opacity: 0.20; }
   .skip-link,
@@ -607,17 +542,13 @@ strong, b { font-weight: 700; }
   .avatar:hover { transform: none; scale: 1; }
 }
 
-/* Donate block — the one gold spotlight. Hearth Brown lifted to a clear tonal step
+/* Donate block: the one gold spotlight. Hearth Brown lifted to a clear tonal step
    above Oxblood so the warm peak reads at rest; touch has no hover to reveal it. */
 .donate-list .link-card {
   background-color: var(--bg-donate);
   color: var(--gold);
 }
-/* Glare hover (React Bits GlareHover adaptation, colors untouched): a soft warm
-   champagne glare at -30° sweeps across the gold fill on pointer-enter. On leave the
-   glare fades out fast (250ms) while the sweep eases back (800ms), so the closing
-   pass reads near-transparent. background-position-driven, hover-gated,
-   overflow:hidden on the card clips it to the pill. */
+/* Glare hover: champagne sweep at -30°; hover-gated, clipped by overflow. */
 .donate-list .link-card::after {
   content: "";
   position: absolute;
@@ -645,7 +576,7 @@ strong, b { font-weight: 700; }
    ponytail: :has() targets the section owning the donate list; unsupported = title stays Ash Rose. */
 .section:has(.donate-list) .section-title { color: var(--gold); }
 
-/* Posts list — reuses the link-list card block; text remains selectable. */
+/* Posts list: reuses the link-list card block; text remains selectable. */
 .post-card-body { flex: 1; min-width: 0; }
 .post-card-head {
   display: flex;
@@ -663,7 +594,7 @@ strong, b { font-weight: 700; }
   font-weight: 600;
 }
 
-/* Single post — article is a card (morph target matches .post-card visual) */
+/* Single post: article is a card (morph target matches .post-card visual) */
 .post-article {
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -678,10 +609,10 @@ strong, b { font-weight: 700; }
 .post-content h3 { font-family: var(--font-display); font-size: clamp(1.05rem, 0.92rem + 0.33vw, 1.25rem); font-weight: 700; }
 .post-content h1, .post-content h2, .post-content h3 { margin: 2rem 0 0.75rem; line-height: var(--leading-headline); text-wrap: balance; }
 .post-content img { max-width: 100%; height: auto; border-radius: var(--radius); }
-/* Post nav — prev/next at the foot of the article. Lives inside .post-article so the
+/* Post nav: prev/next at the foot of the article. Lives inside .post-article so the
    index modal copies it; modal JS swaps content instead of navigating there. */
 .post-nav {
-  /* 2-column grid: each side owns its lane — a long title truncates itself,
+  /* 2-column grid: each side owns its lane, a long title truncates itself,
      never the sibling (previously space-between + min-width:0 let one side starve the other). */
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -695,6 +626,7 @@ strong, b { font-weight: 700; }
   color: var(--fg-muted);
   text-decoration: none;
   min-width: 0;
+  padding: 0.625rem 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -704,7 +636,7 @@ strong, b { font-weight: 700; }
 .post-nav-prev { grid-column: 1; }
 .post-nav-next { grid-column: 2; text-align: right; }
 
-/* Close button — fixed top-right, soft-square control, same card language */
+/* Close button: fixed top-right, soft-square control, same card language */
 .post-close {
   position: fixed;
   top: max(1.5rem, env(safe-area-inset-top));
@@ -728,7 +660,7 @@ strong, b { font-weight: 700; }
 .post-close:hover {
   background: var(--bg-card-hover);
   /* ponytail: accent-link (Signal Bright) reads on the ember hover bg; plain --accent is ~1.5:1 red-on-red.
-     Signal Bright on Ember ≈ 3.7:1 — clears the 3:1 non-text floor (resolved in DESIGN.md). */
+     Signal Bright on Ember ≈ 5.6:1, clearing the 3:1 non-text floor (resolved in DESIGN.md). */
   color: var(--accent-link);
   scale: 1.08;
 }
@@ -738,10 +670,10 @@ strong, b { font-weight: 700; }
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
 
-/* Sound toggle — fixed bottom-right companion of .post-close, same card language.
-   Hidden until piano.js reveals it (no-JS pages have no audio to mute); aria-pressed
-   swaps the two inline icons and piano.js owns the aria-label. */
-.sound-toggle {
+/* Fixed companion controls: sound (revealed by piano.js) and motion pause.
+   Hidden until JS reveals them; data-muted/data-paused swap the icons. */
+.sound-toggle,
+.motion-toggle {
   position: fixed;
   bottom: max(1rem, env(safe-area-inset-bottom));
   right: max(1rem, env(safe-area-inset-right));
@@ -758,28 +690,39 @@ strong, b { font-weight: 700; }
   cursor: pointer;
   transition: background 0.3s ease, color 0.3s ease, scale 0.3s ease;
 }
-.sound-toggle[hidden] { display: none; }
-.sound-toggle span { display: inline-flex; }
-.sound-toggle[aria-pressed="true"] .sound-on,
-.sound-toggle[aria-pressed="false"] .sound-off { display: none; }
-.sound-toggle svg { width: 1.25rem; height: 1.25rem; }
+.motion-toggle { right: calc(max(1rem, env(safe-area-inset-right)) + 3.5rem); }
+.sound-toggle[hidden],
+.motion-toggle[hidden] { display: none; }
+.sound-toggle span,
+.motion-toggle span { display: inline-flex; }
+.sound-toggle[data-muted="true"] .sound-on,
+.sound-toggle[data-muted="false"] .sound-off { display: none; }
+.motion-toggle[data-paused="true"] .motion-pause-icon,
+.motion-toggle[data-paused="false"] .motion-play-icon { display: none; }
+.sound-toggle svg,
+.motion-toggle svg { width: 1.25rem; height: 1.25rem; }
 @media (hover: hover) {
-.sound-toggle:hover {
+.sound-toggle:hover,
+.motion-toggle:hover {
   background: var(--bg-card-hover);
   color: var(--accent-link);
   scale: 1.08;
 }
 }
-.sound-toggle:focus-visible {
+.sound-toggle:focus-visible,
+.motion-toggle:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
 @media (hover: none) {
-.sound-toggle:active { scale: 0.96; transition: scale 0.15s; }
+.sound-toggle:active,
+.motion-toggle:active { scale: 0.96; transition: scale 0.15s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-toggle { display: none; }
 }
 
-/* Post modal — opens instantly over the page (no transition).
-   Wider than the page column on desktop; standalone post page stays as no-JS/direct-link fallback. */
+/* Post modal: short scale/fade over the page; standalone post page is the no-JS fallback. */
 .post-modal {
   border: none;
   padding: 0;
@@ -807,10 +750,7 @@ strong, b { font-weight: 700; }
 .post-modal .sound-toggle { position: absolute; right: 1rem; bottom: 1rem; z-index: 2; }
 .post-modal-body:focus-visible { outline: 2px solid var(--accent-link); outline-offset: -2px; }
 
-/* Post modal — a compact scale/fade entrance avoids a card snapshot covering the
-   dialog; close may use the shared-element View Transition back to the card.
-   Both paths fall back to instant behavior under reduced motion or where
-   startViewTransition is unavailable. */
+/* Modal entrance: short scale/fade; close may morph back via View Transition. */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-group(post-morph) {
     animation-duration: 0.34s;
@@ -828,7 +768,7 @@ strong, b { font-weight: 700; }
   font-weight: 600;
 }
 
-/* 404 — centered hero, gradient code, card-style CTA matching link aesthetic */
+/* 404: centered hero, gradient code, card-style CTA matching link aesthetic */
 .not-found {
   display: flex;
   flex-direction: column;
@@ -880,6 +820,18 @@ strong, b { font-weight: 700; }
   outline: none;
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-link);
 }
+/* Forced-colors removes box-shadow; keep a real outline on the custom controls. */
+@media (forced-colors: active) {
+  .link-card:focus-visible,
+  .post-close:focus-visible,
+  .sound-toggle:focus-visible,
+  .motion-toggle:focus-visible,
+  .not-found-home:focus-visible,
+  .container:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}
 
 .site-footer {
   text-align: center;
@@ -889,10 +841,17 @@ strong, b { font-weight: 700; }
   position: relative; /* stack above the fixed background layer */
   z-index: 1;
 
-  /* Signal Bright like every other actionable accent — inherit (Ash Rose) read as plain text. */
-  a { color: var(--accent-link); text-decoration: none; }
+  /* Signal Bright like every other actionable accent: inherit (Ash Rose) read as plain text. */
+  a {
+    color: var(--accent-link);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+  }
 }
-/* Inline-SVG heart (replaces emoji) — signal red, sized to the cap height.
+/* Inline-SVG heart (replaces emoji): signal red, sized to the cap height.
    One-shot double-thump on load (lub-dub), delayed so it plays after settle. */
 .footer-heart { display: inline-flex; vertical-align: -0.15em; color: var(--accent); animation: heart-beat 0.8s ease-in-out 0.4s 1; }
 .footer-heart svg { width: 1em; height: 1em; }
@@ -904,10 +863,26 @@ strong, b { font-weight: 700; }
   60% { transform: scale(1); }
 }
 
+/* Motion pause: the toggle sets data-motion="paused" on <html>. */
+html[data-motion="paused"] *,
+html[data-motion="paused"] *::before,
+html[data-motion="paused"] *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+}
+/* The badge pop starts hidden; show the chip while motion is paused. */
+html[data-motion="paused"] .badge {
+  animation: none !important;
+  opacity: 1;
+  transform: none;
+}
+html[data-motion="paused"] { scroll-behavior: auto; }
+html[data-motion="paused"] .hero:has(.avatar.live) .nick::after { transform: scaleX(1); }
+
 /* Phone adaptation (< 768px). Desktop is the base; phones get denser spacing,
    stacked card head, smaller hero + close button. Tablet portrait folds in here. */
 @media (max-width: 768px) {
-  /* Type is fluid now (clamp scale above) — only layout/spacing adapt here. */
+  /* Type is fluid now (clamp scale above): only layout/spacing adapt here. */
   .container { padding: max(1.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 2rem max(1rem, env(safe-area-inset-left)); }
   .hero { margin-bottom: 1.5rem; --hero-pad: 0.5rem; --avatar-size: 5rem; }
   .avatar { margin-bottom: 0.75rem; }
@@ -927,7 +902,9 @@ strong, b { font-weight: 700; }
   .post-modal .sound-toggle { right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); top: auto; }
   .sound-toggle { top: max(1rem, env(safe-area-inset-top)); bottom: auto; }
   body[data-page="post"] .sound-toggle { right: max(5.5rem, env(safe-area-inset-right)); }
-  /* 44px touch-target floor (WCAG 2.5.8) — was 2.75rem (44px) nominal but padding shrink
+  .motion-toggle { top: max(1rem, env(safe-area-inset-top)); bottom: auto; right: calc(max(1rem, env(safe-area-inset-right)) + 3.5rem); }
+  body[data-page="post"] .motion-toggle { right: calc(max(5.5rem, env(safe-area-inset-right)) + 3.5rem); }
+  /* 44px touch-target floor (WCAG 2.5.8): was 2.75rem (44px) nominal but padding shrink
      crowded the visual region; keep the hit area at 3rem everywhere. */
   .post-close { top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); }
   .post-close svg { width: 1.35rem; height: 1.35rem; }
@@ -939,11 +916,7 @@ strong, b { font-weight: 700; }
   .link-card { padding: 0.875rem; }
 }
 
-/* Landscape phones (short, wide viewports). Stream viewers rotate to watch; the stacked
-   hero would eat the whole short height and bury the links below the fold. Gate on BOTH
-   orientation:landscape AND a short max-height (30rem = 480px) so tablets in landscape
-   (tall) never match — only phones. Fires on top of the phone query where widths overlap
-   (e.g. iPhone SE landscape < 768px); later source order wins, so the compact values apply. */
+/* Landscape phones: short viewports get compact spacing; tablets stay out. */
 @media (orientation: landscape) and (max-height: 30rem) {
   :root { --text-display: 1.75rem; --text-tagline: 0.95rem; }
   .container { padding-top: 1rem; padding-bottom: 1.5rem; }

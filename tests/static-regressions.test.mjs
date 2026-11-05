@@ -6,9 +6,16 @@ const modal = readFileSync(new URL('../assets/post-modal.js', import.meta.url), 
 const piano = readFileSync(new URL('../assets/piano.js', import.meta.url), 'utf8');
 const config = readFileSync(new URL('../_config.yml', import.meta.url), 'utf8');
 const postLayout = readFileSync(new URL('../_layouts/post.html', import.meta.url), 'utf8');
+const layout = readFileSync(new URL('../_layouts/default.html', import.meta.url), 'utf8');
+const hero = readFileSync(new URL('../_includes/hero.html', import.meta.url), 'utf8');
 
 assert.match(css, /\.post-single\s*\{[^}]*z-index:\s*1/s, 'post content stacks above Silk');
-assert.match(css, /\.sound-toggle\[hidden\]\s*\{\s*display:\s*none;/, 'hidden sound control is not focusable by layout');
+assert.match(css, /\.sound-toggle\[hidden\],\s*\.motion-toggle\[hidden\]\s*\{\s*display:\s*none;/, 'hidden controls are not focusable by layout');
+assert.match(css, /\.link-card:hover \.project-desc/, 'project description promotes on hover');
+assert.match(css, /\.link-card:focus-visible \.project-desc/, 'project description promotes on focus');
+assert.match(css, /html\[data-motion="paused"\]/, 'motion pause stops animation');
+assert.match(layout, /class="motion-toggle"/, 'motion pause control is present');
+assert.match(hero, /fetchpriority="high"/, 'hero image is high priority');
 assert.match(css, /--control-radius:\s*1rem/, 'controls use the shared soft-square radius');
 assert.match(css, /--card-radius:\s*0\.75rem/, 'link cards use the restrained radius');
 assert.doesNotMatch(css, /\.hero:has\(\.avatar\.live\)\s*~\s*\.container/, 'live selector has valid ancestor structure');

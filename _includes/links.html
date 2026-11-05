@@ -7,7 +7,7 @@
   {% assign _rel = 'noopener me' %}
   {% assign _default_title = site.data.locale.nav_links %}
 {% endif %}
-<section class="section" id="{{ include.section_id | default: _id | escape }}"{% if _id == 'links' %} tabindex="-1"{% endif %}>
+<section class="section" id="{{ include.section_id | default: _id | escape }}">
   {% if include.title != false %}{% assign t = include.title | default: _default_title %}<h2 class="section-title">{{ t | escape }}</h2>{% endif %}
   {% if include.items.size > 0 %}
   <ul class="link-list{% if include.style == 'donate' %} donate-list{% endif %}" data-badge-days="{{ site.data.social.badge_days | default: 3 }}">
@@ -20,6 +20,7 @@
     {% if _url_parts.size > 1 and _url_scheme != 'http' and _url_scheme != 'https' and _url_scheme != 'mailto' and _url_scheme != 'tel' %}
       {% assign _url = '#' %}
     {% endif %}
+    {% if _url == '#' %}{% continue %}{% endif %}
     <li>
       <a href="{{ _url | escape }}" target="_blank" rel="{{ _rel }}" class="link-card">
         {% include icon.html name=item.icon %}
@@ -28,7 +29,7 @@
           {% if item.description %}<span class="link-desc">{{ item.description | escape }}</span>{% endif %}
         </span>
         {% if b %}
-        <span class="badge badge-{% if b.type == 'twitch' %}live{% else %}new{% endif %}" hidden
+        <span class="badge badge-{% if b.type == 'twitch' %}live{% else %}new{% endif %}" lang="en" hidden
               data-badge-type="{{ b.type | escape }}"
               {%- if b.login %} data-badge-login="{{ b.login | escape }}"{% endif %}
               {%- if b.channel_id %} data-badge-id="{{ b.channel_id | escape }}"{% endif %}

@@ -1,4 +1,4 @@
-// Runnable check for assets/post-modal.js — imports the real module and passes
+// Runnable check for assets/post-modal.js, imports the real module and passes
 // fakes across its named seams (fetcher / hist / navigate / host / vt / emit).
 // Usage: node tests/modal-history.test.mjs
 import assert from 'node:assert';
@@ -112,7 +112,7 @@ function makeWorld(cardUrls) {
   assert.deepEqual(w.navigated, [], 'T2 no navigation');
 }
 
-// T3: history navigation during a slow open — the pending open is superseded (its late
+// T3: history navigation during a slow open, the pending open is superseded (its late
 // fetch can't push or fill), and Forward reopens the cached entry the user navigated to.
 // The busy dialog is visible immediately; stale work cannot replace its state.
 {
@@ -126,7 +126,7 @@ function makeWorld(cardUrls) {
   assert.ok(w.dlg.open, 'T3 loading dialog opens immediately');
   assert.match(w.body.innerHTML, /Loading/, 'T3 loading state is visible');
   w.historyLike.forward(); // user navigates to the A entry → A reopens from cache
-  w.fetches[1].resolve(okArticle('/posts/b/')); // B resolves late — must be dropped
+  w.fetches[1].resolve(okArticle('/posts/b/')); // B resolves late, must be dropped
   await tick();
   assert.ok(w.dlg.open, 'T3 A reopened from cache via Forward');
   assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T3 stale B fetch pushed nothing');
@@ -136,7 +136,7 @@ function makeWorld(cardUrls) {
   assert.deepEqual(opens, ['card', 'history'], 'T3 reopen via Forward reports source "history"');
 }
 
-// T4: rapid prev/next swaps — last click wins, exactly one push, content matches,
+// T4: rapid prev/next swaps, last click wins, exactly one push, content matches,
 // and swaps emit no additional open events (the modal never closed).
 {
   const w = makeWorld(['/posts/a/', '/posts/b/', '/posts/c/']);
@@ -147,7 +147,7 @@ function makeWorld(cardUrls) {
   w.machine.swap('/posts/c/', true, 1);
   w.fetches[2].resolve(okArticle('/posts/c/')); // C resolves first
   await tick();
-  w.fetches[1].resolve(okArticle('/posts/b/')); // B resolves late — must be dropped
+  w.fetches[1].resolve(okArticle('/posts/b/')); // B resolves late, must be dropped
   await tick();
   assert.equal(w.body.innerHTML, 'body-of /posts/c/', 'T4 last click wins');
   assert.deepEqual(w.st.pushed, ['/posts/a/'], 'T4 only the open pushes; swaps replace in place');
@@ -201,7 +201,7 @@ function makeWorld(cardUrls) {
 }
 
 // T8: fill() force-resets the modal body's scroll position to top before showing
-// new content — a prior post's scroll offset never bleeds into the next open.
+// new content, a prior post's scroll offset never bleeds into the next open.
 {
   const w = makeWorld(['/posts/a/']);
   w.body.scrollTop = 400; // previous post scrolled to the end
@@ -211,7 +211,7 @@ function makeWorld(cardUrls) {
   assert.equal(w.body.scrollTop, 0, 'T8 fill() resets modal body scroll to top');
 }
 
-// T9: scroll lock is behavioural now — open hides html overflow through host.root,
+// T9: scroll lock is behavioural now, open hides html overflow through host.root,
 // every dismiss path (close, Esc-cancel) unlocks it via the dialog 'close' event.
 // The machine never touches body style at all (no position:fixed era regressions).
 {

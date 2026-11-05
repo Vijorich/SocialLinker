@@ -318,7 +318,8 @@ export function initPostModal(doc = (typeof document !== 'undefined' ? document 
     vt: typeof doc.startViewTransition === 'function'
       ? cb => doc.startViewTransition(cb)
       : null,
-    reduce: () => typeof win.matchMedia === 'function' && win.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    reduce: () => (typeof win.matchMedia === 'function' && win.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      || doc.documentElement.dataset.motion === 'paused',
     raf: cb => typeof win.requestAnimationFrame === 'function' ? win.requestAnimationFrame(cb) : setTimeout(cb, 0),
     emit: (type, detail) => win.dispatchEvent(new win.CustomEvent(type, { detail })),
   });

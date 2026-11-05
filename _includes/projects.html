@@ -10,6 +10,7 @@
     {% if _project_parts.size > 1 and _project_scheme != 'http' and _project_scheme != 'https' and _project_scheme != 'mailto' and _project_scheme != 'tel' %}
       {% assign _project_url = '#' %}
     {% endif %}
+    {% if _project_url == '#' %}{% continue %}{% endif %}
     <li>
       <a href="{{ _project_url | escape }}" target="_blank" rel="noopener" class="link-card project-card">
         {% include icon.html name=item.icon %}

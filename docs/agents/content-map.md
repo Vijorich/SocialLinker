@@ -1,6 +1,6 @@
 # Content map
 
-Single source of truth per content type — all content lives in `_data/*.yml`.
+Single source of truth per content type: all content lives in `_data/*.yml`.
 
 | What | File |
 |---|---|

@@ -7,7 +7,7 @@ import { Renderer, Program, Mesh, Triangle } from './ogl.js';
 
 const hexToRgb = (hex) => {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!m) return [0.482, 0.459, 0.506]; // #7B7481 — the component default
+  if (!m) return [0.482, 0.459, 0.506]; // #7B7481: the component default
   return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
 };
 
@@ -48,7 +48,7 @@ vec2 rotateUvs(vec2 uv, float angle) {
 void main() {
   float rnd = noise(gl_FragCoord.xy);
   // Fixed pixel scale: normalize by the canvas HEIGHT so the wave size stays
-  // constant across window widths — a narrow phone no longer squeezes the
+  // constant across window widths: a narrow phone no longer squeezes the
   // pattern into thin waves; width only changes how many waves are visible.
   vec2  uv      = rotateUvs((gl_FragCoord.xy / iResolution.y) * uScale, uRotation);
   vec2  tex     = uv * uScale;
@@ -83,7 +83,7 @@ export function createSilk(container, options = {}) {
 
   // WebGL2 can be unavailable (blocked, driverless, software-disabled). Fail
   // silent like the rest of the site: the CSS gradient ground stays, no console
-  // crash — initSilk already skips null instances.
+  // crash: initSilk already skips null instances.
   let renderer;
   try {
     renderer = new Renderer({
@@ -182,6 +182,7 @@ export function createSilk(container, options = {}) {
   setSize();
 
   let raf = 0;
+  let paused = false;
   let isVisible = true;
   let isPageVisible = !document.hidden;
   const t0 = performance.now();
@@ -200,7 +201,7 @@ export function createSilk(container, options = {}) {
   };
 
   const tryStart = () => {
-    if (isVisible && isPageVisible && raf === 0) raf = requestAnimationFrame(loop);
+    if (!paused && isVisible && isPageVisible && raf === 0) raf = requestAnimationFrame(loop);
   };
   const tryStop = () => {
     if (raf !== 0) {
@@ -240,6 +241,16 @@ export function createSilk(container, options = {}) {
   }
 
   let destroyed = false;
+  const pause = () => {
+    if (destroyed) return;
+    paused = true;
+    tryStop();
+  };
+  const resume = () => {
+    if (destroyed) return;
+    paused = false;
+    tryStart();
+  };
   const destroy = () => {
     if (destroyed) return;
     destroyed = true;
@@ -260,6 +271,8 @@ export function createSilk(container, options = {}) {
       if (destroyed) return;
       try { applyOpts(); } catch { tryStop(); }
     },
+    pause,
+    resume,
     destroy,
   };
 }
@@ -277,6 +290,9 @@ export function initSilk(root = (typeof document !== 'undefined' ? document : nu
     }
     const inst = createSilk(el, opts);
     if (inst) instances.push(inst);
+  });
+  window.addEventListener('motion-pause', e => {
+    instances.forEach(inst => (e.detail ? inst.pause() : inst.resume()));
   });
   return instances;
 }

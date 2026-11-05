@@ -1,4 +1,4 @@
-// Runnable check for the audio stack — asserts on the deep surfaces directly:
+// Runnable check for the audio stack, asserts on the deep surfaces directly:
 //   ladder math + walker bounds + vocabulary data  (assets/piano.js exports)
 //   engine gating, envelopes, release              (assets/audio-engine.js)
 // Usage: node tests/piano.test.mjs
@@ -50,7 +50,7 @@ function makeEngine(opts = {}) {
   return { eng, ...c, storage };
 }
 
-// T1: pentatonic ladder math — DOM-position pitches, octave wrap at 5 steps.
+// T1: pentatonic ladder math, DOM-position pitches, octave wrap at 5 steps.
 {
   assert.ok(closeTo(rungAt(0), 220), 'T1 base rung is A3');
   assert.ok(closeTo(rungAt(3), 220 * Math.pow(2, 7 / 12)), 'T1 fourth rung is +P5');
@@ -59,7 +59,7 @@ function makeEngine(opts = {}) {
   assert.ok(closeTo(rungAt(2, 440), 440 * Math.pow(2, 5 / 12)), 'T1 donate scale rides the same ladder an octave up');
 }
 
-// T2: walker stays bounded — never below 0, never above pos+4, steps within ±2.
+// T2: walker stays bounded, never below 0, never above pos+4, steps within ±2.
 {
   for (const pos of [0, 3, 9]) {
     let rung = pos;
@@ -73,7 +73,7 @@ function makeEngine(opts = {}) {
   }
 }
 
-// T3: importance ladder as DATA — exactly one voice per rung, donate fullest.
+// T3: importance ladder as DATA, exactly one voice per rung, donate fullest.
 {
   assert.deepEqual(MELODIES.thank.semis, [0, 4, 7, 11, 14, 21], 'T3 donate thank = maj7 rise + sparkle');
   assert.deepEqual(MELODIES.joy.semis, [0, 4, 7, 11, 14], 'T3 links joy = maj7 lift');
@@ -99,7 +99,7 @@ function makeEngine(opts = {}) {
   assert.equal(pickMelodyName(card(['post-card'])), 'page', 'T4 post cards page');
 }
 
-// T5: pre-gesture silence — suspended context schedules nothing and never throws
+// T5: pre-gesture silence, suspended context schedules nothing and never throws
 // (the rejecting-resume path included). Ambient voices gate; play() swallows.
 {
   const { eng, oscs } = makeEngine({ state: 'suspended', failResume: true });
@@ -113,7 +113,7 @@ function makeEngine(opts = {}) {
   assert.equal(oscs.length, 0, 'T5 nothing scheduled into the frozen clock');
 }
 
-// T6: master mute — persisted ('sl-audio'), gates every voice creator inside the
+// T6: master mute, persisted ('sl-audio'), gates every voice creator inside the
 // engine, default ON, unmute restores scheduling.
 {
   const { eng, oscs, storage } = makeEngine({});
@@ -134,7 +134,7 @@ function makeEngine(opts = {}) {
   assert.equal(oscs.length - before, 6, 'T6 sound returns: 3 voices × 2 oscs');
 }
 
-// T7: attune hold voices are a real chord — root × 2^(semi/12) (the old NaN
+// T7: attune hold voices are a real chord, root × 2^(semi/12) (the old NaN
 // regression), retune keeps the shape, breath LFO runs on 2×stepS.
 {
   const { eng, oscs } = makeEngine({});
@@ -154,7 +154,7 @@ function makeEngine(opts = {}) {
   h.stop();
 }
 
-// T8: releaseAll is the single chokepoint — active holds AND the drone stop
+// T8: releaseAll is the single chokepoint, active holds AND the drone stop
 // their oscillators; calling it twice is safe; new voices still work.
 {
   const { eng, oscs } = makeEngine({});
@@ -171,7 +171,7 @@ function makeEngine(opts = {}) {
   fresh.stop();
 }
 
-// T9: drone singleton — second call returns the live handle, stop is idempotent.
+// T9: drone singleton, second call returns the live handle, stop is idempotent.
 {
   const { eng } = makeEngine({});
   const d1 = eng.drone();
@@ -183,7 +183,7 @@ function makeEngine(opts = {}) {
   assert.notEqual(d2, d1, 'T9 fresh drone after stop');
 }
 
-// T10: browser boot path — production creates the engine WITHOUT an injected
+// T10: browser boot path, production creates the engine WITHOUT an injected
 // ctxFactory (piano.js passes { storage } only), so the engine must fall back
 // to the ambient AudioContext constructor (the 12cd182 total-silence regression).
 {

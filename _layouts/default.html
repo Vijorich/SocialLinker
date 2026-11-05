@@ -19,7 +19,7 @@
   <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
   <meta property="og:image" content="{{ '/assets/og-cover.png' | absolute_url }}">
-  <meta property="og:image:alt" content="{{ site.data.profile.nick | escape }} — {{ site.description | escape }}">
+  <meta property="og:image:alt" content="{{ site.data.profile.nick | escape }}: {{ site.description | escape }}">
   {% if page.layout == 'post' %}
   <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">
   <meta property="article:author" content="{{ site.author | escape }}">
@@ -41,7 +41,7 @@
   <script type="module" src="{{ '/assets/badges.js' | relative_url }}"></script>
   <script type="module" src="{{ '/assets/piano.js' | relative_url }}"></script>
   <script type="module" src="{{ '/assets/post-modal.js' | relative_url }}"></script>
-  <script type="module" src="{{ '/assets/silk.js' | relative_url }}"></script>
+  {% if site.data.silk.enabled %}<script type="module" src="{{ '/assets/silk.js' | relative_url }}"></script>{% endif %}
 </head>
 <body data-home="{{ '/' | relative_url | escape }}" data-code-label="{{ site.data.locale.code_block | escape }}" data-page="{% if page.layout == 'post' %}post{% elsif is_404 %}404{% else %}index{% endif %}">
 {% if site.data.silk.enabled %}<div class="silk-bg" data-silk data-config='{{ site.data.silk | jsonify | escape }}' aria-hidden="true"></div>{% endif %}
@@ -50,20 +50,27 @@
 {% endunless %}
 {% unless is_404 %}
 <!-- Sound toggle: hidden until piano.js reveals it (no-JS = no audio = nothing to mute). -->
-<button class="sound-toggle" type="button" hidden aria-pressed="false" aria-label="{{ site.data.locale.sound_mute | escape }}"
+<button class="sound-toggle" type="button" hidden data-muted="false" aria-label="{{ site.data.locale.sound_mute | escape }}"
         data-label-mute="{{ site.data.locale.sound_mute | escape }}" data-label-unmute="{{ site.data.locale.sound_unmute | escape }}">
   <span class="sound-on">{% include icon.html name='sound' %}</span>
   <span class="sound-off">{% include icon.html name='mute' %}</span>
 </button>
 {% endunless %}
+<button class="motion-toggle" type="button" hidden data-paused="false" aria-label="{{ site.data.locale.motion_pause | escape }}"
+        data-label-pause="{{ site.data.locale.motion_pause | escape }}" data-label-play="{{ site.data.locale.motion_play | escape }}">
+  <span class="motion-pause-icon">{% include icon.html name='pause' %}</span>
+  <span class="motion-play-icon">{% include icon.html name='play' %}</span>
+</button>
 <div id="site-status" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 {{ content }}
 
 <script>
-/* Card tilt: pointer-follow parallax on desktop hover devices only. The post
-   modal machine lives in assets/post-modal.js; the standalone-post close
-   button and all other behaviour moved there. */
-if(window.matchMedia && window.matchMedia('(hover:hover)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{let fx=0,fy=0,raf=0;const run=()=>{raf=0;const r=c.getBoundingClientRect(),dx=(fx-r.left)/r.width-.5,dy=(fy-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`};c.addEventListener('mousemove',e=>{fx=e.clientX;fy=e.clientY;if(!raf)raf=requestAnimationFrame(run)});c.addEventListener('mouseleave',()=>{if(raf)cancelAnimationFrame(raf);raf=0;c.style.transform=''})})}
+/* Motion pause: stops CSS animation and asks the Silk shader to pause. */
+(function(){var b=document.querySelector('.motion-toggle');if(!b)return;var root=document.documentElement;var set=function(paused){root.dataset.motion=paused?'paused':'';b.dataset.paused=String(paused);b.setAttribute('aria-label',paused?b.dataset.labelPlay:b.dataset.labelPause);window.dispatchEvent(new CustomEvent('motion-pause',{detail:paused}))};b.hidden=false;b.addEventListener('click',function(){set(root.dataset.motion!=='paused')});set(false)})();
+</script>
+<script>
+/* Card tilt: pointer-follow parallax on fine-pointer hover devices only. */
+if(window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches&&window.matchMedia('(prefers-reduced-motion:no-preference)').matches){document.querySelectorAll('.link-card').forEach(c=>{let fx=0,fy=0,raf=0;const run=()=>{raf=0;if(document.documentElement.dataset.motion==='paused')return;const r=c.getBoundingClientRect(),dx=(fx-r.left)/r.width-.5,dy=(fy-r.top)/r.height-.5;c.style.transform=`translate(${dx*8}px,${dy*8}px)`};c.addEventListener('mousemove',e=>{fx=e.clientX;fy=e.clientY;if(!raf)raf=requestAnimationFrame(run)});c.addEventListener('mouseleave',()=>{if(raf)cancelAnimationFrame(raf);raf=0;c.style.transform=''})})}
 </script>
 </body>
 </html>

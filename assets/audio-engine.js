@@ -1,4 +1,4 @@
-/* Audio engine — the deep module under every voice on the site.
+/* Audio engine: the deep module under every voice on the site.
  *
  * Owns the AudioContext lifecycle (lazy creation, autoplay unlock, master bus),
  * the mute gate (persisted in localStorage 'sl-audio', default ON), and every
@@ -6,7 +6,7 @@
  *
  *   play(fn)          gesture path: resumes a suspended context, then runs fn
  *   note(f)           plink: fundamental + fifth partial
- *   chord(root,semis,o) staggered gliding voices — every melody is built here
+ *   chord(root,semis,o) staggered gliding voices: every melody is built here
  *   hold({root,...})  sustained breath-LFO chord -> {retune(root), stop()}
  *   drone()           avatar ember drone -> {stop()} | null
  *   tok() / echo(f)   skip-link tick / GitHub octave tap
@@ -105,7 +105,7 @@ export function createAudioEngine({ storage, ctxFactory = defaultCtxFactory } = 
     const c = ac();
     return c && c.state === 'running' ? c : null;
   };
-  /* Ambient paths stay silent until the context runs — never queued. */
+  /* Ambient paths stay silent until the context runs, never queued. */
   const unlock = () => {
     if (muted) return;
     const c = ac();

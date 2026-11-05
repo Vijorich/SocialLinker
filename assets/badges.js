@@ -105,9 +105,9 @@ function pin(el) {
     }
   };
 
-  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  const reduce = (typeof window !== 'undefined' && typeof window.matchMedia === 'function'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
+    : false) || (typeof document !== 'undefined' && document.documentElement.dataset.motion === 'paused');
   if (typeof document.startViewTransition !== 'function' || reduce) {
     move();
     return;
@@ -130,7 +130,12 @@ function reveal(el) {
   el.hidden = false;
   pin(el);
   const status = document.getElementById('site-status');
-  if (status) status.textContent = el.textContent.trim();
+  if (status) {
+    const card = el.closest('.link-card');
+    const nameEl = card && card.querySelector('.link-card-body > span');
+    const name = nameEl && nameEl.firstChild ? nameEl.firstChild.textContent.trim() : '';
+    status.textContent = name ? `${name}: ${el.textContent.trim()}` : el.textContent.trim();
+  }
   window.dispatchEvent(new CustomEvent('badge-reveal', { detail: el.dataset.badgeType }));
   return true;
 }

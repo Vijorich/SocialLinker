@@ -1,4 +1,4 @@
-/* Piano — DOM wiring + musical vocabulary. The audio machinery lives in
+/* Piano: DOM wiring + musical vocabulary. The audio machinery lives in
  * audio-engine.js; this file maps page events onto it.
  *
  * Touch policy: a primary tap may play the click chord, but hover notes,
@@ -220,7 +220,7 @@ export function initPiano({ doc = (typeof document !== 'undefined' ? document : 
     const paint = () => {
       soundButtons.forEach(button => {
         button.hidden = !engine.available;
-        button.setAttribute('aria-pressed', String(engine.muted));
+        button.dataset.muted = String(engine.muted);
         button.setAttribute('aria-label', engine.muted ? button.dataset.labelUnmute : button.dataset.labelMute);
       });
     };

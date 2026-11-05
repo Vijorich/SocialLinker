@@ -1,19 +1,10 @@
-/* Hold glow — an OUTER ember bloom, not the old inside ::after tint. piano.js
-   adds .attuned after the ~3.5s hold (the same tick the walker melody starts),
-   so light and sound land on one moment. Box-shadow paints outside the card,
-   unaffected by the card's overflow:hidden — the previous radial ::after sat
-   inside the pill and its LFO-locked shimmer froze. Normal cards bloom in the
-   accent; donate cards already glow gold on hover and step a touch brighter
-   here, since their hover glow is immediate. */
+/* Hold ring: a solid outer ring, not a soft glow. Keeps the attune reward
+   without adding another glow source to the page. */
 .link-card.attuned,
 .post-card.attuned {
   z-index: 2;
-  box-shadow:
-    0 0 1.4rem rgba(255, 180, 166, 0.5),
-    0 0 3rem rgba(216, 14, 5, 0.32);
+  box-shadow: 0 0 0 2px var(--accent-link);
 }
 .donate-list .link-card.attuned {
-  box-shadow:
-    0 0 2rem rgba(253, 209, 113, 0.6),
-    0 0 3.6rem rgba(253, 191, 89, 0.42);
+  box-shadow: 0 0 0 2px var(--gold);
 }

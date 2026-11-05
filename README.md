@@ -1,6 +1,6 @@
 # SocialLinker
 
-Статический сайт-визитка на [Jekyll](https://jekyllrb.com) для GitHub Pages. Весь контент — в `_data/*.yml`, шаблоны трогать не нужно. Форкните, впишите свои данные — и сайт готов.
+Статический сайт-визитка на [Jekyll](https://jekyllrb.com) для GitHub Pages. Весь контент лежит в `_data/*.yml`, шаблоны трогать не нужно. Форкните, впишите свои данные, и сайт готов.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Jekyll](https://img.shields.io/badge/Jekyll-3.9-red?logo=jekyll)](https://jekyllrb.com)
@@ -8,8 +8,9 @@
 
 ## Возможности
 
-- Секции набираются из `_data/sections.yml`: порядок строк = порядок на странице, удалил строку — секция скрыта.
-- Соцссылки с живыми бейджами **Live** (Twitch) и **New!** (YouTube, Telegram) — клиентский JS, без ключей API.
+- Секции набираются из `_data/sections.yml`: порядок строк = порядок на странице, удалил строку: секция скрыта.
+- Соцссылки с живыми бейджами **Live** (Twitch) и **New!** (YouTube, Telegram): клиентский JS, без ключей API.
+- Кнопка паузы анимации останавливает свечение, бейджи и Silk-фон.
 - Список проектов, блок донатов и посты на `_posts/*.md` (посты доступны по прямым URL; витрина статей временно скрыта).
 - Без custom plugins и CI: работает в safe mode GitHub Pages, деплой пушем в `main` (allowlisted `jekyll-redirect-from` используется только для старых URL).
 
@@ -24,7 +25,7 @@
    ```
 4. Замените контент (см. таблицу ниже) и `assets/avatar.webp`.
 5. При необходимости перегенерируйте OG-обложку: `python -m pip install -r scripts/requirements.txt && python scripts/make-og.py`.
-6. Запушьте в `main` — сайт обновится сам.
+6. Запушьте в `main`, и сайт обновится сам.
 
 ## Локальный запуск
 
@@ -53,21 +54,21 @@ bundle exec jekyll serve --baseurl ""
 
 Нюансы:
 
-- Заголовок секции: `title: "Текст"` — свой, без `title` — из `locale.yml`, `title: false` — скрыть.
-- Бейдж YouTube требует `channel_id` (смотрите на youtube.com/account_advanced); пустой — бейдж не рендерится.
-- Посты: `_posts/YYYY-MM-DD-slug.md` с `title`, `date`, `lang` в front matter — доступны по прямым URL. Чтобы вернуть витрину, добавь `- type: articles` в `_data/sections.yml`.
+- Заголовок секции: `title: "Текст"` задаёт свой заголовок; без `title` берётся из `locale.yml`; `title: false` скрывает его.
+- Бейдж YouTube требует `channel_id` (смотрите на youtube.com/account_advanced); пустой: бейдж не рендерится.
+- Посты: `_posts/YYYY-MM-DD-slug.md` с `title`, `date`, `lang` в front matter; посты доступны по прямым URL. Чтобы вернуть витрину, добавь `- type: articles` в `_data/sections.yml`.
 
-Больше деталей — в [AGENTS.md](AGENTS.md).
+Больше деталей в [AGENTS.md](AGENTS.md).
 
 ## Как помочь проекту
 
-Баги и идеи — в [Issues](../../issues). Код — через Pull Request:
+Баги и идеи: [Issues](../../issues). Код: через Pull Request:
 
 1. Форк → ветка от `main` (`feat/...` или `fix/...`).
 2. Коммиты: короткое сообщение в повелительном наклонении, префикс `feat:`/`fix:` приветствуется (`feat: add VK badge support`).
 3. Перед PR проверьте локально: `bundle exec jekyll build --baseurl ""` проходит без ошибок, страница выглядит как задумано.
-4. Один PR — одно изменение. Правки контента автора (`_data/profile.yml` и т.п.) в PR не включаем.
+4. Один PR, одно изменение. Правки контента автора (`_data/profile.yml` и т.п.) в PR не включаем.
 
 ## Лицензия
 
-[MIT](LICENSE) — берите, форкайте, меняйте под себя. Указание авторства приветствуется, но не обязательно.
+[MIT](LICENSE): берите, форкайте, меняйте под себя. Указание авторства приветствуется, но не обязательно.

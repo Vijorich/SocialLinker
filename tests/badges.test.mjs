@@ -1,4 +1,4 @@
-// Runnable check for assets/badges.js PROVIDERS.check — the pure detection
+// Runnable check for assets/badges.js PROVIDERS.check, the pure detection
 // surface. Feed shapes are stub documents; network/proxy transport is out of scope.
 // Usage: node tests/badges.test.mjs
 import assert from 'node:assert';
@@ -21,7 +21,7 @@ const htmlDoc = isos => ({
   querySelectorAll: sel => (sel === 'time[datetime]' ? isos.map(iso => ({ getAttribute: () => iso })) : []),
 });
 
-// T1: twitch — decapi uptime strings
+// T1: twitch, decapi uptime strings
 {
   const check = PROVIDERS.twitch.check;
   assert.equal(check('3 hours, 25 minutes', cutoff), true, 'T1 uptime string reveals Live');
@@ -33,7 +33,7 @@ const htmlDoc = isos => ({
   assert.equal(check('USER IS OFFLINE', cutoff), false, 'T1 uppercase offline stays hidden');
 }
 
-// T2: youtube — freshness vs cutoff, robustness against malformed feeds
+// T2: youtube, freshness vs cutoff, robustness against malformed feeds
 {
   const check = (text, doc) => PROVIDERS.youtube.check(text, cutoff, { parseFromString: () => doc });
   assert.equal(check('xml', xmlDoc([ytEntry(daysAgo(1))])), true, 'T2 fresh video reveals New!');
@@ -49,7 +49,7 @@ const htmlDoc = isos => ({
   }
 }
 
-// T3: telegram — LAST time[datetime] wins, robustness against proxy HTML drift
+// T3: telegram, LAST time[datetime] wins, robustness against proxy HTML drift
 {
   const check = (text, doc) => PROVIDERS.telegram.check(text, cutoff, { parseFromString: () => doc });
   assert.equal(check('html', htmlDoc([daysAgo(9), daysAgo(1)])), true, 'T3 latest post fresh reveals New!');

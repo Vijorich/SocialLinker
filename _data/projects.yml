@@ -4,3 +4,7 @@ items:
     url: https://github.com/Vijorich/SocialLinker
     description: "Сайт-визитка на котором вы сейчас находитесь."
     icon: github
+  - name: Emote Anywhere
+    url: https://github.com/Vijorich/emote-anywhere
+    description: "Эмоуты 7TV, BTTV и FFZ в любом чате."
+    icon: github

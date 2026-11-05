@@ -21,13 +21,13 @@
   </ul>
   <dialog id="post-modal" class="post-modal" aria-label="{{ site.data.locale.post_content | escape }}" data-code-label="{{ site.data.locale.code_block | escape }}" data-loading-label="{{ site.data.locale.post_loading | escape }}" hidden>
     <button class="post-close" type="button" aria-label="{{ site.data.locale.close | escape }}">{% include icon.html name='close' %}</button>
-    <button class="sound-toggle post-modal-sound-toggle" type="button" hidden aria-pressed="false" aria-label="{{ site.data.locale.sound_mute | escape }}"
+    <button class="sound-toggle post-modal-sound-toggle" type="button" hidden data-muted="false" aria-label="{{ site.data.locale.sound_mute | escape }}"
             data-label-mute="{{ site.data.locale.sound_mute | escape }}" data-label-unmute="{{ site.data.locale.sound_unmute | escape }}">
       <span class="sound-on">{% include icon.html name='sound' %}</span>
       <span class="sound-off">{% include icon.html name='mute' %}</span>
     </button>
     <div class="visually-hidden" data-post-status aria-live="polite" aria-atomic="true"></div>
-    <div class="post-modal-loading" data-post-loading role="status" hidden>{{ site.data.locale.post_loading | escape }}</div>
+    <div class="post-modal-loading" data-post-loading aria-hidden="true" hidden>{{ site.data.locale.post_loading | escape }}</div>
     <article class="post-modal-body" tabindex="0" aria-label="{{ site.data.locale.post_content | escape }}"></article>
   </dialog>
   {% else %}

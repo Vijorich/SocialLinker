@@ -4,13 +4,13 @@ The whole session machine lives in `assets/post-modal.js`, loaded as an ES modul
 
 ## Interface
 
-`open(card)` / `swap(url, dir)` / `close()` / `popstate(state)` / `prefetch(url)`. Fetch, history, View Transitions, and event emission enter as injected adapters — that's what the tests fake.
+`open(card)` / `swap(url, dir)` / `close()` / `popstate(state)` / `prefetch(url)`. Fetch, history, View Transitions, and event emission enter as injected adapters; that's what the tests fake.
 
 ## Behaviour
 
 Fetches the post page, extracts `.post-article`, and fills the dialog. A cache miss opens a busy dialog immediately with a localized loading state and bounded fetch timeout; the loaded content gets a short scale/fade entrance that never uses the post card as a transition snapshot. Closing may use the shared-element View Transition back to the card. Prev/next swaps focus the new title, announce it through a live region, and slide in from the clicked side (WAAPI). All motion falls back to instant under reduced motion or when the platform API is unavailable.
 
-URL-synced: `pushState` on open, `replaceState` per swap, `popstate` closes/reopens. Refreshing with a modal URL lands on the standalone post page — the no-JS/direct-link fallback.
+URL-synced: `pushState` on open, `replaceState` per swap, `popstate` closes/reopens. Refreshing with a modal URL lands on the standalone post page; the no-JS/direct-link fallback.
 
 Prev/next nav lives inside `.post-article` (`_layouts/post.html`), so the modal copies it and intercepts its links.
 
@@ -23,4 +23,4 @@ Prev/next nav lives inside `.post-article` (`_layouts/post.html`), so the modal 
 
 ## Events
 
-Emits window events **`post-modal-open`** `{url, source: 'card'|'history'}` and **`post-modal-close`**. Consumers subscribe to these instead of observing the dialog — piano.js does for its swell/farewell (see [audio-piano.md](audio-piano.md)).
+Emits window events **`post-modal-open`** `{url, source: 'card'|'history'}` and **`post-modal-close`**. Consumers subscribe to these instead of observing the dialog; piano.js does for its swell/farewell (see [audio-piano.md](audio-piano.md)).

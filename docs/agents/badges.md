@@ -6,7 +6,7 @@ Standing rule: a revealed badge pins its card to the top of the list (stable in 
 
 ## Providers
 
-Providers are adapter rows in the exported `PROVIDERS` table — `feed(data)` plus a pure `check(text, cutoff, parser)`. Adding a provider = one row. Detection is fixture-tested in `tests/badges.test.mjs`.
+Providers are adapter rows in the exported `PROVIDERS` table: `feed(data)` plus a pure `check(text, cutoff, parser)`. Adding a provider = one row. Detection is fixture-tested in `tests/badges.test.mjs`.
 
 Sources are all keyless:
 

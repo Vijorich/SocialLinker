@@ -11,7 +11,7 @@ Dir['_data/*.yml'].sort.each do |path|
   end
 end
 
-required_locale = %w[nav_links nav_support nav_projects nav_posts posts_empty projects_empty not_found back_home badge_live badge_new post_newer post_older skip_to_links skip_to_content sound_mute sound_unmute close new_tab post_content post_loading post_navigation code_block social_empty donate_empty]
+required_locale = %w[nav_links nav_support nav_projects nav_posts posts_empty projects_empty not_found back_home badge_live badge_new post_newer post_older skip_to_content sound_mute sound_unmute motion_pause motion_play close new_tab post_content post_loading post_navigation code_block social_empty donate_empty]
 required_locale.each { |key| errors << "_data/locale.yml: missing #{key}" unless data.dig('locale', key) }
 
 known_sections = %w[hero bio projects socials donate articles]
@@ -32,6 +32,7 @@ safe_url.call(data.dig('profile', 'owner_url'), '_data/profile.yml: owner_url')
 safe_url.call(data.dig('profile', 'avatar'), '_data/profile.yml: avatar')
 %w[social donate projects].each do |file|
   Array(data.dig(file, 'items')).each_with_index do |item, index|
+    errors << "_data/#{file}.yml: item #{index} missing url" if item['url'].to_s.empty?
     safe_url.call(item['url'], "_data/#{file}.yml: item #{index} url")
     badge = item['badge']
     next unless badge

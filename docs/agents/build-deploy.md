@@ -11,18 +11,18 @@ Always pass `--baseurl ""`. `_config.yml` sets `baseurl: "/SocialLinker"` for th
 
 ## Windows
 
-Local Jekyll is broken here: `bundle exec jekyll` fails with `command not found: jekyll` even after `bundle install`. Don't burn time on it — run `npm test` (syntax + JS + Liquid parse) and a YAML parse, then let GitHub Pages do the real build.
+Local Jekyll is broken here: `bundle exec jekyll` fails with `command not found: jekyll` even after `bundle install`. Don't burn time on it; run `npm test` (syntax + JS + Liquid parse) and a YAML parse, then let GitHub Pages do the real build.
 
 ## Tests
 
-All syntax and JS suites run on plain node — `npm test`, no npm packages installed:
+All syntax and JS suites run on plain node with `npm test`, no npm packages installed:
 
-- `tests/piano.test.mjs` — piano/audio-engine
-- `tests/modal-history.test.mjs` — post-modal history sync
-- `tests/badges.test.mjs` — badge provider checks
-- `tests/silk.test.mjs` — Silk module import/fallback smoke check
-- `tests/static-regressions.test.mjs` — guard checks for layering, progressive fallback, permalink, and exclusions
-- `bundle exec ruby scripts/check-liquid.rb` — the same Liquid syntax check under the pinned bundle
+- `tests/piano.test.mjs`: piano/audio-engine
+- `tests/modal-history.test.mjs`: post-modal history sync
+- `tests/badges.test.mjs`: badge provider checks
+- `tests/silk.test.mjs`: Silk module import/fallback smoke check
+- `tests/static-regressions.test.mjs`: guard checks for layering, progressive fallback, permalink, and exclusions
+- `bundle exec ruby scripts/check-liquid.rb`: the same Liquid syntax check under the pinned bundle
 
 They import the asset modules directly and pass fakes across their seams.
 
