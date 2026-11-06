@@ -298,18 +298,6 @@ strong, b { font-weight: 700; }
   100% { transform: translateY(0); }
 }
 
-/* Donate glare leans toward the live spark. */
-@media (prefers-reduced-motion: no-preference) {
-  .container:has(.hero .avatar.live) .donate-list .link-card::after {
-    animation: donate-lean 1s ease-out 0.9s;
-  }
-}
-@keyframes donate-lean {
-  0%   { transform: translateX(0); opacity: 0; }
-  35%  { transform: translateX(6px); opacity: 0.3; }
-  100% { transform: translateX(0); opacity: 0; }
-}
-
 /* Avatar hover warmth: hover-gated; touch gets the press state instead. */
 @media (hover: hover) {
   .avatar { transition: border-color 0.9s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -547,30 +535,6 @@ strong, b { font-weight: 700; }
 .donate-list .link-card {
   background-color: var(--bg-donate);
   color: var(--gold);
-}
-/* Glare hover: champagne sweep at -30°; hover-gated, clipped by overflow. */
-.donate-list .link-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    -30deg,
-    hsla(0, 0%, 100%, 0) 60%,
-    rgba(255, 236, 190, 0.55) 70%,
-    hsla(0, 0%, 100%, 0) 100%
-  );
-  background-size: 300% 300%;
-  background-repeat: no-repeat;
-  background-position: -100% -100%;
-  opacity: 0;
-  transition: background-position 800ms ease, opacity 250ms ease;
-  pointer-events: none;
-}
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .donate-list .link-card:hover::after {
-    opacity: 1;
-    background-position: 100% 100%;
-  }
 }
 /* Donate title takes the spotlight: gold over the usual Ash Rose (One Spotlight Rule).
    ponytail: :has() targets the section owning the donate list; unsupported = title stays Ash Rose. */
